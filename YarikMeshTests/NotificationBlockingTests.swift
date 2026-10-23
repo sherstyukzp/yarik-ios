@@ -1,6 +1,6 @@
 //
 // NotificationBlockingTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -80,8 +80,8 @@ struct NotificationBlockingTests {
 
     // MARK: - Message Blocking Tests
 
-    @Test("BitchatMessage with blocked sender is identified")
-    func bitchatMessage_blockedSenderIdentified() {
+    @Test("YarikMessage with blocked sender is identified")
+    func yarikMessage_blockedSenderIdentified() {
         let keychain = MockKeychain()
         let manager = MockIdentityManager(keychain)
 

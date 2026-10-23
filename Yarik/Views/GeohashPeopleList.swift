@@ -26,7 +26,7 @@ struct GeohashPeopleList: View {
         if peerListModel.geohashPeople.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 Text(Strings.noneNearby)
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .foregroundColor(palette.secondary)
                     .padding(.horizontal)
                     .padding(.top, 12)
@@ -56,14 +56,14 @@ struct GeohashPeopleList: View {
                         Image(systemName: icon)
                             // Size 10 to match the mesh rows' leading glyphs —
                             // both lists share the sidebar.
-                            .font(.bitchatSystem(size: 10))
+                            .font(.yarikSystem(size: 10))
                             .foregroundColor(rowColor)
                             .help(person.isTeleported ? Strings.teleported : Strings.nearby)
 
                         let (base, suffix) = person.displayName.splitSuffix()
                         HStack(spacing: 0) {
                             Text(base)
-                                .bitchatFont(size: 14)
+                                .yarikFont(size: 14)
                                 .fontWeight(person.isMe ? .bold : .regular)
                                 .foregroundColor(rowColor)
                                 .lineLimit(1)
@@ -71,18 +71,18 @@ struct GeohashPeopleList: View {
                             if !suffix.isEmpty {
                                 let suffixColor = person.isMe ? Color.orange.opacity(0.6) : rowColor.opacity(0.6)
                                 Text(suffix)
-                                    .bitchatFont(size: 14)
+                                    .yarikFont(size: 14)
                                     .foregroundColor(suffixColor)
                             }
                             if person.isMe {
                                 Text(Strings.youSuffix)
-                                    .bitchatFont(size: 14)
+                                    .yarikFont(size: 14)
                                     .foregroundColor(rowColor)
                             }
                         }
                         if person.isBlocked {
                             Image(systemName: "nosign")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.red)
                                 .help(Strings.blockedTooltip)
                         }

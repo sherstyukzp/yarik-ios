@@ -1,6 +1,6 @@
 //
 // PrivacyScreen.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -67,7 +67,7 @@ final class PrivacyScreen {
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         let label = UILabel()
-        label.text = "bitchat"
+        label.text = "yarik"
         label.font = .monospacedSystemFont(ofSize: 22, weight: .medium)
         label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false

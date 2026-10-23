@@ -1,6 +1,6 @@
 //
 // LocationNotesPool.swift
-// bitchat
+// yarik
 //
 // Refcounted pool of LocationNotesManager instances keyed by geohash, so
 // surfaces watching the same place (the nearby-notes counter and the notices

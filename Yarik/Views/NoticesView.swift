@@ -1,6 +1,6 @@
 //
 // NoticesView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -352,7 +352,7 @@ struct NoticesView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Text(verbatim: scopeTitle)
-                    .bitchatFont(size: 18)
+                    .yarikFont(size: 18)
                 Spacer()
                 SheetCloseButton { dismiss() }
                     .accessibilityLabel(Strings.closeHint)
@@ -364,7 +364,7 @@ struct NoticesView: View {
             .pickerStyle(.segmented)
             .accessibilityLabel(Strings.scopePicker)
             Text(tab == .geo ? Strings.geoDescription : Strings.meshDescription)
-                .bitchatFont(size: 12)
+                .yarikFont(size: 12)
                 .foregroundColor(palette.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -431,9 +431,9 @@ struct NoticesView: View {
             ) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(Strings.locationNotesTitle)
-                        .bitchatFont(size: 14)
+                        .yarikFont(size: 14)
                     Text(Strings.locationNotesDescription)
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -451,7 +451,7 @@ struct NoticesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 Text(Strings.locationUnavailable)
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .foregroundColor(palette.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Button(Strings.enableLocation) {
@@ -472,12 +472,12 @@ struct NoticesView: View {
             HStack(alignment: .top, spacing: 10) {
                 TextField(Strings.placeholder, text: $draft, axis: .vertical)
                     .textFieldStyle(.plain)
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .lineLimit(maxDraftLines, reservesSpace: true)
                     .padding(.vertical, 6)
                 Button(action: send) {
                     Image(systemName: "arrow.up.circle.fill")
-                        .font(.bitchatSystem(size: 20))
+                        .font(.yarikSystem(size: 20))
                         .foregroundColor(sendEnabled ? palette.accent : .secondary)
                 }
                 .padding(.top, 2)
@@ -491,7 +491,7 @@ struct NoticesView: View {
                 if tab == .mesh {
                     Toggle(isOn: $urgent) {
                         Text(Strings.urgentToggle)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(urgent ? palette.alertRed : palette.secondary)
                     }
                     .toggleStyle(.switch)
@@ -500,7 +500,7 @@ struct NoticesView: View {
                 }
                 Spacer()
                 Text(Strings.expiryLabel)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.secondary)
                 Picker(Strings.expiryLabel, selection: $expiryDays) {
                     // Mesh board posts must fade (the wire caps their
@@ -614,9 +614,9 @@ private struct NoticesList: View {
                         statusRows
                         if showEmptyState {
                             Text(Strings.emptyTitle)
-                                .bitchatFont(size: 13, weight: .semibold)
+                                .yarikFont(size: 13, weight: .semibold)
                             Text(Strings.emptySubtitle)
-                                .bitchatFont(size: 12)
+                                .yarikFont(size: 12)
                                 .foregroundColor(palette.secondary)
                         }
                     }
@@ -659,7 +659,7 @@ private struct NoticesList: View {
                 HStack(spacing: 10) {
                     ProgressView()
                     Text(Strings.loadingNotes)
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.secondary)
                     Spacer()
                 }
@@ -668,7 +668,7 @@ private struct NoticesList: View {
                 HStack(spacing: 10) {
                     ProgressView()
                     Text(Strings.connectingRelays)
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.secondary)
                     Spacer()
                 }
@@ -676,12 +676,12 @@ private struct NoticesList: View {
             } else if notesManager.state == .noRelays {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(Strings.noRelaysNearby)
-                        .bitchatFont(size: 13, weight: .semibold)
+                        .yarikFont(size: 13, weight: .semibold)
                     Text(Strings.relaysRetryHint)
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.secondary)
                     Button(Strings.retry) { notesManager.refresh() }
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .buttonStyle(.plain)
                 }
                 .padding(.bottom, 8)
@@ -689,13 +689,13 @@ private struct NoticesList: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                         Text(error)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                         Spacer()
                     }
                     Button(Strings.dismissError) { notesManager.clearError() }
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .buttonStyle(.plain)
                 }
                 .padding(.bottom, 8)
@@ -728,20 +728,20 @@ private struct NoticesList: View {
             HStack(spacing: 6) {
                 if item.isUrgent {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.bitchatSystem(size: 11))
+                        .font(.yarikSystem(size: 11))
                         .foregroundColor(palette.alertRed)
                     Text(Strings.urgentBadge)
-                        .bitchatFont(size: 11, weight: .semibold)
+                        .yarikFont(size: 11, weight: .semibold)
                         .foregroundColor(palette.alertRed)
                 }
                 Text(verbatim: "@\(item.author)")
-                    .bitchatFont(size: 12, weight: .semibold)
+                    .yarikFont(size: 12, weight: .semibold)
                 Text(Self.timestampText(for: item.createdAt))
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(palette.secondary)
                 if let expiresAt = item.expiresAt, expiresAt > Date() {
                     Text(Strings.fades(expiresAt))
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(palette.secondary.opacity(0.8))
                 }
                 Spacer()
@@ -753,7 +753,7 @@ private struct NoticesList: View {
                         delete(item)
                     } label: {
                         Image(systemName: "trash")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .foregroundColor(palette.secondary)
                     }
                     .buttonStyle(.plain)
@@ -761,7 +761,7 @@ private struct NoticesList: View {
                 }
             }
             Text(item.content)
-                .bitchatFont(size: 14)
+                .yarikFont(size: 14)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 4)
@@ -786,9 +786,9 @@ private struct NoticesList: View {
     private func sourceBadge(_ item: NoticeItem) -> some View {
         HStack(spacing: 3) {
             Image(systemName: item.isBoardPost ? "antenna.radiowaves.left.and.right" : "globe")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
             Text(item.isBoardPost ? Strings.meshSource : Strings.nostrSource)
-                .bitchatFont(size: 10)
+                .yarikFont(size: 10)
         }
         .foregroundColor(palette.secondary.opacity(0.8))
         .accessibilityLabel(item.isBoardPost ? Strings.meshSource : Strings.nostrSource)

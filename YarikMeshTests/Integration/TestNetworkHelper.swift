@@ -1,6 +1,6 @@
 //
 // TestNetworkHelper.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Extracted shared, mutable integration state for nodes and noise sessions.
 // Keeps test containers nonmutating (Swift Testing-friendly).
@@ -72,10 +72,10 @@ final class TestNetworkHelper {
             guard let self else { return }
             guard packet.ttl > 1 else { return }
             
-            if let message = BitchatMessage(packet.payload) {
+            if let message = YarikMessage(packet.payload) {
                 guard message.senderPeerID != node.peerID else { return }
                 
-                let relayMessage = BitchatMessage(
+                let relayMessage = YarikMessage(
                     id: message.id,
                     sender: message.sender,
                     content: message.content,
@@ -89,7 +89,7 @@ final class TestNetworkHelper {
                 )
                 
                 if let relayPayload = relayMessage.toBinaryPayload() {
-                    let relayPacket = BitchatPacket(
+                    let relayPacket = YarikPacket(
                         type: packet.type,
                         senderID: packet.senderID,
                         recipientID: packet.recipientID,

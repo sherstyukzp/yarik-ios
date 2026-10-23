@@ -1,6 +1,6 @@
 //
 // ChatVerificationCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatVerificationCoordinator` against a mock
 // `ChatVerificationContext` — proving the coordinator works without a
@@ -75,11 +75,11 @@ private final class MockChatVerificationContext: ChatVerificationContext {
     func notifyUIChanged() { notifyUIChangedCount += 1 }
 
     // Peers
-    var unifiedPeers: [BitchatPeer] = []
-    var unifiedFavorites: [BitchatPeer] = []
+    var unifiedPeers: [YarikPeer] = []
+    var unifiedFavorites: [YarikPeer] = []
     private(set) var stablePeerIDCache: [PeerID: PeerID] = [:]
 
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer? {
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer? {
         unifiedPeers.first { $0.peerID == peerID }
     }
 
@@ -206,7 +206,7 @@ struct ChatVerificationCoordinatorContextTests {
         #expect(!coordinator.beginQRVerification(with: qr))
 
         // Matching peer without an established session -> handshake first.
-        context.unifiedPeers = [BitchatPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")]
+        context.unifiedPeers = [YarikPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")]
         #expect(coordinator.beginQRVerification(with: qr))
         #expect(context.triggeredHandshakes == [peerID])
         #expect(context.sentChallenges.isEmpty)
@@ -217,7 +217,7 @@ struct ChatVerificationCoordinatorContextTests {
 
         // Fresh coordinator with an established session -> immediate challenge.
         let context2 = MockChatVerificationContext()
-        context2.unifiedPeers = [BitchatPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")]
+        context2.unifiedPeers = [YarikPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")]
         context2.establishedNoiseSessions = [peerID]
         let coordinator2 = ChatVerificationCoordinator(context: context2)
         #expect(coordinator2.beginQRVerification(with: qr))

@@ -112,8 +112,8 @@ struct BLEFileTransferPolicyTests {
         sender: PeerID,
         ttl: UInt8 = 3,
         recipientID: Data? = nil
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipientID,
@@ -125,7 +125,7 @@ struct BLEFileTransferPolicyTests {
     }
 
     private func makeFilePayload(mimeType: String?, content: Data) throws -> Data {
-        let packet = BitchatFilePacket(
+        let packet = YarikFilePacket(
             fileName: "sample",
             fileSize: UInt64(content.count),
             mimeType: mimeType,

@@ -1,6 +1,6 @@
 //
 // ConversationStore.swift
-// bitchat
+// yarik
 //
 // Single source of truth for conversation message state (see
 // docs/CONVERSATION-STORE-DESIGN.md). One `Conversation` object per
@@ -36,7 +36,7 @@ final class Conversation: ObservableObject, Identifiable {
     /// Maximum retained messages; oldest are trimmed on overflow.
     let cap: Int
 
-    @Published private(set) var messages: [BitchatMessage] = []
+    @Published private(set) var messages: [YarikMessage] = []
     @Published private(set) var isUnread: Bool = false
 
     /// Incrementally-maintained message-ID → logical-index map for O(1)
@@ -62,7 +62,7 @@ final class Conversation: ObservableObject, Identifiable {
         indexByMessageID[messageID] != nil
     }
 
-    func message(withID messageID: String) -> BitchatMessage? {
+    func message(withID messageID: String) -> YarikMessage? {
         guard let index = physicalIndex(forMessageID: messageID) else { return nil }
         return messages[index]
     }
@@ -94,7 +94,7 @@ final class Conversation: ObservableObject, Identifiable {
     /// otherwise a binary search finds the upper-bound insertion point so
     /// arrival order is preserved among equal timestamps.
     /// Reports `inserted: false` if a message with the same ID already exists.
-    fileprivate func insert(_ message: BitchatMessage) -> InsertResult {
+    fileprivate func insert(_ message: YarikMessage) -> InsertResult {
         guard indexByMessageID[message.id] == nil else { return .duplicate }
 
         if let last = messages.last, message.timestamp < last.timestamp {
@@ -112,7 +112,7 @@ final class Conversation: ObservableObject, Identifiable {
     /// Replace-or-append by message ID. An existing message keeps its
     /// timeline position (in-place updates like media progress reuse the
     /// original timestamp); a new message goes through ordered insertion.
-    fileprivate func upsert(_ message: BitchatMessage) -> UpsertOutcome {
+    fileprivate func upsert(_ message: YarikMessage) -> UpsertOutcome {
         if let index = physicalIndex(forMessageID: message.id) {
             messages[index] = message
             return .updated
@@ -132,14 +132,14 @@ final class Conversation: ObservableObject, Identifiable {
         guard !Self.shouldSkipStatusUpdate(current: message.deliveryStatus, new: status) else { return false }
 
         message.deliveryStatus = status
-        // BitchatMessage is a reference type; write back through the
+        // YarikMessage is a reference type; write back through the
         // subscript so the @Published wrapper emits.
         messages[index] = message
         return true
     }
 
     /// Republishes a message without changing state. Used for mirrored
-    /// copies that share a BitchatMessage instance: the first conversation's
+    /// copies that share a YarikMessage instance: the first conversation's
     /// status apply mutated the shared object, so this conversation's
     /// observers still need an @Published emission to re-render.
     @discardableResult
@@ -158,7 +158,7 @@ final class Conversation: ObservableObject, Identifiable {
 
     /// Removes a single message by ID. Returns the removed message, or
     /// `nil` when no message with that ID exists.
-    fileprivate func remove(messageID: String) -> BitchatMessage? {
+    fileprivate func remove(messageID: String) -> YarikMessage? {
         guard let index = physicalIndex(forMessageID: messageID) else { return nil }
         let removed = messages.remove(at: index)
         indexByMessageID.removeValue(forKey: messageID)
@@ -172,7 +172,7 @@ final class Conversation: ObservableObject, Identifiable {
 
     /// Removes every message matching `predicate`. Returns the removed
     /// message IDs (empty when nothing matched).
-    fileprivate func removeAll(where predicate: (BitchatMessage) -> Bool) -> [String] {
+    fileprivate func removeAll(where predicate: (YarikMessage) -> Bool) -> [String] {
         var removedIDs: [String] = []
         messages.removeAll { message in
             guard predicate(message) else { return false }
@@ -313,7 +313,7 @@ final class Conversation: ObservableObject, Identifiable {
 /// without subscribing to whole message arrays. Emitted on the store's
 /// `changes` subject AFTER the corresponding state is consistent.
 enum ConversationChange {
-    case appended(ConversationID, BitchatMessage)
+    case appended(ConversationID, YarikMessage)
     case updated(ConversationID, messageID: String)
     case statusChanged(ConversationID, messageID: String, DeliveryStatus)
     case messageRemoved(ConversationID, messageID: String)
@@ -393,7 +393,7 @@ final class ConversationStore: ObservableObject {
     /// Appends a message in timestamp order. Returns `false` (and emits
     /// nothing) if a message with the same ID is already present.
     @discardableResult
-    func append(_ message: BitchatMessage, to id: ConversationID) -> Bool {
+    func append(_ message: YarikMessage, to id: ConversationID) -> Bool {
         let conversation = conversation(for: id)
         let result = conversation.insert(message)
         guard result.inserted else { return false }
@@ -404,7 +404,7 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Replace-or-append by message ID (media progress, edits).
-    func upsertByID(_ message: BitchatMessage, in id: ConversationID) {
+    func upsertByID(_ message: YarikMessage, in id: ConversationID) {
         let conversation = conversation(for: id)
         switch conversation.upsert(message) {
         case .appended(let trimmedMessageIDs):
@@ -435,7 +435,7 @@ final class ConversationStore: ObservableObject {
     /// when the message is unknown or no copy changed (equal status or
     /// downgrade — read beats delivered beats sent).
     ///
-    /// `BitchatMessage` is a reference type, so mirrored copies sharing one
+    /// `YarikMessage` is a reference type, so mirrored copies sharing one
     /// instance are mutated by the first conversation's apply. The skipped
     /// conversations still hold the changed message, so they get an explicit
     /// republish and `.statusChanged` event - otherwise a view observing the
@@ -626,7 +626,7 @@ final class ConversationStore: ObservableObject {
     /// removed message, or `nil` (emitting nothing) when the conversation or
     /// message is unknown.
     @discardableResult
-    func removeMessage(withID messageID: String, from id: ConversationID) -> BitchatMessage? {
+    func removeMessage(withID messageID: String, from id: ConversationID) -> YarikMessage? {
         guard let conversation = conversationsByID[id],
               let removed = conversation.remove(messageID: messageID) else {
             return nil
@@ -639,7 +639,7 @@ final class ConversationStore: ObservableObject {
     /// Removes every message matching `predicate` from a conversation,
     /// emitting one `.messageRemoved` per removed message after the
     /// conversation is consistent. No-op for unknown conversations.
-    func removeMessages(from id: ConversationID, where predicate: (BitchatMessage) -> Bool) {
+    func removeMessages(from id: ConversationID, where predicate: (YarikMessage) -> Bool) {
         guard let conversation = conversationsByID[id] else { return }
         let removedIDs = conversation.removeAll(where: predicate)
         unregisterMessageIDs(removedIDs, from: id)
@@ -825,8 +825,8 @@ extension ConversationStore {
     /// shape `ChatViewModel.privateChats` exposes to the coordinators.
     /// Values are the conversations' backing arrays (COW), so building this
     /// is O(#conversations), not O(#messages).
-    func directMessagesByRoutingPeerID() -> [PeerID: [BitchatMessage]] {
-        var messagesByPeerID: [PeerID: [BitchatMessage]] = [:]
+    func directMessagesByRoutingPeerID() -> [PeerID: [YarikMessage]] {
+        var messagesByPeerID: [PeerID: [YarikMessage]] = [:]
         messagesByPeerID.reserveCapacity(conversationsByID.count)
         for (id, conversation) in conversationsByID {
             guard case .direct(let handle) = id else { continue }
@@ -933,7 +933,7 @@ extension ConversationStore {
 
     /// Appends past the conversation cap, bypassing trim (map kept exact so
     /// only the cap invariant is violated).
-    func _testAppendBypassingCap(_ message: BitchatMessage, to id: ConversationID) {
+    func _testAppendBypassingCap(_ message: YarikMessage, to id: ConversationID) {
         let conversation = conversation(for: id)
         conversation._testAppendBypassingTrim(message)
         conversationIDsByMessageID[message.id, default: []].insert(id)
@@ -951,7 +951,7 @@ extension ConversationStore {
 }
 
 extension Conversation {
-    fileprivate func _testAppendBypassingTrim(_ message: BitchatMessage) {
+    fileprivate func _testAppendBypassingTrim(_ message: YarikMessage) {
         messages.append(message)
         indexByMessageID[message.id] = indexOffset + messages.count - 1
     }
@@ -964,7 +964,7 @@ extension ConversationStore {
     /// Removes a message by ID from whichever public (mesh/geohash)
     /// conversation contains it. Returns the removed message, if any.
     @discardableResult
-    func removePublicMessage(withID messageID: String) -> BitchatMessage? {
+    func removePublicMessage(withID messageID: String) -> YarikMessage? {
         for id in conversationIDs(forMessageID: messageID) {
             switch id {
             case .mesh, .geohash:

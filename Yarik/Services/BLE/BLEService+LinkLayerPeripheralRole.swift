@@ -1,6 +1,6 @@
 //
 // BLEService+LinkLayerPeripheralRole.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -305,7 +305,7 @@ extension BLEService: CBPeripheralManagerDelegate {
         SecureLogger.error("❌ Failed to decode packet from central (len=\(raw.count), prefix=\(prefix))", category: .session)
     }
 
-    private func processDecodedCentralWrite(_ packet: BitchatPacket, centralUUID: String, central: CBCentral) {
+    private func processDecodedCentralWrite(_ packet: YarikPacket, centralUUID: String, central: CBCentral) {
         // bleQueue: physical bookkeeping only. A writer is a live central
         // whether or not it subscribed; track it so directed replies and
         // the fanout planner can reach it.

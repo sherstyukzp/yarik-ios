@@ -18,7 +18,7 @@ struct BLEFragmentHeader: Equatable {
         String(format: "%016llx", key.id)
     }
 
-    init?(packet: BitchatPacket) {
+    init?(packet: YarikPacket) {
         // Minimum header: 8 bytes ID + 2 index + 2 total + 1 type.
         guard packet.payload.count >= 13 else { return nil }
 

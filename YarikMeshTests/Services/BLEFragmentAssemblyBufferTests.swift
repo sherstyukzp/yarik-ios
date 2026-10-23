@@ -370,8 +370,8 @@ struct BLEFragmentAssemblyBufferTests {
         #expect(stalled.isEmpty)
     }
 
-    private func makePacket(payload: Data, timestamp: UInt64 = 0x0102030405) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(payload: Data, timestamp: UInt64 = 0x0102030405) -> YarikPacket {
+        YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]),
             recipientID: nil,
@@ -390,7 +390,7 @@ struct BLEFragmentAssemblyBufferTests {
         })
     }
 
-    private func makeFragments(for packet: BitchatPacket, chunkSize: Int, fragmentID: Data) throws -> [BitchatPacket] {
+    private func makeFragments(for packet: YarikPacket, chunkSize: Int, fragmentID: Data) throws -> [YarikPacket] {
         let fullData = try #require(packet.toBinaryData(padding: false))
         let chunks = stride(from: 0, to: fullData.count, by: chunkSize).map { offset in
             Data(fullData[offset..<min(offset + chunkSize, fullData.count)])
@@ -419,7 +419,7 @@ struct BLEFragmentAssemblyBufferTests {
         senderID: Data = Data([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]),
         recipientID: Data? = nil,
         timestamp: UInt64 = 0x0102030405
-    ) -> BitchatPacket {
+    ) -> YarikPacket {
         var payload = Data()
         payload.append(fragmentID)
         payload.append(contentsOf: withUnsafeBytes(of: UInt16(index).bigEndian) { Data($0) })
@@ -427,7 +427,7 @@ struct BLEFragmentAssemblyBufferTests {
         payload.append(originalType)
         payload.append(fragmentData)
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: senderID,
             recipientID: recipientID,

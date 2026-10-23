@@ -1,6 +1,6 @@
 //
 // BLEService+LinkLayerCentralRole.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -250,7 +250,7 @@ extension BLEService: CBPeripheralDelegate {
         }
         
         guard let service = services.first(where: { $0.uuid == BLEService.serviceUUID }) else {
-            // Not a BitChat peer - disconnect
+            // Not a Yarik peer - disconnect
             centralManager?.cancelPeripheralConnection(peripheral)
             return
         }
@@ -389,7 +389,7 @@ extension BLEService: CBPeripheralDelegate {
         guard !isPanicSuspended else { return }
         SecureLogger.warning("⚠️ Services modified for \(peripheral.name ?? peripheral.identifier.uuidString)", category: .session)
 
-        let shouldRediscover = BLEService.shouldRediscoverBitChatService(
+        let shouldRediscover = BLEService.shouldRediscoverYarikService(
             invalidatedServiceUUIDs: invalidatedServices.map(\.uuid),
             cachedServiceUUIDs: peripheral.services?.map(\.uuid)
         )
@@ -402,7 +402,7 @@ extension BLEService: CBPeripheralDelegate {
             $0.assembler = NotificationStreamAssembler()
         }
 
-        SecureLogger.debug("🔄 BitChat service changed for \(peripheral.name ?? peripheral.identifier.uuidString), rediscovering", category: .session)
+        SecureLogger.debug("🔄 Yarik service changed for \(peripheral.name ?? peripheral.identifier.uuidString), rediscovering", category: .session)
         peripheral.discoverServices([BLEService.serviceUUID])
     }
     
@@ -424,7 +424,7 @@ extension BLEService: CBPeripheralDelegate {
 }
 
 extension BLEService {
-    static func shouldRediscoverBitChatService(
+    static func shouldRediscoverYarikService(
         invalidatedServiceUUIDs: [CBUUID],
         cachedServiceUUIDs: [CBUUID]?
     ) -> Bool {

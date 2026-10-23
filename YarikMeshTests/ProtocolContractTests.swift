@@ -5,8 +5,8 @@ import CoreBluetooth
 import BitFoundation
 @testable import YarikMesh
 
-private final class DefaultDelegateProbe: BitchatDelegate {
-    func didReceiveMessage(_ message: BitchatMessage) {}
+private final class DefaultDelegateProbe: YarikDelegate {
+    func didReceiveMessage(_ message: YarikMessage) {}
     func didConnectToPeer(_ peerID: PeerID) {}
     func didDisconnectFromPeer(_ peerID: PeerID) {}
     func didUpdatePeerList(_ peers: [PeerID]) {}
@@ -14,7 +14,7 @@ private final class DefaultDelegateProbe: BitchatDelegate {
 }
 
 private final class DefaultTransportProbe: Transport {
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     weak var eventDelegate: TransportEventDelegate?
     weak var peerEventsDelegate: TransportPeerEventsDelegate?
 
@@ -102,7 +102,7 @@ struct ProtocolContractTests {
 
     @Test
     func previewMessage_exposesStableSampleShape() {
-        let preview = BitchatMessage.preview
+        let preview = YarikMessage.preview
 
         #expect(preview.sender == "John Doe")
         #expect(preview.content == "Hello")

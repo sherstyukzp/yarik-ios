@@ -1,6 +1,6 @@
 //
 // BoardPackets.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -34,8 +34,8 @@ enum BoardWireConstants {
     static let geohashMaxLength = 12
     /// Posts may live at most 7 days past their creation timestamp.
     static let maxLifetimeMs: UInt64 = 7 * 24 * 60 * 60 * 1000
-    static let postSigningContext = "bitchat-board-v1"
-    static let tombstoneSigningContext = "bitchat-board-del-v1"
+    static let postSigningContext = "yarik-board-v1"
+    static let tombstoneSigningContext = "yarik-board-del-v1"
     static let geohashAlphabet = Set("0123456789bcdefghjkmnpqrstuvwxyz")
 }
 

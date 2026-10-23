@@ -1,6 +1,6 @@
 {
   "_comment": [
-    "Golden vectors for the bitchat courier wire format. Generated from the iOS",
+    "Golden vectors for the yarik courier wire format. Generated from the iOS",
     "implementation and asserted by CourierVectorTests in the BitFoundation test",
     "target, so these cannot drift from the code without a test failing.",
     "All hex is lowercase. All multi-byte integers are big-endian.",

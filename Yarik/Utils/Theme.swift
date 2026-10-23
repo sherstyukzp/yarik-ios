@@ -1,6 +1,6 @@
 //
 // Theme.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -151,7 +151,7 @@ struct ThemedPalette: DynamicProperty {
 
 // MARK: - Themed view helpers
 
-/// Themed replacement for `.font(.bitchatSystem(size:weight:design: .monospaced))`:
+/// Themed replacement for `.font(.yarikSystem(size:weight:design: .monospaced))`:
 /// monospaced under matrix, system default under liquid glass.
 private struct ThemedFontModifier: ViewModifier {
     @Environment(\.appTheme) private var theme
@@ -159,7 +159,7 @@ private struct ThemedFontModifier: ViewModifier {
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.bitchatSystem(size: size, weight: weight, design: theme.bodyFontDesign))
+        content.font(.yarikSystem(size: size, weight: weight, design: theme.bodyFontDesign))
     }
 }
 
@@ -272,7 +272,7 @@ private struct ThemedInputBackgroundModifier: ViewModifier {
 }
 
 extension View {
-    func bitchatFont(size: CGFloat, weight: Font.Weight = .regular) -> some View {
+    func yarikFont(size: CGFloat, weight: Font.Weight = .regular) -> some View {
         modifier(ThemedFontModifier(size: size, weight: weight))
     }
 

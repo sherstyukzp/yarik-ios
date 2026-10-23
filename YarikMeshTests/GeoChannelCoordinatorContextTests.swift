@@ -1,6 +1,6 @@
 //
 // GeoChannelCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `GeoChannelCoordinator` against a mock `GeoChannelContext` —
 // proving the coordinator works without a `ChatViewModel`, following the

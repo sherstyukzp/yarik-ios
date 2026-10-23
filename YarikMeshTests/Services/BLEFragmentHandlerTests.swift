@@ -9,10 +9,10 @@ struct BLEFragmentHandlerTests {
         var appendResult: ((BLEFragmentHeader) -> BLEFragmentAssemblyBuffer.AppendResult)?
         var accepted = true
 
-        var trackedPackets: [BitchatPacket] = []
+        var trackedPackets: [YarikPacket] = []
         var appendedHeaders: [BLEFragmentHeader] = []
-        var ingressChecks: [(packet: BitchatPacket, innerSender: PeerID)] = []
-        var reinjectedPackets: [(packet: BitchatPacket, from: PeerID)] = []
+        var ingressChecks: [(packet: YarikPacket, innerSender: PeerID)] = []
+        var reinjectedPackets: [(packet: YarikPacket, from: PeerID)] = []
     }
 
     private let localPeerID = PeerID(str: "0102030405060708")
@@ -59,7 +59,7 @@ struct BLEFragmentHandlerTests {
     func malformedFragmentPayloadIsIgnored() {
         let recorder = Recorder()
         let handler = makeHandler(recorder: recorder)
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: Data(hexString: remotePeerID.id) ?? Data(),
             recipientID: nil,
@@ -114,7 +114,7 @@ struct BLEFragmentHandlerTests {
     @Test
     func completedReassemblyReinjectsAcceptedPacketWithZeroTTL() throws {
         let innerSender = PeerID(str: "99AABBCCDDEEFF00")
-        let innerPacket = BitchatPacket(
+        let innerPacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: innerSender.id) ?? Data(),
             recipientID: nil,
@@ -147,7 +147,7 @@ struct BLEFragmentHandlerTests {
 
     @Test
     func rejectedReassembledPacketIsNotReinjected() throws {
-        let innerPacket = BitchatPacket(
+        let innerPacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: "99AABBCCDDEEFF00") ?? Data(),
             recipientID: nil,
@@ -188,7 +188,7 @@ struct BLEFragmentHandlerTests {
             let handler = makeHandler(recorder: recorder)
 
             for payloadSize in [cap, cap + 1] {
-                let inner = BitchatPacket(
+                let inner = YarikPacket(
                     type: type.rawValue,
                     senderID: Data(hexString: "99AABBCCDDEEFF00") ?? Data(),
                     recipientID: nil,
@@ -212,7 +212,7 @@ struct BLEFragmentHandlerTests {
 
     @Test
     func reassembledPacketOfAnotherTypeThanItsFragmentsClaimIsDropped() throws {
-        let innerPacket = BitchatPacket(
+        let innerPacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: "99AABBCCDDEEFF00") ?? Data(),
             recipientID: nil,
@@ -282,7 +282,7 @@ struct BLEFragmentHandlerTests {
 
     /// Fragments `packet` with the real planner, then puts each fragment
     /// through the wire codec as a receiver would.
-    private func fragmentsAsReceived(_ packet: BitchatPacket) throws -> [BitchatPacket] {
+    private func fragmentsAsReceived(_ packet: YarikPacket) throws -> [YarikPacket] {
         let request = BLEOutboundFragmentTransferRequest(
             packet: packet,
             pad: false,
@@ -315,7 +315,7 @@ struct BLEFragmentHandlerTests {
         originalType: UInt8 = MessageType.message.rawValue,
         chunk: Data = Data([0xAA, 0xBB]),
         recipientID: Data? = nil
-    ) -> BitchatPacket {
+    ) -> YarikPacket {
         var payload = Data()
         payload.append(contentsOf: [0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]) // fragment ID
         payload.append(UInt8(index >> 8))
@@ -325,7 +325,7 @@ struct BLEFragmentHandlerTests {
         payload.append(originalType)
         payload.append(chunk)
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipientID,

@@ -1,6 +1,6 @@
 //
 // BoardStoreTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -37,7 +37,7 @@ struct BoardStoreTests {
         content: String = "note",
         createdAt: UInt64,
         lifetimeMs: UInt64 = 24 * 60 * 60 * 1000
-    ) throws -> (wire: BoardWire, packet: BitchatPacket, post: BoardPostPacket) {
+    ) throws -> (wire: BoardWire, packet: YarikPacket, post: BoardPostPacket) {
         let postID = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
         let key = author.publicKey.rawRepresentation
         let expiresAt = createdAt + lifetimeMs
@@ -71,7 +71,7 @@ struct BoardStoreTests {
         author: Curve25519.Signing.PrivateKey,
         deletedAt: UInt64,
         claimKey: Data? = nil
-    ) throws -> (wire: BoardWire, packet: BitchatPacket) {
+    ) throws -> (wire: BoardWire, packet: YarikPacket) {
         let tombstone = BoardTombstonePacket(
             postID: post.postID,
             authorSigningKey: claimKey ?? author.publicKey.rawRepresentation,
@@ -82,8 +82,8 @@ struct BoardStoreTests {
         return (wire, makePacket(payload: wire.encode(), timestamp: deletedAt))
     }
 
-    private func makePacket(payload: Data, timestamp: UInt64) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(payload: Data, timestamp: UInt64) -> YarikPacket {
+        YarikPacket(
             type: MessageType.boardPost.rawValue,
             senderID: Data((0..<8).map { _ in UInt8.random(in: 0...255) }),
             recipientID: nil,
@@ -285,7 +285,7 @@ struct BoardStoreTests {
         let store = makeStore(clock: clock)
         let author = Curve25519.Signing.PrivateKey()
 
-        var unseenPosts: [(wire: BoardWire, packet: BitchatPacket, post: BoardPostPacket)] = []
+        var unseenPosts: [(wire: BoardWire, packet: YarikPacket, post: BoardPostPacket)] = []
         for index in 0..<(BoardStore.Limits.maxOrphanTombstonesPerAuthor + 1) {
             let entry = try makePost(author: author, createdAt: baseMs + UInt64(index))
             unseenPosts.append(entry)

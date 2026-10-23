@@ -14,10 +14,10 @@ import Foundation
 @MainActor
 protocol ChatPrivateConversationContext: AnyObject {
     // MARK: Conversation state
-    var privateChats: [PeerID: [BitchatMessage]] { get }
+    var privateChats: [PeerID: [YarikMessage]] { get }
     /// A single private chat's timeline. Witnessed by the store-direct
     /// lookup on `ChatViewModel` (no `privateChats` dictionary build).
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage]
+    func privateMessages(for peerID: PeerID) -> [YarikMessage]
     var sentReadReceipts: Set<String> { get }
     var selectedPrivateChatPeer: PeerID? { get }
     var nickname: String { get }
@@ -30,9 +30,9 @@ protocol ChatPrivateConversationContext: AnyObject {
     /// Appends a private message in timestamp order; returns `false` on
     /// duplicate message ID.
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool
     /// Replace-or-append a private message by ID, keeping its position.
-    func upsertPrivateMessage(_ message: BitchatMessage, in peerID: PeerID)
+    func upsertPrivateMessage(_ message: YarikMessage, in peerID: PeerID)
     /// Applies a delivery status by message ID; returns `false` when the
     /// message is unknown or the update would downgrade the status.
     @discardableResult
@@ -293,7 +293,7 @@ final class ChatPrivateConversationCoordinator {
             let canonicalMessages = context.privateMessages(for: targetPeerID)
             for message in canonicalMessages where message.senderPeerID == sourcePeerID {
                 context.upsertPrivateMessage(
-                    BitchatMessage(
+                    YarikMessage(
                         id: message.id,
                         sender: message.sender,
                         content: message.content,
@@ -355,7 +355,7 @@ final class ChatPrivateConversationCoordinator {
             ?? "anon"
 
         let messageID = UUID().uuidString
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: context.nickname,
             content: content,
@@ -406,7 +406,7 @@ final class ChatPrivateConversationCoordinator {
         }
 
         let messageID = UUID().uuidString
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: context.nickname,
             content: content,
@@ -536,7 +536,7 @@ final class ChatPrivateConversationCoordinator {
 
         if context.privateChatsContainMessage(withID: messageId) { return }
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageId,
             sender: senderName,
             content: pm.content,
@@ -647,7 +647,7 @@ final class ChatPrivateConversationCoordinator {
         context.sendGeohashReadReceipt(messageId, toRecipientHex: senderPubKey, from: id)
     }
 
-    func handlePrivateMessage(_ message: BitchatMessage) {
+    func handlePrivateMessage(_ message: YarikMessage) {
         SecureLogger.debug("📥 handlePrivateMessage called for message from \(message.sender)", category: .session)
         let senderPeerID = message.senderPeerID ?? context.getPeerIDForNickname(message.sender)
 
@@ -710,13 +710,13 @@ final class ChatPrivateConversationCoordinator {
         context.privateChatsContainMessage(withID: messageId)
     }
 
-    func addMessageToPrivateChatsIfNeeded(_ message: BitchatMessage, targetPeerID: PeerID) {
+    func addMessageToPrivateChatsIfNeeded(_ message: YarikMessage, targetPeerID: PeerID) {
         // Store upsert replaces in place by message ID or inserts in
         // timestamp order; the old per-append sanitize re-sort is obsolete.
         context.upsertPrivateMessage(message, in: targetPeerID)
     }
 
-    func mirrorToEphemeralIfNeeded(_ message: BitchatMessage, targetPeerID: PeerID, key: Data?) {
+    func mirrorToEphemeralIfNeeded(_ message: YarikMessage, targetPeerID: PeerID, key: Data?) {
         guard let key,
               let ephemeralPeerID = context.ephemeralPeerID(forNoiseKey: key),
               ephemeralPeerID != targetPeerID
@@ -728,7 +728,7 @@ final class ChatPrivateConversationCoordinator {
     }
 
     func handleViewingThisChat(
-        _ message: BitchatMessage,
+        _ message: YarikMessage,
         targetPeerID: PeerID,
         key: Data?,
         senderPubkey: String
@@ -820,7 +820,7 @@ final class ChatPrivateConversationCoordinator {
         }
     }
 
-    func processActionMessage(_ message: BitchatMessage) -> BitchatMessage {
+    func processActionMessage(_ message: YarikMessage) -> YarikMessage {
         let isActionMessage = message.content.hasPrefix("* ")
             && message.content.hasSuffix(" *")
             && (message.content.contains("🫂")
@@ -829,7 +829,7 @@ final class ChatPrivateConversationCoordinator {
 
         guard isActionMessage else { return message }
 
-        return BitchatMessage(
+        return YarikMessage(
             id: message.id,
             sender: "system",
             content: String(message.content.dropFirst(2).dropLast(2)),
@@ -852,7 +852,7 @@ final class ChatPrivateConversationCoordinator {
             // `migrateConversation` intent; partially-migrated chats keep
             // their non-recent tail, so the recent messages are copied in
             // via ordered append (dedup by ID) instead.
-            var partiallyMigratedMessages: [BitchatMessage] = []
+            var partiallyMigratedMessages: [YarikMessage] = []
             var oldPeerIDsToRemove: [PeerID] = []
             var didMigrate = false
             let cutoffTime = Date().addingTimeInterval(-TransportConfig.uiMigrationCutoffSeconds)
@@ -925,7 +925,7 @@ final class ChatPrivateConversationCoordinator {
         }
     }
 
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool {
+    func isMessageBlocked(_ message: YarikMessage) -> Bool {
         if let peerID = message.senderPeerID ?? context.getPeerIDForNickname(message.sender) {
             if context.isPeerBlocked(peerID) { return true }
             if peerID.isGeoChat || peerID.isGeoDM,
@@ -941,7 +941,7 @@ final class ChatPrivateConversationCoordinator {
 /// Default for conforming test contexts that model chats as a dictionary;
 /// `ChatViewModel` overrides with a store-direct lookup.
 extension ChatPrivateConversationContext {
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         privateChats[peerID] ?? []
     }
 }

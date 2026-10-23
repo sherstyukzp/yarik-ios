@@ -1,6 +1,6 @@
 //
 // IdentityModels.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -9,11 +9,11 @@
 ///
 /// # IdentityModels
 ///
-/// Defines BitChat's innovative three-layer identity model that balances
+/// Defines Yarik's innovative three-layer identity model that balances
 /// privacy, security, and usability in a decentralized mesh network.
 ///
 /// ## Overview
-/// BitChat's identity system separates concerns across three distinct layers:
+/// Yarik's identity system separates concerns across three distinct layers:
 /// 1. **Network Identity**: the 8-byte peer ID seen on air
 /// 2. **Cryptographic Identity**: Long-term Noise static keys for security
 /// 3. **Social Identity**: assigned names and trust relationships

@@ -1,6 +1,6 @@
 //
 // ImagePreviewView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -48,7 +48,7 @@ struct ImagePreviewView: View {
                 HStack {
                     Button(action: { dismiss() }) {
                         Text("close", comment: "Button to dismiss fullscreen media viewer")
-                            .font(.bitchatSystem(size: 15, weight: .semibold))
+                            .font(.yarikSystem(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -57,7 +57,7 @@ struct ImagePreviewView: View {
                     Spacer()
                     Button(action: saveCopy) {
                         Text("save", comment: "Button to save media to device")
-                            .font(.bitchatSystem(size: 15, weight: .semibold))
+                            .font(.yarikSystem(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)

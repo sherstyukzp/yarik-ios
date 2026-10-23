@@ -1,6 +1,6 @@
 //
 // NoiseEncryptionService.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -10,7 +10,7 @@
 /// # NoiseEncryptionService
 ///
 /// High-level encryption service that manages Noise Protocol sessions for secure
-/// peer-to-peer communication in BitChat. Acts as the bridge between the transport
+/// peer-to-peer communication in Yarik. Acts as the bridge between the transport
 /// layer (BLEService) and the cryptographic layer (NoiseProtocol).
 ///
 /// ## Overview
@@ -146,7 +146,7 @@ enum EncryptionStatus: Equatable {
 
 // MARK: - Noise Encryption Service
 
-/// Manages end-to-end encryption for BitChat using the Noise Protocol Framework.
+/// Manages end-to-end encryption for Yarik using the Noise Protocol Framework.
 /// Provides a high-level API for establishing secure channels between peers,
 /// handling all cryptographic operations transparently.
 /// - Important: This service maintains the device's cryptographic identity
@@ -435,7 +435,7 @@ final class NoiseEncryptionService {
 
     /// Domain separation for courier envelopes so X-pattern transcripts can
     /// never be confused with interactive XX handshakes.
-    private static let courierPrologue = Data("bitchat-courier-v1".utf8)
+    private static let courierPrologue = Data("yarik-courier-v1".utf8)
 
     /// Encrypt a payload to a peer's known static key without an interactive
     /// handshake (Noise X pattern). Used for store-and-forward envelopes
@@ -480,7 +480,7 @@ final class NoiseEncryptionService {
     /// interactive XX transcripts and static-sealed courier envelopes, and
     /// bound to the specific prekey ID so a ciphertext cannot be replayed
     /// against a different prekey.
-    private static let prekeyProloguePrefix = Data("bitchat-prekey-v1".utf8)
+    private static let prekeyProloguePrefix = Data("yarik-prekey-v1".utf8)
 
     private static func prekeyPrologue(for prekeyID: UInt32) -> Data {
         var prologue = prekeyProloguePrefix
@@ -630,7 +630,7 @@ final class NoiseEncryptionService {
     private func canonicalAnnounceBytes(peerID: Data, noiseKey: Data, ed25519Key: Data, nickname: String, timestampMs: UInt64) -> Data {
         var out = Data()
         // context
-        let context = Data("bitchat-announce-v1".utf8)
+        let context = Data("yarik-announce-v1".utf8)
         out.append(UInt8(min(context.count, 255)))
         out.append(context.prefix(255))
         // peerID (expect 8 bytes; pad/truncate to 8 for canonicalization)
@@ -657,8 +657,8 @@ final class NoiseEncryptionService {
     
     // MARK: - Packet Signing/Verification
     
-    /// Sign a BitchatPacket using the noise private key
-    func signPacket(_ packet: BitchatPacket) -> BitchatPacket? {
+    /// Sign a YarikPacket using the noise private key
+    func signPacket(_ packet: YarikPacket) -> YarikPacket? {
         // Create canonical packet bytes for signing
         guard let packetData = packet.toBinaryDataForSigning() else {
             return nil
@@ -675,8 +675,8 @@ final class NoiseEncryptionService {
         return signedPacket
     }
     
-    /// Verify a BitchatPacket signature using the provided public key
-    func verifyPacketSignature(_ packet: BitchatPacket, publicKey: Data) -> Bool {
+    /// Verify a YarikPacket signature using the provided public key
+    func verifyPacketSignature(_ packet: YarikPacket, publicKey: Data) -> Bool {
         guard let signature = packet.signature else {
             return false
         }
@@ -890,7 +890,7 @@ final class NoiseEncryptionService {
 
     /// Encrypts a finalized private-media packet. Ordinary Noise application
     /// messages retain the 64 KiB ceiling; this purpose-specific path permits
-    /// the bounded `BitchatFilePacket` envelope and refuses every other typed
+    /// the bounded `YarikFilePacket` envelope and refuses every other typed
     /// payload so the larger allocation budget cannot become a generic bypass.
     func encryptPrivateFilePayload(
         _ data: Data,
@@ -1103,7 +1103,7 @@ final class NoiseEncryptionService {
 // MARK: - Protocol Message Types for Noise
 
 /// Message types for the Noise encryption protocol layer.
-/// These types wrap the underlying BitChat protocol messages with encryption metadata.
+/// These types wrap the underlying Yarik protocol messages with encryption metadata.
 enum NoiseMessageType: UInt8 {
     case handshakeInitiation = 0x10
     case handshakeResponse = 0x11

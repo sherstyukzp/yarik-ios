@@ -1,8 +1,8 @@
 //
 // NostrProtocolTests.swift
-// bitchatTests
+// YarikMeshTests
 //
-// Tests for BitChat's proprietary private-envelope transport over Nostr.
+// Tests for Yarik's proprietary private-envelope transport over Nostr.
 //
 
 import Testing
@@ -253,7 +253,7 @@ struct NostrProtocolTests {
         let recipient = try NostrIdentity.generate()
         let wrapper = try NostrIdentity.generate()
         // A valid NIP-44 v2 payload from the official test vectors. Its wire
-        // format starts with a version byte in standard Base64, not BitChat's
+        // format starts with a version byte in standard Base64, not Yarik's
         // historical `v2:` prefix.
         let standardPayload = "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABee0G5VSK0/9YypIObAtDKfYEAjD35uVkHyB0F4DwrcNaCXlCWZKaArsGrY6M9wnuTMxWfp1RTN9Xga8no+kF5Vsb"
         let event = NostrEvent(
@@ -343,7 +343,7 @@ struct NostrProtocolTests {
         let messageID = "TEST-MSG-DELIVERED-1"
 
         let embedded = try #require(
-            NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(type: .delivered, messageID: messageID),
+            NostrEmbeddedYarik.encodeAckForNostrNoRecipient(type: .delivered, messageID: messageID),
             "Failed to embed delivered ack"
         )
 
@@ -366,11 +366,11 @@ struct NostrProtocolTests {
         // Verify sender is correct
         #expect(senderPubkey == sender.publicKeyHex)
 
-        // Parse BitChat payload
+        // Parse Yarik payload
         #expect(content.hasPrefix("bitchat1:"))
         let base64url = String(content.dropFirst("bitchat1:".count))
         let packetData = try #require(Self.base64URLDecode(base64url))
-        let packet = try #require(BitchatPacket.from(packetData), "Failed to decode bitchat packet")
+        let packet = try #require(YarikPacket.from(packetData), "Failed to decode yarik packet")
         
         #expect(packet.type == MessageType.noiseEncrypted.rawValue)
         let payload = try #require(NoisePayload.decode(packet.payload), "Failed to decode NoisePayload")
@@ -391,7 +391,7 @@ struct NostrProtocolTests {
         
         let messageID = "TEST-MSG-READ-1"
         let embedded = try #require(
-            NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(type: .readReceipt, messageID: messageID),
+            NostrEmbeddedYarik.encodeAckForNostrNoRecipient(type: .readReceipt, messageID: messageID),
             "Failed to embed read ack"
         )
 
@@ -412,7 +412,7 @@ struct NostrProtocolTests {
         #expect(content.hasPrefix("bitchat1:"))
         let base64url = String(content.dropFirst("bitchat1:".count))
         let packetData = try #require(Self.base64URLDecode(base64url))
-        let packet = try #require(BitchatPacket.from(packetData), "Failed to decode bitchat packet")
+        let packet = try #require(YarikPacket.from(packetData), "Failed to decode yarik packet")
         
         #expect(packet.type == MessageType.noiseEncrypted.rawValue)
         let payload = try #require(NoisePayload.decode(packet.payload), "Failed to decode NoisePayload")

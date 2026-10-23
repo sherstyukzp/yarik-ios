@@ -1,10 +1,10 @@
 import Foundation
 import BitFoundation
 
-// MARK: - BitChat-over-Nostr Adapter
+// MARK: - Yarik-over-Nostr Adapter
 
-struct NostrEmbeddedBitChat {
-    /// Build a `bitchat1:` base64url-encoded BitChat packet carrying a private message for Nostr DMs.
+struct NostrEmbeddedYarik {
+    /// Build a `bitchat1:` base64url-encoded Yarik packet carrying a private message for Nostr DMs.
     static func encodePMForNostr(content: String, messageID: String, recipientPeerID: PeerID, senderPeerID: PeerID) -> String? {
         // TLV-encode the private message
         let pm = PrivateMessagePacket(messageID: messageID, content: content)
@@ -17,7 +17,7 @@ struct NostrEmbeddedBitChat {
         // Determine 8-byte recipient ID to embed
         let recipientID = normalizeRecipientPeerID(recipientPeerID)
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: senderPeerID.id) ?? Data(),
             recipientID: Data(hexString: recipientID.id),
@@ -31,7 +31,7 @@ struct NostrEmbeddedBitChat {
         return "bitchat1:" + base64URLEncode(data)
     }
 
-    /// Build a `bitchat1:` base64url-encoded BitChat packet carrying a delivery/read ack for Nostr DMs.
+    /// Build a `bitchat1:` base64url-encoded Yarik packet carrying a delivery/read ack for Nostr DMs.
     static func encodeAckForNostr(type: NoisePayloadType, messageID: String, recipientPeerID: PeerID, senderPeerID: PeerID) -> String? {
         guard type == .delivered || type == .readReceipt else { return nil }
 
@@ -40,7 +40,7 @@ struct NostrEmbeddedBitChat {
 
         let recipientID = normalizeRecipientPeerID(recipientPeerID)
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: senderPeerID.id) ?? Data(),
             recipientID: Data(hexString: recipientID.id),
@@ -62,7 +62,7 @@ struct NostrEmbeddedBitChat {
         var payload = Data([type.rawValue])
         payload.append(Data(messageID.utf8))
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: unlinkableSenderID(),
             recipientID: nil,
@@ -85,7 +85,7 @@ struct NostrEmbeddedBitChat {
         var payload = Data([NoisePayloadType.privateMessage.rawValue])
         payload.append(tlv)
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: unlinkableSenderID(),
             recipientID: nil,

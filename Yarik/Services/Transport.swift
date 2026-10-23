@@ -66,7 +66,7 @@ struct MeshTopologySnapshot: Equatable {
 }
 
 enum TransportEvent: @unchecked Sendable {
-    case messageReceived(BitchatMessage)
+    case messageReceived(YarikMessage)
     case publicMessageReceived(peerID: PeerID, nickname: String, content: String, timestamp: Date, messageID: String?)
     case noisePayloadReceived(peerID: PeerID, type: NoisePayloadType, payload: Data, timestamp: Date)
     /// Encrypted group broadcast (MessageType 0x25). Opaque here — the group
@@ -126,13 +126,13 @@ protocol TransportEventDelegate: AnyObject {
 /// whether an inbound message was accepted.
 protocol SynchronousMessageTransportEventDelegate: TransportEventDelegate {
     @MainActor
-    func didReceiveTransportMessageSynchronously(_ message: BitchatMessage) -> Bool
+    func didReceiveTransportMessageSynchronously(_ message: YarikMessage) -> Bool
 }
 
 protocol Transport: AnyObject {
     // Event sink
-    var delegate: BitchatDelegate? { get set }
-    // Typed event sink for transport-domain events. Prefer this over BitchatDelegate for new code.
+    var delegate: YarikDelegate? { get set }
+    // Typed event sink for transport-domain events. Prefer this over YarikDelegate for new code.
     var eventDelegate: TransportEventDelegate? { get set }
     // Peer events (preferred over publishers for UI)
     var peerEventsDelegate: TransportPeerEventsDelegate? { get set }
@@ -224,7 +224,7 @@ struct ArchivedPublicMessage {
     let timestamp: Date
 }
 
-extension BitchatMessage {
+extension YarikMessage {
     /// Echo rows are minted locally with this prefix (packet-id derived, so
     /// stable across launches); the timeline dims them.
     static let archivedEchoIDPrefix = "echo-"
@@ -268,7 +268,7 @@ protocol TransportPeerEventsDelegate: AnyObject {
     @MainActor func didUpdatePeerSnapshots(_: [TransportPeerSnapshot])
 }
 
-extension BitchatDelegate {
+extension YarikDelegate {
     @MainActor
     func receiveTransportEvent(_ event: TransportEvent) {
         switch event {

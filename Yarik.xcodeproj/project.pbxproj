@@ -16,10 +16,10 @@
 		YRKBFBITF2 /* BitFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPBITF /* BitFoundation */; };
 		YRKBFBITL1 /* BitLogger in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPBITL /* BitLogger */; };
 		YRKBFBITL2 /* BitLogger in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPBITL /* BitLogger */; };
-		YRKBFP2561 /* P256K in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPP256 /* P256K */; };
-		YRKBFP2562 /* P256K in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPP256 /* P256K */; };
 		YRKBFBTOR1 /* Tor in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPTOR /* Tor */; };
 		YRKBFBTOR2 /* Tor in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPTOR /* Tor */; };
+		YRKBFP2561 /* P256K in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPP256 /* P256K */; };
+		YRKBFP2562 /* P256K in Frameworks */ = {isa = PBXBuildFile; productRef = YRKDEPP256 /* P256K */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,20 +78,6 @@
 			);
 			target = 57CA17A36A2532A6CFF367BB /* YarikShareExtension */;
 		};
-		C1C1C1C100000000000001 /* Exceptions for "Yarik" folder in "Yarik_iOS" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Yarik-macOS.entitlements,
-			);
-			target = AF077EA0474EDEDE2C72716C /* Yarik_iOS */;
-		};
-		C1C1C1C100000000000002 /* Exceptions for "Yarik" folder in "Yarik_macOS" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Yarik.entitlements,
-			);
-			target = 0576A29205865664C0937536 /* Yarik_macOS */;
-		};
 		C5E027A52ECCDFD700BD6012 /* Exceptions for "YarikMeshTests" folder in "YarikMeshTests_macOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -137,10 +123,6 @@
 		};
 		C0585B240308B708300AE4DBE /* Yarik */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C1C1C1C100000000000001 /* Exceptions for "Yarik" folder in "Yarik_iOS" target */,
-				C1C1C1C100000000000002 /* Exceptions for "Yarik" folder in "Yarik_macOS" target */,
-			);
 			path = Yarik;
 			sourceTree = "<group>";
 		};

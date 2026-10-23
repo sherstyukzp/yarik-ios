@@ -68,7 +68,7 @@ struct NoiseEncryptionServiceTests {
         )
         #expect(!service.verifySignature(signature, for: Data("data".utf8), publicKey: Data([1, 2, 3])))
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data([0, 1, 2, 3, 4, 5, 6, 7]),
             recipientID: nil,
@@ -316,7 +316,7 @@ struct NoiseEncryptionServiceTests {
         try establishSessions(alice: alice, bob: bob)
 
         let content = Data("%PDF-1.7\n".utf8) + Data(repeating: 0x51, count: 96 * 1024)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "large-private.pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",

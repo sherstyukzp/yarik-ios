@@ -1,6 +1,6 @@
 //
 // ChatTransportEventCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatTransportEventCoordinator` against a mock
 // `ChatTransportEventContext` — proving the coordinator works without a
@@ -27,9 +27,9 @@ private final class MockChatTransportEventContext: ChatTransportEventContext {
     var isConnected = false
     var nickname = "me"
     var myPeerID = PeerID(str: "0011223344556677")
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
 
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         privateChats[peerID] ?? []
     }
     var unreadPrivateMessages: Set<PeerID> = []
@@ -39,7 +39,7 @@ private final class MockChatTransportEventContext: ChatTransportEventContext {
 
     // Conversation store intents (mirror `ConversationStore` semantics)
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool {
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool {
         var chat = privateChats[peerID] ?? []
         guard !chat.contains(where: { $0.id == message.id }) else { return false }
         let index = chat.firstIndex(where: { $0.timestamp > message.timestamp }) ?? chat.count
@@ -71,28 +71,28 @@ private final class MockChatTransportEventContext: ChatTransportEventContext {
 
     // Inbound message handling
     var blockedMessageIDs: Set<String> = []
-    private(set) var handledPrivateMessages: [BitchatMessage] = []
-    private(set) var handledPublicMessages: [BitchatMessage] = []
+    private(set) var handledPrivateMessages: [YarikMessage] = []
+    private(set) var handledPublicMessages: [YarikMessage] = []
     private(set) var mentionCheckedMessageIDs: [String] = []
     private(set) var hapticMessageIDs: [String] = []
 
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool {
+    func isMessageBlocked(_ message: YarikMessage) -> Bool {
         blockedMessageIDs.contains(message.id)
     }
 
-    func handlePrivateMessage(_ message: BitchatMessage) {
+    func handlePrivateMessage(_ message: YarikMessage) {
         handledPrivateMessages.append(message)
     }
 
-    func handlePublicMessage(_ message: BitchatMessage) {
+    func handlePublicMessage(_ message: YarikMessage) {
         handledPublicMessages.append(message)
     }
 
-    func checkForMentions(_ message: BitchatMessage) {
+    func checkForMentions(_ message: YarikMessage) {
         mentionCheckedMessageIDs.append(message.id)
     }
 
-    func sendHapticFeedback(for message: BitchatMessage) {
+    func sendHapticFeedback(for message: YarikMessage) {
         hapticMessageIDs.append(message.id)
     }
 
@@ -102,14 +102,14 @@ private final class MockChatTransportEventContext: ChatTransportEventContext {
 
     // Peer identity & sessions
     var blockedPeers: Set<PeerID> = []
-    var peersByID: [PeerID: BitchatPeer] = [:]
+    var peersByID: [PeerID: YarikPeer] = [:]
     var noiseSessionKeysByPeerID: [PeerID: Data] = [:]
     private(set) var stablePeerIDCache: [PeerID: PeerID] = [:]
     private(set) var registeredEphemeralSessions: [PeerID] = []
     private(set) var removedEphemeralSessions: [PeerID] = []
 
     func isPeerBlocked(_ peerID: PeerID) -> Bool { blockedPeers.contains(peerID) }
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer? { peersByID[peerID] }
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer? { peersByID[peerID] }
     func resolveNickname(for peerID: PeerID) -> String { "anon\(peerID.id.prefix(4))" }
     func registerEphemeralSession(peerID: PeerID) { registeredEphemeralSessions.append(peerID) }
     func removeEphemeralSession(peerID: PeerID) { removedEphemeralSessions.append(peerID) }
@@ -203,8 +203,8 @@ private func makeMessage(
     content: String = "hello",
     isPrivate: Bool = false,
     senderPeerID: PeerID? = nil
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: sender,
         content: content,
@@ -336,7 +336,7 @@ struct ChatTransportEventCoordinatorContextTests {
         let coordinator = ChatTransportEventCoordinator(context: context)
         let peerID = PeerID(str: "1122334455667788")
         let noiseKey = Data(repeating: 0xAB, count: 32)
-        context.peersByID[peerID] = BitchatPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
+        context.peersByID[peerID] = YarikPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
 
         coordinator.didConnectToPeer(peerID)
         await drainMainActorTasks()
@@ -422,7 +422,7 @@ struct ChatTransportEventCoordinatorContextTests {
         let coordinator = ChatTransportEventCoordinator(context: context)
         let peerID = PeerID(str: "99aabbccddeeff00")
         let noiseKey = Data(repeating: 0x44, count: 32)
-        context.peersByID[peerID] = BitchatPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
+        context.peersByID[peerID] = YarikPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
         let stablePeerID = PeerID(hexData: noiseKey)
         let staleStablePeerID = PeerID(hexData: Data(repeating: 0x55, count: 32))
         context.cacheStablePeerID(staleStablePeerID, for: peerID)

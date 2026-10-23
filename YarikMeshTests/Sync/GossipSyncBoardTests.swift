@@ -1,6 +1,6 @@
 //
 // GossipSyncBoardTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -17,8 +17,8 @@ struct GossipSyncBoardTests {
 
     private let myPeerID = PeerID(str: "0102030405060708")
 
-    private func makeBoardPacket(timestamp: UInt64) throws -> BitchatPacket {
-        BitchatPacket(
+    private func makeBoardPacket(timestamp: UInt64) throws -> YarikPacket {
+        YarikPacket(
             type: MessageType.boardPost.rawValue,
             senderID: try #require(Data(hexString: "aabbccddeeff0011")),
             recipientID: nil,
@@ -101,27 +101,27 @@ struct GossipSyncBoardTests {
 
 private final class RecordingBoardDelegate: GossipSyncManager.Delegate {
     private let lock = NSLock()
-    private var _packets: [BitchatPacket] = []
+    private var _packets: [YarikPacket] = []
 
-    var packets: [BitchatPacket] {
+    var packets: [YarikPacket] {
         lock.lock()
         defer { lock.unlock() }
         return _packets
     }
 
-    func sendPacket(_ packet: BitchatPacket) {
+    func sendPacket(_ packet: YarikPacket) {
         lock.lock()
         _packets.append(packet)
         lock.unlock()
     }
 
-    func sendPacket(to peerID: PeerID, packet: BitchatPacket) {
+    func sendPacket(to peerID: PeerID, packet: YarikPacket) {
         lock.lock()
         _packets.append(packet)
         lock.unlock()
     }
 
-    func signPacketForBroadcast(_ packet: BitchatPacket) -> BitchatPacket {
+    func signPacketForBroadcast(_ packet: YarikPacket) -> YarikPacket {
         packet
     }
 

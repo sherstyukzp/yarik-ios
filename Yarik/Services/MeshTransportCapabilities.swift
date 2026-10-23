@@ -30,9 +30,9 @@ protocol PanicResettingTransport: AnyObject {
 /// File and private-media transfer over a mesh transport, including the
 /// capability-proof policy that gates encrypted private media.
 protocol MeshFileTransferring: AnyObject {
-    func sendFileBroadcast(_ packet: BitchatFilePacket, transferId: String)
+    func sendFileBroadcast(_ packet: YarikFilePacket, transferId: String)
     func sendFilePrivate(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
@@ -41,7 +41,7 @@ protocol MeshFileTransferring: AnyObject {
     /// generation authenticates bit 9. It must never queue across a session
     /// replacement or enter the signed raw legacy path.
     func sendFilePrivateReceiptRetry(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     )

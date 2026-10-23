@@ -1,6 +1,6 @@
 //
 // ChatGroupCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatGroupCoordinator`'s group-state authorization against a
 // mock `ChatGroupContext` and a real in-memory `GroupStore`, with real
@@ -59,7 +59,7 @@ private final class MockChatGroupContext: ChatGroupContext {
     private(set) var systemMessages: [String] = []
 
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool { true }
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool { true }
     func markPrivateChatUnread(_ peerID: PeerID) {}
     func removePrivateChat(_ peerID: PeerID) { removedPrivateChats.append(peerID) }
     func startPrivateChat(with peerID: PeerID) {}
@@ -127,7 +127,7 @@ struct ChatGroupCoordinatorContextTests {
         key: Data,
         signedBy signer: TestIdentity
     ) throws -> Data {
-        let group = BitchatGroup(
+        let group = YarikGroup(
             groupID: groupID,
             name: "trail crew",
             epoch: epoch,
@@ -146,7 +146,7 @@ struct ChatGroupCoordinatorContextTests {
     /// Joins the group through the coordinator (the creator's invite), opens
     /// its chat, and clears the join side effects. Both the creator and the
     /// attacker hold Noise sessions with us.
-    private func makeJoinedGroup() throws -> (MockChatGroupContext, ChatGroupCoordinator, BitchatGroup) {
+    private func makeJoinedGroup() throws -> (MockChatGroupContext, ChatGroupCoordinator, YarikGroup) {
         let context = MockChatGroupContext(identity: me)
         let coordinator = ChatGroupCoordinator(context: context)
         context.fingerprintsByPeerID[creator.peerID] = creator.fingerprint
@@ -163,7 +163,7 @@ struct ChatGroupCoordinatorContextTests {
         return (context, coordinator, joined)
     }
 
-    private func expectUnchanged(_ context: MockChatGroupContext, joined: BitchatGroup) {
+    private func expectUnchanged(_ context: MockChatGroupContext, joined: YarikGroup) {
         #expect(context.groupStore.group(withID: groupID) == joined)
         #expect(context.groupStore.key(forGroupID: groupID) == groupKey)
         #expect(context.removedPrivateChats.isEmpty)
@@ -266,7 +266,7 @@ struct ChatGroupCoordinatorContextTests {
         let removal = try creatorState(
             epoch: joinedEpoch + 1,
             members: [creator.member, member.member],
-            key: Data(count: BitchatGroup.keyLength)
+            key: Data(count: YarikGroup.keyLength)
         )
         coordinator.handleGroupKeyUpdatePayload(from: creator.peerID, payload: removal)
 
@@ -294,7 +294,7 @@ struct ChatGroupCoordinatorContextTests {
         let staleRemoval = try creatorState(
             epoch: joinedEpoch - 1,
             members: [creator.member, member.member],
-            key: Data(count: BitchatGroup.keyLength)
+            key: Data(count: YarikGroup.keyLength)
         )
         coordinator.handleGroupKeyUpdatePayload(from: creator.peerID, payload: staleRemoval)
         expectUnchanged(context, joined: joined)

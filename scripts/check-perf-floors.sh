@@ -4,7 +4,7 @@
 #
 # Parses the `PERF[name]: N unit/sec ...` lines that PerformanceBaselineTests
 # prints into captured test output and fails if any benchmark's throughput is
-# below its floor from bitchatTests/Performance/perf-floors.json.
+# below its floor from YarikMeshTests/Performance/perf-floors.json.
 #
 # Floor philosophy (see the floors file): floors sit at ~25% of locally
 # measured throughput, so they catch algorithmic regressions (O(n) -> O(n^2)),
@@ -48,7 +48,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 OUTPUT_FILE="$1"
-FLOORS_FILE="${2:-$(cd "$(dirname "$0")/.." && pwd)/bitchatTests/Performance/perf-floors.json}"
+FLOORS_FILE="${2:-$(cd "$(dirname "$0")/.." && pwd)/YarikMeshTests/Performance/perf-floors.json}"
 MAX_ATTEMPTS="${BITCHAT_PERF_GATE_ATTEMPTS:-3}"
 REMEASURE_CMD="${BITCHAT_PERF_REMEASURE_CMD:-swift test --quiet --filter PerformanceBaselineTests}"
 
@@ -141,7 +141,7 @@ if below_floor:
     print("\n".join(below_floor))
     print("\nFloors are ~25% of healthy local throughput; falling below one means an")
     print("algorithmic regression, not runner noise. If the change is intentional,")
-    print("update bitchatTests/Performance/perf-floors.json deliberately.")
+    print("update YarikMeshTests/Performance/perf-floors.json deliberately.")
     sys.exit(1)
 
 print("perf-floors: all benchmarks at or above their floors.")

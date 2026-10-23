@@ -1,6 +1,6 @@
 //
 // BLEServiceCoreTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Focused BLEService tests for packet handling behavior.
 //
@@ -134,7 +134,7 @@ struct BLEServiceCoreTests {
         let wrongFirst = derivedPeerID.bare.first == "0" ? "1" : "0"
         let wrongBare = String(wrongFirst) + String(derivedPeerID.bare.dropFirst())
         let wrongPeerID = PeerID(str: wrongBare)
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: wrongPeerID.id) ?? Data(),
             recipientID: nil,
@@ -261,7 +261,7 @@ struct BLEServiceCoreTests {
         let ble = makeService()
         let boundPeer = PeerID(str: "1122334455667788")
         let claimedPeer = PeerID(str: "8899aabbccddeeff")
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: claimedPeer.id) ?? Data(),
             recipientID: nil,
@@ -279,7 +279,7 @@ struct BLEServiceCoreTests {
         let ble = makeService()
         let boundPeer = PeerID(str: "1122334455667788")
         let claimedPeer = PeerID(str: "8899aabbccddeeff")
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.requestSync.rawValue,
             senderID: Data(hexString: claimedPeer.id) ?? Data(),
             recipientID: nil,
@@ -313,7 +313,7 @@ struct BLEServiceCoreTests {
         )
         let payload = try #require(announcement.encode(), "Failed to encode announcement")
         let newPeerID = PeerID(publicKey: announcement.noisePublicKey)
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: newPeerID.id) ?? Data(),
             recipientID: nil,
@@ -411,7 +411,7 @@ struct BLEServiceCoreTests {
         // The victim's fresh signed announce replayed on the attacker's bound
         // link with its direct TTL restored (TTL is excluded from signing, so
         // the signature still verifies).
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: victimPeerID.id) ?? Data(),
             recipientID: nil,
@@ -475,7 +475,7 @@ struct BLEServiceCoreTests {
         )
         let payload = try #require(announcement.encode(), "Failed to encode announcement")
         let victimPeerID = PeerID(publicKey: announcement.noisePublicKey)
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: victimPeerID.id) ?? Data(),
             recipientID: nil,
@@ -543,7 +543,7 @@ struct BLEServiceCoreTests {
         #expect(ble.canDeliverSecurely(to: victimPeerID))
 
         let payload = try #require(announcement.encode(), "Failed to encode announcement")
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: victimPeerID.id) ?? Data(),
             recipientID: nil,
@@ -640,7 +640,7 @@ struct BLEServiceCoreTests {
                 > NoiseSecurityConstants.xxInitialMessageSize
         )
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: victimPeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -719,7 +719,7 @@ struct BLEServiceCoreTests {
         let outbound = OutboundPacketTap()
         ble._test_onOutboundPacket = outbound.record
         let forgedMessage1 = try mallory.initiateHandshake(with: ble.myPeerID)
-        let firstPacket = BitchatPacket(
+        let firstPacket = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -785,7 +785,7 @@ struct BLEServiceCoreTests {
             forgedEarlyPayload,
             for: ble.myPeerID
         )
-        let earlyPacket = BitchatPacket(
+        let earlyPacket = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -797,7 +797,7 @@ struct BLEServiceCoreTests {
         ble._test_handlePacket(earlyPacket, fromPeerID: alicePeerID)
         await ble._test_drainNoiseMessagePipeline()
 
-        let thirdPacket = BitchatPacket(
+        let thirdPacket = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -919,7 +919,7 @@ struct BLEServiceCoreTests {
         // Its message 3 never arrives, modeling the restarted peer whose
         // completion was lost after it already discarded the old keys.
         let reconnectMessage1 = try mallory.initiateHandshake(with: ble.myPeerID)
-        let reconnectPacket = BitchatPacket(
+        let reconnectPacket = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -1000,7 +1000,7 @@ struct BLEServiceCoreTests {
                 message: retryMessage1
             )
         )
-        let retryPacket = BitchatPacket(
+        let retryPacket = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: ble.myPeerID.id),
@@ -1075,7 +1075,7 @@ struct BLEServiceCoreTests {
         )
         let payload = try #require(announcement.encode(), "Failed to encode announcement")
         let newPeerID = PeerID(publicKey: announcement.noisePublicKey)
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: newPeerID.id) ?? Data(),
             recipientID: nil,
@@ -1209,7 +1209,7 @@ struct BLEServiceCoreTests {
         let ble = makeService()
         let delegate = TransportEventCaptureDelegate()
         ble.eventDelegate = delegate
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "pre-panic-ingress",
             sender: "Peer",
             content: "must not survive panic",
@@ -1291,7 +1291,7 @@ struct BLEServiceCoreTests {
         let ble = makeService()
         let delegate = TransportEventCaptureDelegate()
         ble.eventDelegate = delegate
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "pre-panic-finalization",
             sender: "Peer",
             content: "must be rejected",
@@ -1325,30 +1325,30 @@ struct BLEServiceCoreTests {
     }
 
     @Test
-    func modifiedServices_rediscoverWhenBitChatServiceIsInvalidated() async throws {
+    func modifiedServices_rediscoverWhenYarikServiceIsInvalidated() async throws {
         let otherService = CBUUID(string: "0000180F-0000-1000-8000-00805F9B34FB")
 
-        #expect(BLEService._test_shouldRediscoverBitChatService(
+        #expect(BLEService._test_shouldRediscoverYarikService(
             invalidatedServiceUUIDs: [BLEService.serviceUUID],
             cachedServiceUUIDs: [otherService]
         ))
     }
 
     @Test
-    func modifiedServices_rediscoverWhenCachedServicesNoLongerIncludeBitChat() async throws {
+    func modifiedServices_rediscoverWhenCachedServicesNoLongerIncludeYarik() async throws {
         let otherService = CBUUID(string: "0000180F-0000-1000-8000-00805F9B34FB")
 
-        #expect(BLEService._test_shouldRediscoverBitChatService(
+        #expect(BLEService._test_shouldRediscoverYarikService(
             invalidatedServiceUUIDs: [otherService],
             cachedServiceUUIDs: [otherService]
         ))
     }
 
     @Test
-    func modifiedServices_ignoreUnrelatedInvalidationWhenBitChatIsStillCached() async throws {
+    func modifiedServices_ignoreUnrelatedInvalidationWhenYarikIsStillCached() async throws {
         let otherService = CBUUID(string: "0000180F-0000-1000-8000-00805F9B34FB")
 
-        #expect(!BLEService._test_shouldRediscoverBitChatService(
+        #expect(!BLEService._test_shouldRediscoverYarikService(
             invalidatedServiceUUIDs: [otherService],
             cachedServiceUUIDs: [BLEService.serviceUUID, otherService]
         ))
@@ -1375,7 +1375,7 @@ struct BLEServiceCoreTests {
             var nonce = Data(repeating: 0, count: MeshPingPayload.nonceLength)
             nonce[0] = UInt8(i)
             let payload = try #require(MeshPingPayload(nonce: nonce, originTTL: 7))
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.ping.rawValue,
                 senderID: Data(hexString: forgedSender.id) ?? Data(),
                 recipientID: myRecipientData,
@@ -1406,9 +1406,9 @@ struct BLEServiceCoreTests {
 /// Thread-safe capture of packets leaving the service under test.
 private final class OutboundPacketTap {
     private let lock = NSLock()
-    private var packets: [BitchatPacket] = []
+    private var packets: [YarikPacket] = []
 
-    func record(_ packet: BitchatPacket) {
+    func record(_ packet: YarikPacket) {
         lock.lock(); packets.append(packet); lock.unlock()
     }
 
@@ -1417,7 +1417,7 @@ private final class OutboundPacketTap {
         return packets.filter { $0.type == type.rawValue }.count
     }
 
-    func snapshot() -> [BitchatPacket] {
+    func snapshot() -> [YarikPacket] {
         lock.lock(); defer { lock.unlock() }
         return packets
     }
@@ -1542,8 +1542,8 @@ private func makeService(
     )
 }
 
-private func makePublicPacket(content: String, sender: PeerID, timestamp: UInt64) -> BitchatPacket {
-    BitchatPacket(
+private func makePublicPacket(content: String, sender: PeerID, timestamp: UInt64) -> YarikPacket {
+    YarikPacket(
         type: MessageType.message.rawValue,
         senderID: Data(hexString: sender.id) ?? Data(),
         recipientID: nil,
@@ -1554,8 +1554,8 @@ private func makePublicPacket(content: String, sender: PeerID, timestamp: UInt64
     )
 }
 
-private func makeLeavePacket(sender: PeerID, marker: String) -> BitchatPacket {
-    BitchatPacket(
+private func makeLeavePacket(sender: PeerID, marker: String) -> YarikPacket {
+    YarikPacket(
         type: MessageType.leave.rawValue,
         senderID: Data(hexString: sender.id) ?? Data(),
         recipientID: nil,
@@ -1566,12 +1566,12 @@ private func makeLeavePacket(sender: PeerID, marker: String) -> BitchatPacket {
     )
 }
 
-private final class PublicCaptureDelegate: BitchatDelegate {
+private final class PublicCaptureDelegate: YarikDelegate {
     private let lock = NSLock()
-    private(set) var publicMessages: [BitchatMessage] = []
+    private(set) var publicMessages: [YarikMessage] = []
 
     func didReceivePublicMessage(from peerID: PeerID, nickname: String, content: String, timestamp: Date, messageID: String?) {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: nickname,
             content: content,
@@ -1588,13 +1588,13 @@ private final class PublicCaptureDelegate: BitchatDelegate {
         lock.unlock()
     }
 
-    func didReceiveMessage(_ message: BitchatMessage) {}
+    func didReceiveMessage(_ message: YarikMessage) {}
     func didConnectToPeer(_ peerID: PeerID) {}
     func didDisconnectFromPeer(_ peerID: PeerID) {}
     func didUpdatePeerList(_ peers: [PeerID]) {}
     func didUpdateBluetoothState(_ state: CBManagerState) {}
 
-    func publicMessagesSnapshot() -> [BitchatMessage] {
+    func publicMessagesSnapshot() -> [YarikMessage] {
         lock.lock()
         defer { lock.unlock() }
         return publicMessages

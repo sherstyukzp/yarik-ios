@@ -124,7 +124,7 @@ struct BLERouteForwardingPolicyTests {
             ttl: 7,
             route: [routeData(local), routeData(nextHop)]
         )
-        packet = BitchatPacket(
+        packet = YarikPacket(
             type: MessageType.requestSync.rawValue,
             senderID: packet.senderID,
             recipientID: packet.recipientID,
@@ -143,7 +143,7 @@ struct BLERouteForwardingPolicyTests {
     }
 
     private func forwardingPlan(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         local: PeerID,
         connected: Set<PeerID> = []
     ) -> BLERouteForwardingPlan {
@@ -161,8 +161,8 @@ struct BLERouteForwardingPolicyTests {
         recipient: PeerID?,
         ttl: UInt8 = 7,
         route: [Data]? = []
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: routeData(sender),
             recipientID: recipient.map { routeData($0) },

@@ -213,8 +213,8 @@ struct BLEOutboundLinkPlannerTests {
         sender: PeerID = PeerID(str: "8877665544332211"),
         recipient: PeerID? = nil,
         ttl: UInt8 = TransportConfig.messageTTLDefault
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: type.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipient.flatMap { Data(hexString: $0.id) },

@@ -3,7 +3,7 @@ import Foundation
 
 struct BLERouteForwardingPlan {
     let shouldSuppressFloodRelay: Bool
-    let forwardPacket: BitchatPacket?
+    let forwardPacket: YarikPacket?
     let nextHop: PeerID?
 
     static let allowFloodRelay = BLERouteForwardingPlan(
@@ -18,7 +18,7 @@ struct BLERouteForwardingPlan {
         nextHop: nil
     )
 
-    static func forward(_ packet: BitchatPacket, to nextHop: PeerID) -> BLERouteForwardingPlan {
+    static func forward(_ packet: YarikPacket, to nextHop: PeerID) -> BLERouteForwardingPlan {
         BLERouteForwardingPlan(
             shouldSuppressFloodRelay: true,
             forwardPacket: packet,
@@ -29,7 +29,7 @@ struct BLERouteForwardingPlan {
 
 struct BLERouteForwardingPolicy {
     static func plan(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         localPeerID: PeerID,
         localRoutingData: Data?,
         routingPeer: (Data) -> PeerID?,
@@ -80,7 +80,7 @@ struct BLERouteForwardingPolicy {
     }
 
     private static func forward(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         toRouteData routeData: Data,
         routingPeer: (Data) -> PeerID?,
         isPeerConnected: (PeerID) -> Bool
@@ -93,7 +93,7 @@ struct BLERouteForwardingPolicy {
         return .forward(relayed(packet), to: nextPeer)
     }
 
-    private static func relayed(_ packet: BitchatPacket) -> BitchatPacket {
+    private static func relayed(_ packet: YarikPacket) -> YarikPacket {
         var relayPacket = packet
         relayPacket.ttl = packet.ttl - 1
         return relayPacket

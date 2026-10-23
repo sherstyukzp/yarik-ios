@@ -2,11 +2,11 @@ import BitFoundation
 import XCTest
 @testable import YarikMesh
 
-final class BitchatFilePacketTests: XCTestCase {
+final class YarikFilePacketTests: XCTestCase {
 
     func testRoundTripPreservesFields() throws {
         let content = Data((0..<4096).map { UInt8($0 % 251) })
-        let packet = BitchatFilePacket(
+        let packet = YarikFilePacket(
             fileName: "sample.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -16,7 +16,7 @@ final class BitchatFilePacketTests: XCTestCase {
         guard let encoded = packet.encode() else {
             return XCTFail("Failed to encode file packet")
         }
-        guard let decoded = BitchatFilePacket.decode(encoded) else {
+        guard let decoded = YarikFilePacket.decode(encoded) else {
             return XCTFail("Failed to decode file packet")
         }
 
@@ -28,7 +28,7 @@ final class BitchatFilePacketTests: XCTestCase {
 
     func testDecodeFallsBackToContentSizeWhenFileSizeMissing() throws {
         let content = Data(repeating: 0x7F, count: 1024)
-        let packet = BitchatFilePacket(
+        let packet = YarikFilePacket(
             fileName: nil,
             fileSize: nil,
             mimeType: nil,
@@ -38,7 +38,7 @@ final class BitchatFilePacketTests: XCTestCase {
         guard let encoded = packet.encode() else {
             return XCTFail("Failed to encode file packet")
         }
-        guard let decoded = BitchatFilePacket.decode(encoded) else {
+        guard let decoded = YarikFilePacket.decode(encoded) else {
             return XCTFail("Failed to decode file packet")
         }
 
@@ -57,7 +57,7 @@ final class BitchatFilePacketTests: XCTestCase {
         data.append(contentsOf: [0x00, 0x00, 0x00, 0x04])
         data.append(content)
 
-        let decoded = try XCTUnwrap(BitchatFilePacket.decode(data))
+        let decoded = try XCTUnwrap(YarikFilePacket.decode(data))
         XCTAssertEqual(decoded.fileSize, 256)
         XCTAssertEqual(decoded.content, content)
     }
@@ -70,7 +70,7 @@ final class BitchatFilePacketTests: XCTestCase {
         data.append(contentsOf: [0x00, 0x00, 0x00, 0x03])
         data.append(content)
 
-        let decoded = try XCTUnwrap(BitchatFilePacket.decode(data))
+        let decoded = try XCTUnwrap(YarikFilePacket.decode(data))
         XCTAssertEqual(decoded.fileSize, UInt64(content.count))
         XCTAssertEqual(decoded.content, content)
     }
@@ -109,7 +109,7 @@ final class BitchatFilePacketTests: XCTestCase {
         data.append(contentsOf: [0x00, 0x00, 0x00, UInt8(content.count)])
         data.append(content)
 
-        let decoded = try XCTUnwrap(BitchatFilePacket.decode(data))
+        let decoded = try XCTUnwrap(YarikFilePacket.decode(data))
         XCTAssertEqual(decoded.fileName, "photo.jpg")
         XCTAssertEqual(decoded.mimeType, "image/jpeg")
         XCTAssertEqual(decoded.fileSize, UInt64(content.count))
@@ -132,7 +132,7 @@ final class BitchatFilePacketTests: XCTestCase {
         data.append(contentsOf: [0x00, 0x04])
         data.append(Data([0x11, 0x11, 0x11, 0x11]))
 
-        let decoded = try XCTUnwrap(BitchatFilePacket.decode(data))
+        let decoded = try XCTUnwrap(YarikFilePacket.decode(data))
         XCTAssertEqual(decoded.fileName, "note.m4a")
         XCTAssertNil(decoded.mimeType)
         XCTAssertEqual(decoded.fileSize, UInt64(content.count))

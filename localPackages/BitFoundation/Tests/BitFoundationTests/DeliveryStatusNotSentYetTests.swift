@@ -1,6 +1,6 @@
 //
 // DeliveryStatusNotSentYetTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // DeliveryStatus is a total state machine: every message carries a concrete
 // status from creation. Public messages start .notSentYet, private messages
@@ -16,8 +16,8 @@ import Foundation
 
 struct DeliveryStatusNotSentYetTests {
 
-    private func makeMessage(isPrivate: Bool, deliveryStatus: DeliveryStatus? = nil) -> BitchatMessage {
-        BitchatMessage(
+    private func makeMessage(isPrivate: Bool, deliveryStatus: DeliveryStatus? = nil) -> YarikMessage {
+        YarikMessage(
             sender: "alice",
             content: "hello",
             timestamp: Date(timeIntervalSince1970: 1_000),
@@ -46,14 +46,14 @@ struct DeliveryStatusNotSentYetTests {
         json.removeValue(forKey: "deliveryStatus")
         let legacyData = try JSONSerialization.data(withJSONObject: json)
 
-        let decoded = try JSONDecoder().decode(BitchatMessage.self, from: legacyData)
+        let decoded = try JSONDecoder().decode(YarikMessage.self, from: legacyData)
         #expect(decoded.deliveryStatus == .notSentYet)
     }
 
     @Test
     func decodingRoundTripPreservesConcreteStatus() throws {
         let message = makeMessage(isPrivate: true, deliveryStatus: .delivered(to: "bob", at: Date(timeIntervalSince1970: 2_000)))
-        let decoded = try JSONDecoder().decode(BitchatMessage.self, from: JSONEncoder().encode(message))
+        let decoded = try JSONDecoder().decode(YarikMessage.self, from: JSONEncoder().encode(message))
         #expect(decoded.deliveryStatus == .delivered(to: "bob", at: Date(timeIntervalSince1970: 2_000)))
     }
 }

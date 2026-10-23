@@ -12,15 +12,15 @@ import Foundation
 @MainActor
 protocol ChatLifecycleContext: AnyObject {
     // MARK: Chat & receipt state
-    var messages: [BitchatMessage] { get }
+    var messages: [YarikMessage] { get }
     /// A single private chat's timeline (store-direct lookup on
     /// `ChatViewModel`; no `privateChats` dictionary build).
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage]
+    func privateMessages(for peerID: PeerID) -> [YarikMessage]
     var unreadPrivateMessages: Set<PeerID> { get }
     var selectedPrivateChatPeer: PeerID? { get }
     /// Appends a private message via the single-writer store intent.
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool
     /// Clears the peer's unread flag (store unread state only).
     func markPrivateChatRead(_ peerID: PeerID)
     var sentReadReceipts: Set<String> { get }
@@ -44,7 +44,7 @@ protocol ChatLifecycleContext: AnyObject {
     // MARK: Peers & sessions
     func peerNickname(for peerID: PeerID) -> String?
     /// The peer's current entry in the unified peer service, if known.
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer?
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer?
     func noiseSessionState(for peerID: PeerID) -> LazyHandshakeState
     func stopMeshServices()
     /// Re-reads the transport's current Bluetooth state and updates the alert UI.
@@ -241,13 +241,13 @@ final class ChatLifecycleCoordinator {
         }
     }
 
-    func getMessages(for peerID: PeerID?) -> [BitchatMessage] {
+    func getMessages(for peerID: PeerID?) -> [YarikMessage] {
         guard let peerID else { return context.messages }
         return getPrivateChatMessages(for: peerID)
     }
 
-    func getPrivateChatMessages(for peerID: PeerID) -> [BitchatMessage] {
-        var combined: [BitchatMessage] = []
+    func getPrivateChatMessages(for peerID: PeerID) -> [YarikMessage] {
+        var combined: [YarikMessage] = []
 
         combined.append(contentsOf: context.privateMessages(for: peerID))
 
@@ -258,7 +258,7 @@ final class ChatLifecycleCoordinator {
             }
         }
 
-        var bestByID: [String: BitchatMessage] = [:]
+        var bestByID: [String: YarikMessage] = [:]
         for message in combined {
             if let existing = bestByID[message.id] {
                 let existingRank = deliveryStatusRank(existing.deliveryStatus)
@@ -302,7 +302,7 @@ private extension ChatLifecycleCoordinator {
     }
 
     func appendPrivateScreenshotNotice(for peerID: PeerID) {
-        let notice = BitchatMessage(
+        let notice = YarikMessage(
             sender: "system",
             content: String(localized: "system.screenshot.you", defaultValue: "you took a screenshot", comment: "Local system line after your screenshot notice was sent to the DM peer"),
             timestamp: Date(),

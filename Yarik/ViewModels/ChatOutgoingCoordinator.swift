@@ -28,7 +28,7 @@ protocol ChatOutgoingContext: AnyObject {
     /// Appends a public message via the single-writer store intent
     /// (immediate: the local echo must render without batching).
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool
     func addSystemMessage(_ content: String)
 
     // MARK: Content dedup
@@ -124,7 +124,7 @@ final class ChatOutgoingCoordinator {
     }
 
     /// Broadcasts a wave on the mesh channel regardless of the active channel —
-    /// used by the "bitchatters nearby" notification quick action, which always
+    /// used by the "yarikters nearby" notification quick action, which always
     /// refers to mesh peers.
     func sendMeshWave() {
         sendMeshPublicMessage(originalContent: "👋", trimmed: "👋", mentions: [])
@@ -133,7 +133,7 @@ final class ChatOutgoingCoordinator {
 
 private extension ChatOutgoingCoordinator {
     func sendMeshPublicMessage(originalContent: String, trimmed: String, mentions: [String]) {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: context.nickname,
             content: trimmed,
             timestamp: Date(),
@@ -205,7 +205,7 @@ private extension ChatOutgoingCoordinator {
             }
             guard let context else { return }
 
-            let message = BitchatMessage(
+            let message = YarikMessage(
                 id: event.id,
                 sender: displaySender,
                 content: trimmed,
@@ -229,7 +229,7 @@ private extension ChatOutgoingCoordinator {
         }
     }
 
-    func appendLocalEcho(_ message: BitchatMessage, to conversationID: ConversationID) {
+    func appendLocalEcho(_ message: YarikMessage, to conversationID: ConversationID) {
         context.appendPublicMessage(message, to: conversationID)
 
         let contentKey = context.normalizedContentKey(message.content)

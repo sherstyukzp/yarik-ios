@@ -28,7 +28,7 @@ final class PrivateInboxModel: ObservableObject {
         bind()
     }
 
-    func messages(for peerID: PeerID?) -> [BitchatMessage] {
+    func messages(for peerID: PeerID?) -> [YarikMessage] {
         guard let peerID else { return [] }
         return conversations.conversationsByID[.directPeer(peerID)]?.messages ?? []
     }
@@ -265,7 +265,7 @@ final class PrivateConversationModel: ObservableObject {
         let headerPeerID = chatViewModel.getShortIDForNoiseKey(conversationPeerID)
         let peer = chatViewModel.getPeer(byID: headerPeerID)
         let displayName = resolveDisplayName(for: conversationPeerID, headerPeerID: headerPeerID, peer: peer)
-        // Geo DMs are always routed through BitChat private envelopes over
+        // Geo DMs are always routed through Yarik private envelopes over
         // Nostr; their nostr_ keys never resolve to a reachable mesh peer, so
         // resolveAvailability would report .offline. Report .nostrAvailable
         // so the header shows the globe instead of a misleading "offline" tag.
@@ -289,7 +289,7 @@ final class PrivateConversationModel: ObservableObject {
     private func resolveDisplayName(
         for conversationPeerID: PeerID,
         headerPeerID: PeerID,
-        peer: BitchatPeer?
+        peer: YarikPeer?
     ) -> String {
         if conversationPeerID.isGeoDM, case .location(let channel) = locationChannelsModel.selectedChannel {
             return "#\(channel.geohash)/@\(chatViewModel.geohashDisplayName(for: conversationPeerID))"
@@ -338,7 +338,7 @@ final class PrivateConversationModel: ObservableObject {
         return String(localized: "common.unknown", comment: "Fallback label for unknown peer")
     }
 
-    private func resolveAvailability(for headerPeerID: PeerID, peer: BitchatPeer?) -> PrivateConversationAvailability {
+    private func resolveAvailability(for headerPeerID: PeerID, peer: YarikPeer?) -> PrivateConversationAvailability {
         if let connectionState = peer?.connectionState {
             switch connectionState {
             case .bluetoothConnected:

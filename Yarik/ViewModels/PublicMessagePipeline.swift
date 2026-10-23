@@ -1,6 +1,6 @@
 //
 // PublicMessagePipeline.swift
-// bitchat
+// yarik
 //
 // Batches visible-channel public messages before committing them to the
 // ConversationStore: the deliberate ~80 ms UI flush cadence survives the
@@ -20,8 +20,8 @@ protocol PublicMessagePipelineDelegate: AnyObject {
     /// Commits a batched message to its conversation in the store.
     /// Returns `false` when the message was already present (ID dedup).
     @discardableResult
-    func pipeline(_: PublicMessagePipeline, commit message: BitchatMessage, to conversationID: ConversationID) -> Bool
-    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: BitchatMessage)
+    func pipeline(_: PublicMessagePipeline, commit message: YarikMessage, to conversationID: ConversationID) -> Bool
+    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: YarikMessage)
     func pipelineSetBatchingState(_: PublicMessagePipeline, isBatching: Bool)
 }
 
@@ -29,7 +29,7 @@ protocol PublicMessagePipelineDelegate: AnyObject {
 final class PublicMessagePipeline {
     weak var delegate: PublicMessagePipelineDelegate?
 
-    private var buffer: [(message: BitchatMessage, conversationID: ConversationID)] = []
+    private var buffer: [(message: YarikMessage, conversationID: ConversationID)] = []
     private var timer: Timer?
     private let baseFlushInterval: TimeInterval
     private var dynamicFlushInterval: TimeInterval
@@ -55,7 +55,7 @@ final class PublicMessagePipeline {
     /// Buffers a message destined for `conversationID`; the next batched
     /// flush commits it to the store. Each entry carries its destination so
     /// a channel switch mid-batch can never misroute buffered messages.
-    func enqueue(_ message: BitchatMessage, to conversationID: ConversationID) {
+    func enqueue(_ message: YarikMessage, to conversationID: ConversationID) {
         buffer.append((message, conversationID))
         scheduleFlush()
     }
@@ -104,7 +104,7 @@ private extension PublicMessagePipeline {
 
         // Content-window dedup against recorded keys and within the batch;
         // ID dedup happens in the store at commit time.
-        var pending: [(message: BitchatMessage, conversationID: ConversationID, contentKey: String)] = []
+        var pending: [(message: YarikMessage, conversationID: ConversationID, contentKey: String)] = []
         var batchContentLatest: [String: Date] = [:]
 
         for item in buffer {

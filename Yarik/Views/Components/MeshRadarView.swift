@@ -1,6 +1,6 @@
 //
 // MeshRadarView.swift
-// bitchat
+// yarik
 //
 // Ambient sonar shown on the empty mesh timeline: expanding rings around a
 // center dot make it visible that the radio is broadcasting and scanning

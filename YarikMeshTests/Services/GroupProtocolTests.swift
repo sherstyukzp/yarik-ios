@@ -1,6 +1,6 @@
 //
 // GroupProtocolTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -47,8 +47,8 @@ struct GroupProtocolTests {
     private let groupID = Data((0..<16).map { UInt8($0) })
     private let key = Data(repeating: 0x42, count: 32)
 
-    private func makeGroup(extraMembers: [GroupMember] = [], epoch: UInt32 = 1) -> BitchatGroup {
-        BitchatGroup(
+    private func makeGroup(extraMembers: [GroupMember] = [], epoch: UInt32 = 1) -> YarikGroup {
+        YarikGroup(
             groupID: groupID,
             name: "trail crew",
             epoch: epoch,
@@ -131,7 +131,7 @@ struct GroupProtocolTests {
     @Test func creatorMissingFromRosterIsRejected() throws {
         // State claiming a creator whose fingerprint is not in the roster has
         // no key to verify against and must fail closed.
-        let group = BitchatGroup(
+        let group = YarikGroup(
             groupID: groupID,
             name: "orphan",
             epoch: 1,

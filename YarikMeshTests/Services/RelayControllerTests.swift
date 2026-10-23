@@ -1,6 +1,6 @@
 //
 // RelayControllerTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for relay decision logic.
 //

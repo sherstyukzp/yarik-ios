@@ -1,6 +1,6 @@
 //
 // LocationNotesSettings.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -17,7 +17,7 @@ enum LocationNotesSettings {
 
     /// Fired on every toggle write so live consumers (the nearby-notes
     /// counter) can drop or restart their relay subscription immediately.
-    static let didChangeNotification = Notification.Name("bitchat.locationNotesSettingsDidChange")
+    static let didChangeNotification = Notification.Name("yarik.locationNotesSettingsDidChange")
 
     static var enabled: Bool {
         get { UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true }

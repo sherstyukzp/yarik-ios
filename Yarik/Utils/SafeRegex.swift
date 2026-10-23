@@ -1,6 +1,6 @@
 //
 // SafeRegex.swift
-// bitchat
+// yarik
 //
 // Non-trapping construction for the app's compiled-in regex patterns.
 // This is free and unencumbered software released into the public domain.

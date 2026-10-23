@@ -1,11 +1,11 @@
 # Service UUID Detectability
 
 **Status:** Analysis for cross-platform review. **No implementation is proposed.** This documents why the obvious fix — rotating or deriving the service UUID — does not work, so the idea stops being re-raised without its constraints, and records what is achievable instead.
-**Audience:** bitchat iOS and Android maintainers.
+**Audience:** yarik iOS and Android maintainers.
 
-`docs/PEER-ID-ROTATION.md` §2 lists this as an explicit non-goal: *"Hiding **that** bitchat is in use. The service UUID is a separate problem; BLE requires something discoverable. Tracked separately."* This is that tracking document.
+`docs/PEER-ID-ROTATION.md` §2 lists this as an explicit non-goal: *"Hiding **that** yarik is in use. The service UUID is a separate problem; BLE requires something discoverable. Tracked separately."* This is that tracking document.
 
-**The conclusion, up front:** hiding that bitchat is running is **not achievable** for an open-source app that supports discovery between strangers. That is a consequence of the threat model, not a gap in the implementation. `docs/privacy-assessment.md:34` already says so; this document explains why, so the honesty there is preserved rather than softened by a scheme that looks like a fix.
+**The conclusion, up front:** hiding that yarik is running is **not achievable** for an open-source app that supports discovery between strangers. That is a consequence of the threat model, not a gap in the implementation. `docs/privacy-assessment.md:34` already says so; this document explains why, so the honesty there is preserved rather than softened by a scheme that looks like a fix.
 
 ---
 
@@ -21,7 +21,7 @@
 
 `BLERadioController.advertisementData()` advertises the service UUID and deliberately no local name. In the **foreground** that 128-bit constant goes out in the clear, occupying 18 of the 31 advertising bytes — the strongest possible app fingerprint. Scanning filters on the same constant (`BLERadioController.swift:83`, `BLEService.swift:960`).
 
-Note there are **two** fixed identifiers, not one. Even if the advertised UUID changed, `BLEService+LinkLayerPeripheralRole.swift:38-46` builds one primary service containing one characteristic, both constants, so an active prober that connects still identifies bitchat.
+Note there are **two** fixed identifiers, not one. Even if the advertised UUID changed, `BLEService+LinkLayerPeripheralRole.swift:38-46` builds one primary service containing one characteristic, both constants, so an active prober that connects still identifies yarik.
 
 ---
 
@@ -46,7 +46,7 @@ The closest real-world analogue is Tor's twenty-year bridge-distribution problem
 
 - **Third-party iOS apps cannot control advertisement contents.** Only `CBAdvertisementDataLocalNameKey` and `CBAdvertisementDataServiceUUIDsKey` are supported; other keys error. Manufacturer data and service data — where every comparable system puts its rotating payload — are unavailable to us. MASHaBLE, the one BLE secret-handshake prototype, could not be built on iOS for exactly this reason and fell back to Windows Phone.
 - **Advertised services cannot be changed while backgrounded (iOS 14+).** A wall-clock rotation cannot advance while the app is in the background — which is the state during the scenario this feature exists for. *Undocumented by Apple; needs device verification (§6).*
-- **Backgrounded, the UUID is not transmitted at all.** iOS re-encodes it as Apple manufacturer data (`0x004C`) plus a 128-bit bitmask, one bit per advertised UUID. This is worth understanding precisely, because it cuts both ways: background exposure is already only ~7 bits with genuine collisions against every other backgrounded Apple advertiser — but the mapping is stable and empirically discoverable with a free Android app, so an adversary installs bitchat once, notes the bit, and matches passively forever.
+- **Backgrounded, the UUID is not transmitted at all.** iOS re-encodes it as Apple manufacturer data (`0x004C`) plus a 128-bit bitmask, one bit per advertised UUID. This is worth understanding precisely, because it cuts both ways: background exposure is already only ~7 bits with genuine collisions against every other backgrounded Apple advertiser — but the mapping is stable and empirically discoverable with a free Android app, so an adversary installs yarik once, notes the bit, and matches passively forever.
 
 The practical consequence: **the real identification exposure is foreground advertising**, where the raw constant is on the air. iOS does permit rotation there — a foreground app can stop advertising, swap the service, and start again under a new UUID, the same stop / remove / add / start cycle `BLEService+LinkLayerPeripheralRole.swift` already runs at runtime — so the mechanics alone do not foreclose it. What they foreclose is rotation in the **background**, where the app spends most of its life in the scenario this feature exists for, and any scheme that puts the rotating value in manufacturer or service data. Foreground rotation would defeat a scanner holding a stale UUID list; it would not defeat an adversary running the public derivation (§2.1), and GATT connect-and-probe (§4) identifies us regardless of what is advertised.
 
@@ -85,12 +85,12 @@ Bridgefy is the instructive near-miss: its UUID *is* cryptographically derived, 
 
 Two observations that matter for us:
 
-- **bitchat's advertisement is already cleaner than all of them.** Every app above leaks a stable **per-user** identifier alongside the app identifier — so BLE MAC randomization buys them nothing at all. bitchat advertises the service UUID and deliberately nothing else: no local name, no service data, no manufacturer data. Our advertisement says "a bitchat device is here", not "this person is here". The per-user leak in bitchat lives one layer up, in the announce payload (stable peer ID, cleartext static keys, nickname, neighbour list) — which is precisely what `PEER-ID-ROTATION.md` addresses, and another reason §7.1 is where the effort belongs.
+- **yarik's advertisement is already cleaner than all of them.** Every app above leaks a stable **per-user** identifier alongside the app identifier — so BLE MAC randomization buys them nothing at all. yarik advertises the service UUID and deliberately nothing else: no local name, no service data, no manufacturer data. Our advertisement says "a yarik device is here", not "this person is here". The per-user leak in yarik lives one layer up, in the announce payload (stable peer ID, cleartext static keys, nickname, neighbour list) — which is precisely what `PEER-ID-ROTATION.md` addresses, and another reason §7.1 is where the effort belongs.
 - **Briar is the only structurally different answer**, and it is not a UUID trick: it does not broadcast. It uses Bluetooth Classic and dials a contact's known MAC directly, requesting discoverability only during in-person QR pairing — where it *does* derive a per-session rendezvous UUID from the key commitment. That is contact-scoped rendezvous with an in-person secret (our §7.4), achieved by giving up broadcast discovery entirely.
 
 ---
 
-## 4. What still identifies bitchat after any UUID change
+## 4. What still identifies yarik after any UUID change
 
 Rotation would leave all of these intact:
 
@@ -98,7 +98,7 @@ Ordered by how cheaply an adversary can actually use them — which is not the o
 
 - **GATT connect-and-probe — the one to worry about, and the reason rotation cannot succeed.** Cheap, active, decisive, and completely unaffected by anything done to the advertisement. Any central connects and enumerates our one primary service containing one read/write/notify characteristic (§1).
 
-  The distinction that matters, because the literature is easy to misread here: the well-known GATT-fingerprinting results are about telling *devices apart* — and by that measure the attack is weak against phones (only 4.28% of randomizing addresses uniquely identified; 85.49% of iPhones sit in anonymity sets of ≥100). But **"does this phone run bitchat" is a lookup, not a discrimination problem.** A custom 128-bit service UUID paired with a custom characteristic UUID is a categorical exact match. The measured cost of collecting a profile was ~**3.7 seconds** per device on a **Raspberry Pi 3 with four USB dongles** — squarely a cheap dragnet.
+  The distinction that matters, because the literature is easy to misread here: the well-known GATT-fingerprinting results are about telling *devices apart* — and by that measure the attack is weak against phones (only 4.28% of randomizing addresses uniquely identified; 85.49% of iPhones sit in anonymity sets of ≥100). But **"does this phone run yarik" is a lookup, not a discrimination problem.** A custom 128-bit service UUID paired with a custom characteristic UUID is a categorical exact match. The measured cost of collecting a profile was ~**3.7 seconds** per device on a **Raspberry Pi 3 with four USB dongles** — squarely a cheap dragnet.
 
   This is what forecloses rotation as a fix rather than merely complicating it. A prober reads whatever the values *currently* are, so rotating them changes nothing for an attacker who connects; and the **structure** — exactly one custom primary service, exactly one custom read/write/notify characteristic — is invariant under any rotation scheme. Worse, `characteristicUUID` is a *separate* constant today, so rotating only the service UUID would leave it as a static relink handle: the textbook out-of-sync-identifier failure that has repeatedly re-linked devices across MAC rotations in deployed Apple protocols. Gating characteristic *values* behind authentication (the mitigation that paper recommends) reduces what is served but does **not** hide the UUIDs or the shape from an enumerator.
 - **Automated, at-scale UUID mining.** The precedent that matters: a 2019 field study fingerprinted **5,509 of 5,822 real BLE devices (94.6%)** across ~1.3 square miles, using a UUID→app mapping built *automatically* by mining app stores. For a closed-source app that mapping takes reverse engineering; for us it is a grep of the repository. This is the detector that rotation would actually defeat — and the one that got Bridgefy's users tracked.
@@ -113,7 +113,7 @@ Ordered by how cheaply an adversary can actually use them — which is not the o
 
 This is the part that matters most, because each is counter-intuitive.
 
-1. **A derived UUID shrinks the anonymity set.** A global constant hides an individual inside the entire bitchat population. A per-group or per-user derived UUID is a *stronger* selector for a targeted adversary — it identifies not "a bitchat user" but "a member of this cell." Against blanket blocking that is a gain; against targeted work it is a gift.
+1. **A derived UUID shrinks the anonymity set.** A global constant hides an individual inside the entire yarik population. A per-group or per-user derived UUID is a *stronger* selector for a targeted adversary — it identifies not "a yarik user" but "a member of this cell." Against blanket blocking that is a gain; against targeted work it is a gift.
 2. **State restoration becomes a stale-identifier trap.** If iOS terminates the app while scanning, the system continues scanning for the **old** UUID indefinitely and relaunches the app *into the background*, where §2.2 says the advertisement cannot be updated. A restored device could sit advertising a dead epoch's UUID — undiscoverable by current peers *and* wearing a distinctive stale identifier. Strictly worse than the fixed UUID for that device.
 
 ---
@@ -133,9 +133,9 @@ Unresolved and not guessed at here: whether the overflow payload rides in the pr
 
 Ranked by value per unit of risk, given everything above.
 
-1. **Fix linkability, not detectability.** The far larger exposure is that today a stable 8-byte peer ID, cleartext static keys, a nickname, and a neighbour list identify a **specific person**, not merely "a bitchat user." `docs/PEER-ID-ROTATION.md` targets exactly that and is achievable. Invisibility is not. If effort is going anywhere, it should go there.
+1. **Fix linkability, not detectability.** The far larger exposure is that today a stable 8-byte peer ID, cleartext static keys, a nickname, and a neighbour list identify a **specific person**, not merely "a yarik user." `docs/PEER-ID-ROTATION.md` targets exactly that and is achievable. Invisibility is not. If effort is going anywhere, it should go there.
 2. **If anything is done to the advertisement, it must be *blending in*, not *removing*.** Adopting a widely-shared service UUID in place of a globally unique constant trades a perfect app fingerprint for genuine cover from unrelated devices. But note the trap in the obvious version of this idea: **an advertisement with no local name, no manufacturer data, and no service UUID is itself a distinctive negative signature.** Ordinary crowd BLE is dominated by Apple Continuity (`0x004C`) and Microsoft (`0x0006`) manufacturer data; stripping our identifier does not put us in the crowd, it puts us in a small, odd bucket. Any such change must also carry the §4 GATT problem, which it cannot solve, and it invites the well-supported "unobservability by imitation is fundamentally flawed" critique. A maintainer decision with real downside, not an obvious win.
-3. **Uniformity, per the Exposure Notification lesson.** Make every bitchat advertisement byte-identical in structure and timing so implementations, versions, and users do not distinguish themselves from each other. This is achievable unilaterally and has no discovery cost.
+3. **Uniformity, per the Exposure Notification lesson.** Make every yarik advertisement byte-identical in structure and timing so implementations, versions, and users do not distinguish themselves from each other. This is achievable unilaterally and has no discovery cost.
 4. **Contact-scoped covert rendezvous is genuinely possible** — a UUID derived from a shared secret, for peers who have already exchanged one. Group keys with epochs already exist (`Services/Groups/GroupStore.swift`). But it cannot coexist with stranger discovery in the same advertisement, it inherits the §5.1 anonymity-set problem, and §2.2 constrains when it can rotate at all. If it is ever built it should be an explicit, opt-in mode whose costs are stated plainly, not the default.
 
-**What to tell users:** bitchat does not hide that it is running, and no known technique would let it while strangers can still find each other. `docs/privacy-assessment.md` already states this correctly. That honesty is the right posture and should be preserved.
+**What to tell users:** yarik does not hide that it is running, and no known technique would let it while strangers can still find each other. `docs/privacy-assessment.md` already states this correctly. That honesty is the right posture and should be preserved.

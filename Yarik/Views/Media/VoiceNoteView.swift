@@ -75,14 +75,14 @@ struct VoiceNoteView: View {
                 LiveVoiceBadge()
             } else {
                 Text(playbackLabel)
-                    .bitchatFont(size: 13)
+                    .yarikFont(size: 13)
                     .foregroundColor(palette.secondary)
             }
 
             if let onCancel = onCancel, isSending {
                 Button(action: onCancel) {
                     Image(systemName: "xmark")
-                        .font(.bitchatSystem(size: 12, weight: .bold))
+                        .font(.yarikSystem(size: 12, weight: .bold))
                         .frame(width: 28, height: 28)
                         .background(Circle().fill(Color.red.opacity(0.9)))
                         .foregroundColor(.white)

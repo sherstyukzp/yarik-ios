@@ -10,7 +10,7 @@ struct BLEReceivedPacketContext: Equatable {
 }
 
 struct BLEReceivePipeline {
-    static func context(for packet: BitchatPacket, localPeerID: PeerID) -> BLEReceivedPacketContext {
+    static func context(for packet: YarikPacket, localPeerID: PeerID) -> BLEReceivedPacketContext {
         let senderID = PeerID(hexData: packet.senderID)
         // Include a payload digest so that distinct packets sharing the same
         // sender/timestamp(ms)/type are not collapsed as duplicates. The
@@ -37,7 +37,7 @@ struct BLEReceivePipeline {
     }
 
     static func relayDecision(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         senderID: PeerID,
         localPeerID: PeerID,
         degree: Int,

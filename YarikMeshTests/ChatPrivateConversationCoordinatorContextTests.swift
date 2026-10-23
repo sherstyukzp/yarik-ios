@@ -1,6 +1,6 @@
 //
 // ChatPrivateConversationCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatPrivateConversationCoordinator` against a mock
 // `ChatPrivateConversationContext` — proving the coordinator works without a
@@ -19,7 +19,7 @@ import BitFoundation
 @MainActor
 private final class MockChatPrivateConversationContext: ChatPrivateConversationContext {
     // Conversation state
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
     var sentReadReceipts: Set<String> = []
     var sentGeoDeliveryAcks: Set<String> = []
     var unreadPrivateMessages: Set<PeerID> = []
@@ -55,7 +55,7 @@ private final class MockChatPrivateConversationContext: ChatPrivateConversationC
     private(set) var migratedChats: [(from: PeerID, to: PeerID)] = []
 
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool {
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool {
         var chat = privateChats[peerID] ?? []
         guard !chat.contains(where: { $0.id == message.id }) else {
             privateChats[peerID] = chat
@@ -67,7 +67,7 @@ private final class MockChatPrivateConversationContext: ChatPrivateConversationC
         return true
     }
 
-    func upsertPrivateMessage(_ message: BitchatMessage, in peerID: PeerID) {
+    func upsertPrivateMessage(_ message: YarikMessage, in peerID: PeerID) {
         upsertedMessages.append((message.id, peerID))
         if var chat = privateChats[peerID],
            let index = chat.firstIndex(where: { $0.id == message.id }) {
@@ -274,8 +274,8 @@ private func makeIncomingMessage(
     timestamp: Date = Date(),
     senderPeerID: PeerID? = nil,
     recipientNickname: String? = "me"
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: sender,
         content: content,

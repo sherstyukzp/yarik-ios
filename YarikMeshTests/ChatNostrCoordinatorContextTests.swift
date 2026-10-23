@@ -1,6 +1,6 @@
 //
 // ChatNostrCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises the `ChatNostrCoordinator` facade and its components
 // (`NostrInboundPipeline`, `GeohashSubscriptionManager`, `GeoPresenceTracker`)
@@ -41,12 +41,12 @@ private final class MockChatNostrContext: ChatNostrContext {
     }
 
     // Public timeline & pipeline
-    var messages: [BitchatMessage] = []
+    var messages: [YarikMessage] = []
     private(set) var pipelineFlushCount = 0
     private(set) var refreshedChannels: [ChannelID?] = []
     private(set) var publicSystemMessages: [String] = []
     var pendingGeohashSystemMessages: [String] = []
-    private(set) var appendedGeohashMessages: [(message: BitchatMessage, geohash: String)] = []
+    private(set) var appendedGeohashMessages: [(message: YarikMessage, geohash: String)] = []
 
     func flushPublicMessagePipeline() { pipelineFlushCount += 1 }
     func refreshVisibleMessages(from channel: ChannelID?) { refreshedChannels.append(channel) }
@@ -57,7 +57,7 @@ private final class MockChatNostrContext: ChatNostrContext {
         return pendingGeohashSystemMessages
     }
 
-    func appendGeohashMessageIfAbsent(_ message: BitchatMessage, toGeohash geohash: String) -> Bool {
+    func appendGeohashMessageIfAbsent(_ message: YarikMessage, toGeohash geohash: String) -> Bool {
         guard !appendedGeohashMessages.contains(where: { $0.message.id == message.id && $0.geohash == geohash }) else {
             return false
         }
@@ -66,13 +66,13 @@ private final class MockChatNostrContext: ChatNostrContext {
     }
 
     // Inbound public messages
-    private(set) var handledPublicMessages: [BitchatMessage] = []
+    private(set) var handledPublicMessages: [YarikMessage] = []
     private(set) var mentionCheckedMessageIDs: [String] = []
     private(set) var hapticMessageIDs: [String] = []
 
-    func handlePublicMessage(_ message: BitchatMessage, powBits: Int) { handledPublicMessages.append(message) }
-    func checkForMentions(_ message: BitchatMessage) { mentionCheckedMessageIDs.append(message.id) }
-    func sendHapticFeedback(for message: BitchatMessage) { hapticMessageIDs.append(message.id) }
+    func handlePublicMessage(_ message: YarikMessage, powBits: Int) { handledPublicMessages.append(message) }
+    func checkForMentions(_ message: YarikMessage) { mentionCheckedMessageIDs.append(message.id) }
+    func sendHapticFeedback(for message: YarikMessage) { hapticMessageIDs.append(message.id) }
     func parseMentions(from content: String) -> [String] { [] }
 
     // Inbound private (geohash DM) payloads
@@ -341,7 +341,7 @@ struct ChatNostrCoordinatorContextTests {
 
         let recipient = try NostrIdentity.generate()
         let sender = try NostrIdentity.generate()
-        let embedded = try #require(NostrEmbeddedBitChat.encodePMForNostrNoRecipient(
+        let embedded = try #require(NostrEmbeddedYarik.encodePMForNostrNoRecipient(
             content: "psst",
             messageID: "gm-1"
         ))
@@ -383,7 +383,7 @@ struct ChatNostrCoordinatorContextTests {
 
         let recipient = try NostrIdentity.generate()
         let sender = try NostrIdentity.generate()
-        let embedded = try #require(NostrEmbeddedBitChat.encodePMForNostrNoRecipient(
+        let embedded = try #require(NostrEmbeddedYarik.encodePMForNostrNoRecipient(
             content: "pre-wipe secret",
             messageID: "gm-wipe-1"
         ))
@@ -479,7 +479,7 @@ struct ChatNostrCoordinatorContextTests {
         let senderPubkey = "feedface00112233"
         let convKey = PeerID(nostr_: senderPubkey)
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "mid-1",
             sender: "alice#1234",
             content: "hi",
@@ -606,7 +606,7 @@ struct GeoPresenceTrackerTests {
 
         // Pre-seed the same event ID so the timeline append reports a
         // duplicate and the flow never reaches the live notification center.
-        let placeholder = BitchatMessage(
+        let placeholder = YarikMessage(
             id: event.id,
             sender: "seed",
             content: "seed",

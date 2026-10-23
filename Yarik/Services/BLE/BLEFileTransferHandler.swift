@@ -15,13 +15,13 @@ struct BLEFileTransferHandlerEnvironment {
     /// Snapshot of known peers keyed by ID (registry read).
     let peersSnapshot: () -> [PeerID: BLEPeerInfo]
     /// Verifies a packet's signature against a candidate signing key (registry path).
-    let verifyPacketSignature: (_ packet: BitchatPacket, _ signingPublicKey: Data) -> Bool
+    let verifyPacketSignature: (_ packet: YarikPacket, _ signingPublicKey: Data) -> Bool
     /// Local signing key used to authenticate our own gossip-sync replays.
     let localSigningPublicKey: () -> Data
     /// Resolves a display name from a verified packet signature for peers missing from the registry.
-    let signedSenderDisplayName: (_ packet: BitchatPacket, _ peerID: PeerID) -> String?
+    let signedSenderDisplayName: (_ packet: YarikPacket, _ peerID: PeerID) -> String?
     /// Tracks the broadcast file packet for gossip sync.
-    let trackPacketSeen: (BitchatPacket) -> Void
+    let trackPacketSeen: (YarikPacket) -> Void
     /// Enforces the incoming-media storage quota before saving (BCH-01-002).
     let enforceStorageQuota: (_ reservingBytes: Int) -> Void
     /// Persists the validated file to the incoming-media store; returns the destination URL.
@@ -56,7 +56,7 @@ struct BLEFileTransferHandlerEnvironment {
     /// every delivery attempt, including rejection, so allocator ownership
     /// cannot leak indefinitely.
     let deliverMessage: (
-        _ message: BitchatMessage,
+        _ message: YarikMessage,
         _ shouldDeliver: @escaping () -> Bool,
         _ completion: @escaping () -> Void,
         _ finalization: @escaping (TransportEventDeliveryOutcome) -> Void
@@ -129,7 +129,7 @@ final class BLEFileTransferHandler {
     /// before the routing decision, so a forged directed packet cannot use a
     /// node that is not its recipient as an unsigned forwarding hop.
     @discardableResult
-    func handle(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    func handle(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         let env = environment
         let localPeerID = env.localPeerID()
         let peersSnapshot = env.peersSnapshot()
@@ -399,7 +399,7 @@ final class BLEFileTransferHandler {
     }
 
     private func deliverStableMessage(
-        _ message: BitchatMessage,
+        _ message: YarikMessage,
         messageID: String,
         peerID: PeerID,
         expectedURL: URL,
@@ -433,8 +433,8 @@ final class BLEFileTransferHandler {
         destination: URL,
         category: MimeType.Category,
         env: BLEFileTransferHandlerEnvironment
-    ) -> BitchatMessage {
-        BitchatMessage(
+    ) -> YarikMessage {
+        YarikMessage(
             id: messageID,
             sender: senderNickname,
             content: "\(category.messagePrefix)\(destination.lastPathComponent)",
@@ -444,7 +444,7 @@ final class BLEFileTransferHandler {
             isPrivate: isPrivate,
             recipientNickname: nil,
             senderPeerID: peerID,
-            // Received messages need an explicit status: BitchatMessage
+            // Received messages need an explicit status: YarikMessage
             // defaults private messages to .sending, which media views render
             // as an in-flight send.
             deliveryStatus: isPrivate
@@ -481,7 +481,7 @@ final class BLEFileTransferHandler {
     /// signing keys are preferred; persisted identities cover peers that have
     /// rotated or are not currently present in the registry.
     private func authenticatedRawSenderNickname(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         from peerID: PeerID,
         peers: [PeerID: BLEPeerInfo],
         env: BLEFileTransferHandlerEnvironment

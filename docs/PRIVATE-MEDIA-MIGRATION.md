@@ -1,6 +1,6 @@
 # Private-media wire migration
 
-Private files use the `BitchatFilePacket` TLV shared by iOS and Android. The
+Private files use the `YarikFilePacket` TLV shared by iOS and Android. The
 preferred direct-message wire form encrypts that complete TLV inside the
 peer's Noise session before BLE fragmentation.
 

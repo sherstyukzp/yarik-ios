@@ -240,8 +240,8 @@ private extension ChatViewModelBootstrapper {
                 guard viewModel.conversations.conversationsByID[.mesh]?.messages.isEmpty != false else { return }
 
                 for item in archived {
-                    let echo = BitchatMessage(
-                        id: BitchatMessage.archivedEchoIDPrefix + item.packetIdHex,
+                    let echo = YarikMessage(
+                        id: YarikMessage.archivedEchoIDPrefix + item.packetIdHex,
                         sender: item.senderNickname,
                         content: item.content,
                         timestamp: item.timestamp,
@@ -259,8 +259,8 @@ private extension ChatViewModelBootstrapper {
                 if let firstTimestamp = archived.map(\.timestamp).min() {
                     // Echo-prefixed ID so the divider joins the tinted,
                     // dimmed echo block in the timeline.
-                    let divider = BitchatMessage(
-                        id: BitchatMessage.archivedEchoIDPrefix + "divider",
+                    let divider = YarikMessage(
+                        id: YarikMessage.archivedEchoIDPrefix + "divider",
                         sender: "system",
                         content: String(localized: "content.echoes.divider", comment: "System line shown above dimmed archived messages replayed on the mesh timeline at launch"),
                         timestamp: firstTimestamp.addingTimeInterval(-1),
@@ -281,7 +281,7 @@ private extension ChatViewModelBootstrapper {
 
                     viewModel.allPeers = peers
 
-                    var uniquePeers: [PeerID: BitchatPeer] = [:]
+                    var uniquePeers: [PeerID: YarikPeer] = [:]
                     for peer in peers {
                         if uniquePeers[peer.peerID] == nil {
                             uniquePeers[peer.peerID] = peer
@@ -465,7 +465,7 @@ private extension ChatViewModelBootstrapper {
             bleService?.broadcastNostrCarrier(payload)
         }
         bridge.injectInbound = { [weak viewModel] inbound in
-            viewModel?.handlePublicMessage(BitchatMessage(
+            viewModel?.handlePublicMessage(YarikMessage(
                 id: inbound.messageID,
                 sender: inbound.senderNickname,
                 content: inbound.content,

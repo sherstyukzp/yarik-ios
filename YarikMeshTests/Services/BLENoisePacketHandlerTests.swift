@@ -21,7 +21,7 @@ struct BLENoisePacketHandlerTests {
         var processedHandshakes: [(peerID: PeerID, message: Data)] = []
         var hasSessionQueries: [PeerID] = []
         var initiatedHandshakes: [PeerID] = []
-        var broadcastPackets: [BitchatPacket] = []
+        var broadcastPackets: [YarikPacket] = []
         var lastSeenUpdates: [PeerID] = []
         var decryptCalls: [(payload: Data, peerID: PeerID)] = []
         var clearedSessions: [PeerID] = []
@@ -1278,8 +1278,8 @@ struct BLENoisePacketHandlerTests {
         #expect(recorder.initiatedHandshakes.isEmpty)
     }
 
-    private func makeHandshakePacket(recipientID: Data?) -> BitchatPacket {
-        BitchatPacket(
+    private func makeHandshakePacket(recipientID: Data?) -> YarikPacket {
+        YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: Data(hexString: remotePeerID.id) ?? Data(),
             recipientID: recipientID,
@@ -1294,8 +1294,8 @@ struct BLENoisePacketHandlerTests {
         recipientID: Data?,
         timestamp: UInt64 = 900_000,
         payload: Data = Data([0xC0, 0xFF, 0xEE])
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: remotePeerID.id) ?? Data(),
             recipientID: recipientID,

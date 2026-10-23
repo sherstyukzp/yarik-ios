@@ -1,6 +1,6 @@
 //
 // BinaryProtocol.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -9,7 +9,7 @@
 ///
 /// # BinaryProtocol
 ///
-/// Low-level binary encoding and decoding for BitChat protocol messages.
+/// Low-level binary encoding and decoding for Yarik protocol messages.
 /// Optimized for Bluetooth LE's limited bandwidth and MTU constraints.
 ///
 /// ## Overview
@@ -93,8 +93,8 @@ import struct Foundation.Data
 import class Foundation.NSData
 private import BitLogger
 
-/// Implements binary encoding and decoding for BitChat protocol messages.
-/// Provides static methods for converting between BitchatPacket objects and
+/// Implements binary encoding and decoding for Yarik protocol messages.
+/// Provides static methods for converting between YarikPacket objects and
 /// their binary wire format representation.
 /// - Note: All multi-byte values use network byte order (big-endian)
 public struct BinaryProtocol {
@@ -129,8 +129,8 @@ public struct BinaryProtocol {
         static let isRSR: UInt8 = 0x10
     }
     
-    // Encode BitchatPacket to binary format
-    static func encode(_ packet: BitchatPacket, padding: Bool = true) -> Data? {
+    // Encode YarikPacket to binary format
+    static func encode(_ packet: YarikPacket, padding: Bool = true) -> Data? {
         let version = packet.version
         guard version == 1 || version == 2 else { return nil }
 
@@ -253,8 +253,8 @@ public struct BinaryProtocol {
         return data
     }
     
-    // Decode binary data to BitchatPacket
-    public static func decode(_ data: Data) -> BitchatPacket? {
+    // Decode binary data to YarikPacket
+    public static func decode(_ data: Data) -> YarikPacket? {
         // Try decode as-is first (robust when padding wasn't applied)
         if let pkt = decodeCore(data) { return pkt }
         // If that fails, try after removing padding
@@ -264,10 +264,10 @@ public struct BinaryProtocol {
     }
 
     // Core decoding implementation used by decode(_:) with and without padding removal
-    private static func decodeCore(_ raw: Data) -> BitchatPacket? {
+    private static func decodeCore(_ raw: Data) -> YarikPacket? {
         guard raw.count >= v1HeaderSize + senderIDSize else { return nil }
 
-        return raw.withUnsafeBytes { (buf: UnsafeRawBufferPointer) -> BitchatPacket? in
+        return raw.withUnsafeBytes { (buf: UnsafeRawBufferPointer) -> YarikPacket? in
             guard let base = buf.baseAddress else { return nil }
             var offset = 0
             func require(_ n: Int) -> Bool { offset + n <= buf.count }
@@ -405,7 +405,7 @@ public struct BinaryProtocol {
 
             guard offset <= buf.count else { return nil }
 
-            return BitchatPacket(
+            return YarikPacket(
                 type: type,
                 senderID: senderID,
                 recipientID: recipientID,

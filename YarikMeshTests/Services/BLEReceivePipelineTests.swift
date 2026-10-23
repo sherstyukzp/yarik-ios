@@ -94,8 +94,8 @@ struct BLEReceivePipelineTests {
         recipient: PeerID? = nil,
         timestamp: UInt64 = 1,
         ttl: UInt8 = 7
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: type.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipient.flatMap { Data(hexString: $0.id) },

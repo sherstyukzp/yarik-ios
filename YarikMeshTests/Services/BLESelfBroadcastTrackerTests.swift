@@ -56,8 +56,8 @@ struct BLESelfBroadcastTrackerTests {
         #expect(tracker.takeMessageID(for: packet) == nil)
     }
 
-    private func makePacket(timestamp: UInt64) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(timestamp: UInt64) -> YarikPacket {
+        YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: "8877665544332211") ?? Data(),
             recipientID: nil,

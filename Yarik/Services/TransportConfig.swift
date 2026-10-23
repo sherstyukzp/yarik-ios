@@ -116,7 +116,7 @@ enum TransportConfig {
     static let nostrInboundPerRelayBufferCap: Int = 256
     // Hard per-frame byte bound, applied as URLSessionWebSocketTask
     // .maximumMessageSize (oversized frames fail the receive instead of
-    // buffering). BitChat's legitimate Nostr traffic is small: geohash chat /
+    // buffering). Yarik's legitimate Nostr traffic is small: geohash chat /
     // presence events (kind 20000/20001), kind-1 notes, and NIP-17
     // gift-wrapped DMs carrying text payloads or receipts are all a few KiB,
     // and most public relays reject events beyond ~64–256 KiB anyway. 512 KiB

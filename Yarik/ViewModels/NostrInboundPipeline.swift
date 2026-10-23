@@ -35,9 +35,9 @@ protocol NostrInboundPipelineContext: AnyObject {
     /// `powBits` is the validated NIP-13 difficulty of the source event
     /// (`NostrPoW.validatedDifficulty`); it relaxes the per-sender rate limit
     /// downstream.
-    func handlePublicMessage(_ message: BitchatMessage, powBits: Int)
-    func checkForMentions(_ message: BitchatMessage)
-    func sendHapticFeedback(for message: BitchatMessage)
+    func handlePublicMessage(_ message: YarikMessage, powBits: Int)
+    func checkForMentions(_ message: YarikMessage)
+    func sendHapticFeedback(for message: YarikMessage)
     func parseMentions(from content: String) -> [String]
 
     // MARK: Inbound private (DM) payloads
@@ -172,7 +172,7 @@ final class NostrInboundPipeline {
         let timestamp = min(rawTs, Date())
         let mentions = context.parseMentions(from: content)
         let powBits = NostrPoW.validatedDifficulty(idHex: event.id, tags: event.tags)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: event.id,
             sender: senderName,
             content: content,
@@ -267,7 +267,7 @@ final class NostrInboundPipeline {
 
         let rawTs = Date(timeIntervalSince1970: TimeInterval(event.created_at))
         let mentions = context.parseMentions(from: content)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: event.id,
             sender: senderName,
             content: content,
@@ -376,7 +376,7 @@ final class NostrInboundPipeline {
             // pre-wipe plaintext reach post-wipe state; drop it here, atomic
             // with the wipe on the main actor.
             guard self.wipeGeneration == wipeGeneration else { return }
-            guard let packet = Self.decodeEmbeddedBitChatPacket(from: content),
+            guard let packet = Self.decodeEmbeddedYarikPacket(from: content),
                   packet.type == MessageType.noiseEncrypted.rawValue,
                   let payload = NoisePayload.decode(packet.payload)
             else {
@@ -462,11 +462,11 @@ final class NostrInboundPipeline {
             }
 
             if content.hasPrefix("bitchat1:") {
-                let packet: BitchatPacket? = await MainActor.run {
-                    Self.decodeEmbeddedBitChatPacket(from: content)
+                let packet: YarikPacket? = await MainActor.run {
+                    Self.decodeEmbeddedYarikPacket(from: content)
                 }
                 guard let packet else {
-                    SecureLogger.error("Failed to decode embedded BitChat packet from Nostr DM", category: .session)
+                    SecureLogger.error("Failed to decode embedded Yarik packet from Nostr DM", category: .session)
                     return
                 }
 
@@ -572,7 +572,7 @@ extension NostrInboundPipeline {
 
 private extension NostrInboundPipeline {
     @MainActor
-    static func decodeEmbeddedBitChatPacket(from content: String) -> BitchatPacket? {
+    static func decodeEmbeddedYarikPacket(from content: String) -> YarikPacket? {
         guard content.hasPrefix("bitchat1:") else { return nil }
         let encoded = String(content.dropFirst("bitchat1:".count))
         let maxBytes = FileTransferLimits.maxFramedFileBytes
@@ -583,6 +583,6 @@ private extension NostrInboundPipeline {
         else {
             return nil
         }
-        return BitchatPacket.from(packetData)
+        return YarikPacket.from(packetData)
     }
 }

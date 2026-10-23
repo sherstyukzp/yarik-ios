@@ -48,7 +48,7 @@ struct MeshPeerList: View {
             // padding as a peer row) so the empty state reads as the list's
             // only line, not a floating caption.
             Text(Strings.noneNearby)
-                .bitchatFont(size: 14)
+                .yarikFont(size: 14)
                 .foregroundColor(palette.secondary)
                 .padding(.horizontal)
                 .padding(.vertical, 4)
@@ -65,31 +65,31 @@ struct MeshPeerList: View {
                         // the peer is reachable (radio, relayed, nostr-only).
                         if isMe {
                             Image(systemName: "person.fill")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(baseColor)
                         } else if peer.isConnected {
                             // Mesh-connected peer: radio icon
                             Image(systemName: "antenna.radiowaves.left.and.right")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(baseColor)
                                 .help(Strings.connected)
                         } else if peer.isReachable {
                             // Mesh-reachable (relayed): point.3 icon
                             Image(systemName: "point.3.filled.connected.trianglepath.dotted")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(baseColor)
                                 .help(Strings.reachable)
                         } else if peer.isMutualFavorite {
                             // Mutual favorite reachable via Nostr: globe icon (purple)
                             Image(systemName: "globe")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.purple)
                                 .help(Strings.nostr)
                         } else {
                             // Offline: slashed variant of the connected glyph
                             // (dimmed) — clearer than a generic person icon.
                             Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(palette.secondary)
                                 .help(Strings.offline)
                         }
@@ -97,21 +97,21 @@ struct MeshPeerList: View {
                         let (base, suffix) = peer.displayName.splitSuffix()
                         HStack(spacing: 0) {
                             Text(base)
-                                .bitchatFont(size: 14)
+                                .yarikFont(size: 14)
                                 .foregroundColor(baseColor)
                                 .lineLimit(1)
                                 .truncationMode(.tail)
                             if !suffix.isEmpty {
                                 let suffixColor = isMe ? Color.orange.opacity(0.6) : baseColor.opacity(0.6)
                                 Text(suffix)
-                                    .bitchatFont(size: 14)
+                                    .yarikFont(size: 14)
                                     .foregroundColor(suffixColor)
                             }
                         }
 
                         if peer.isBlocked {
                             Image(systemName: "nosign")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.red)
                                 .help(Strings.blockedTooltip)
                         }
@@ -120,7 +120,7 @@ struct MeshPeerList: View {
                             if peer.isConnected {
                                 if let icon = peer.encryptionStatus.icon {
                                     Image(systemName: icon)
-                                        .font(.bitchatSystem(size: 10))
+                                        .font(.yarikSystem(size: 10))
                                         // Optical centering: lock glyph ink is
                                         // bottom-heavy, so geometric centering
                                         // reads low next to the name.
@@ -131,12 +131,12 @@ struct MeshPeerList: View {
                                 // Offline: prefer showing verified badge from persisted fingerprints
                                 if peer.showsVerifiedBadgeWhenOffline {
                                     Image(systemName: "checkmark.seal.fill")
-                                        .font(.bitchatSystem(size: 10))
+                                        .font(.yarikSystem(size: 10))
                                         .foregroundColor(baseColor)
                                 } else if let icon = peer.encryptionStatus.icon {
                                     // Fallback to whatever status says (likely lock if we had a past session)
                                     Image(systemName: icon)
-                                        .font(.bitchatSystem(size: 10))
+                                        .font(.yarikSystem(size: 10))
                                         .offset(y: icon.hasPrefix("lock") ? -0.5 : 0)
                                         .foregroundColor(baseColor)
                                 }
@@ -147,7 +147,7 @@ struct MeshPeerList: View {
                             // Never shown alongside a verified badge.
                             if peer.showsVouchedBadge {
                                 Image(systemName: "checkmark.seal")
-                                    .font(.bitchatSystem(size: 10))
+                                    .font(.yarikSystem(size: 10))
                                     .foregroundColor(baseColor)
                                     .help(Strings.vouchedTooltip)
                             }
@@ -158,7 +158,7 @@ struct MeshPeerList: View {
                         // Unread message indicator for this peer
                         if peer.hasUnread {
                             Image(systemName: "envelope.fill")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.orange)
                                 .help(Strings.newMessagesTooltip)
                         }
@@ -166,7 +166,7 @@ struct MeshPeerList: View {
                         if !isMe {
                             Button(action: { onToggleFavorite(peer.peerID) }) {
                                 Image(systemName: peer.isFavorite ? "star.fill" : "star")
-                                    .font(.bitchatSystem(size: 12))
+                                    .font(.yarikSystem(size: 12))
                                     .foregroundColor(peer.isFavorite ? .yellow : palette.secondary)
                                     // Widen the tap target beyond the bare glyph;
                                     // height stays row-bound so neighboring rows

@@ -1,6 +1,6 @@
 //
 // BridgeWireFormatTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -72,12 +72,12 @@ struct BridgeWireFormatTests {
         }
     }
 
-    // MARK: - BitchatMessage bridged flag
+    // MARK: - YarikMessage bridged flag
     // (Binary round-trip lives in BitFoundation's own tests —
     // `toBinaryPayload` is internal to the package.)
 
     @Test func bridgedFlagSurvivesCodableRoundTrip() throws {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: "far-friend",
             content: "hi",
             timestamp: Date(),
@@ -85,12 +85,12 @@ struct BridgeWireFormatTests {
             isBridged: true
         )
         let data = try JSONEncoder().encode(message)
-        let decoded = try JSONDecoder().decode(BitchatMessage.self, from: data)
+        let decoded = try JSONDecoder().decode(YarikMessage.self, from: data)
         #expect(decoded.isBridged)
     }
 
     @Test func legacyJSONWithoutBridgedFlagDecodes() throws {
-        let plain = BitchatMessage(
+        let plain = YarikMessage(
             sender: "old-client",
             content: "hi",
             timestamp: Date(),
@@ -99,7 +99,7 @@ struct BridgeWireFormatTests {
         let encoded = try JSONEncoder().encode(plain)
         var json = try #require(try JSONSerialization.jsonObject(with: encoded) as? [String: Any])
         json.removeValue(forKey: "isBridged")
-        let decoded = try JSONDecoder().decode(BitchatMessage.self, from: JSONSerialization.data(withJSONObject: json))
+        let decoded = try JSONDecoder().decode(YarikMessage.self, from: JSONSerialization.data(withJSONObject: json))
         #expect(!decoded.isBridged)
     }
 

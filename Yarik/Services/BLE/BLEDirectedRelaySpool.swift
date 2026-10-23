@@ -3,7 +3,7 @@ import Foundation
 
 struct BLEDirectedRelaySpoolEntry {
     let recipient: PeerID
-    let packet: BitchatPacket
+    let packet: YarikPacket
 }
 
 /// Directed packets held at a relay while no onward link exists.
@@ -22,7 +22,7 @@ struct BLEDirectedRelaySpool {
     }
 
     private struct StoredPacket {
-        let packet: BitchatPacket
+        let packet: YarikPacket
         let enqueuedAt: Date
     }
 
@@ -55,7 +55,7 @@ struct BLEDirectedRelaySpool {
     /// both the count and the byte budget hold.
     @discardableResult
     mutating func enqueue(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         recipient: PeerID,
         messageID: String,
         enqueuedAt: Date

@@ -17,11 +17,11 @@ struct BLESelfBroadcastTracker {
         entriesByDedupID.count
     }
 
-    mutating func record(messageID: String, packet: BitchatPacket, sentAt: Date) {
+    mutating func record(messageID: String, packet: YarikPacket, sentAt: Date) {
         entriesByDedupID[Self.dedupID(for: packet)] = Entry(messageID: messageID, sentAt: sentAt)
     }
 
-    mutating func takeMessageID(for packet: BitchatPacket) -> String? {
+    mutating func takeMessageID(for packet: YarikPacket) -> String? {
         entriesByDedupID.removeValue(forKey: Self.dedupID(for: packet))?.messageID
     }
 
@@ -34,7 +34,7 @@ struct BLESelfBroadcastTracker {
         entriesByDedupID.removeAll()
     }
 
-    static func dedupID(for packet: BitchatPacket) -> String {
+    static func dedupID(for packet: YarikPacket) -> String {
         "\(packet.senderID.hexEncodedString())-\(packet.timestamp)-\(packet.type)"
     }
 }

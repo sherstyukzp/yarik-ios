@@ -1,6 +1,6 @@
 //
 // BLERecentPeripheralCacheTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Eviction, expiry, and reconnect-target selection for the background
 // wake-on-proximity peripheral cache.

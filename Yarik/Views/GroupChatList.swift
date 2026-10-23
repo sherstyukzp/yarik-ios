@@ -31,18 +31,18 @@ struct GroupChatList: View {
                 ForEach(groups) { group in
                     HStack(spacing: 4) {
                         Text("#\(group.name)")
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(palette.primary)
                             .lineLimit(1)
                             .truncationMode(.tail)
 
                         Text(String(format: Strings.memberCountFormat, locale: .current, "\(group.memberCount)"))
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.secondary)
 
                         if group.isCreator {
                             Image(systemName: "crown.fill")
-                                .font(.bitchatSystem(size: 9))
+                                .font(.yarikSystem(size: 9))
                                 .foregroundColor(.yellow)
                                 .help(Strings.creator)
                         }
@@ -51,7 +51,7 @@ struct GroupChatList: View {
 
                         if group.hasUnread {
                             Image(systemName: "envelope.fill")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.orange)
                                 .help(Strings.newMessagesTooltip)
                         }

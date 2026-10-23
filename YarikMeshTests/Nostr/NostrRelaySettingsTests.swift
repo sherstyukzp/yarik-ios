@@ -9,7 +9,7 @@ struct NostrRelaySettingsTests {
     /// Each case gets its own suite so nothing touches the real preferences or
     /// races another case.
     private func makeDefaults() -> UserDefaults {
-        let suite = "bitchat.tests.relays.\(UUID().uuidString)"
+        let suite = "yarik.tests.relays.\(UUID().uuidString)"
         return UserDefaults(suiteName: suite)!
     }
 

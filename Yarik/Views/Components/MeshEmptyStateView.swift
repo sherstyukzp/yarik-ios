@@ -1,6 +1,6 @@
 //
 // MeshEmptyStateView.swift
-// bitchat
+// yarik
 //
 // The empty mesh timeline, upgraded from a dead end into a live surface:
 // a sonar shows the radio scanning, the daily sightings tally proves the
@@ -130,7 +130,7 @@ struct MeshEmptyStateView: View {
             MeshRadarView(height: compact ? 44 : 72)
             if sightingsTracker.todayCount > 0 {
                 Text(verbatim: sightingsText)
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(palette.secondary.opacity(0.8))
             }
         }
@@ -218,7 +218,7 @@ private extension MeshEmptyStateView {
         // Non-breaking space before the closing asterisk so a tight wrap
         // can't orphan a lone "*" onto its own line.
         Text(verbatim: "* \(text)\u{00A0}*")
-            .bitchatFont(size: 13)
+            .yarikFont(size: 13)
             .foregroundColor(color)
             .fixedSize(horizontal: false, vertical: true)
     }

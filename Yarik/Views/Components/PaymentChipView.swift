@@ -1,6 +1,6 @@
 //
 // PaymentChipView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -118,10 +118,10 @@ struct PaymentChipView: View {
                 Text(paymentType.emoji)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(primaryLabel)
-                        .bitchatFont(size: 12, weight: .semibold)
+                        .yarikFont(size: 12, weight: .semibold)
                     if let memoLabel {
                         Text(memoLabel)
-                            .bitchatFont(size: 10)
+                            .yarikFont(size: 10)
                             .opacity(0.7)
                             .lineLimit(1)
                     }

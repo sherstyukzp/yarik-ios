@@ -14,7 +14,7 @@ final class ChatMessageFormatter {
         self.viewModel = viewModel
     }
 
-    func formatMessageAsText(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme = .matrix) -> AttributedString {
+    func formatMessageAsText(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme = .matrix) -> AttributedString {
         let design = theme.bodyFontDesign
         let isSelf: Bool = {
             if let spid = message.senderPeerID {
@@ -55,9 +55,9 @@ final class ChatMessageFormatter {
             var senderStyle = AttributeContainer()
             senderStyle.foregroundColor = baseColor
             let fontWeight: Font.Weight = isSelf ? .bold : .medium
-            senderStyle.font = .bitchatSystem(size: 14, weight: fontWeight, design: design)
+            senderStyle.font = .yarikSystem(size: 14, weight: fontWeight, design: design)
             if let spid = message.senderPeerID,
-               let url = URL(string: "bitchat://user/\(spid.toPercentEncoded())") {
+               let url = URL(string: "yarik://user/\(spid.toPercentEncoded())") {
                 senderStyle.link = url
             }
 
@@ -84,8 +84,8 @@ final class ChatMessageFormatter {
                 var plainStyle = AttributeContainer()
                 plainStyle.foregroundColor = baseColor
                 plainStyle.font = isSelf
-                    ? .bitchatSystem(size: 14, weight: .bold, design: design)
-                    : .bitchatSystem(size: 14, design: design)
+                    ? .yarikSystem(size: 14, weight: .bold, design: design)
+                    : .yarikSystem(size: 14, design: design)
                 result.append(AttributedString(content).mergingAttributes(plainStyle))
             } else {
                 let hashtagRegex = Patterns.hashtag
@@ -203,8 +203,8 @@ final class ChatMessageFormatter {
                             var beforeStyle = AttributeContainer()
                             beforeStyle.foregroundColor = baseColor
                             beforeStyle.font = isSelf
-                                ? .bitchatSystem(size: 14, weight: .bold, design: design)
-                                : .bitchatSystem(size: 14, design: design)
+                                ? .yarikSystem(size: 14, weight: .bold, design: design)
+                                : .yarikSystem(size: 14, design: design)
                             if isMentioned {
                                 beforeStyle.font = beforeStyle.font?.bold()
                             }
@@ -233,7 +233,7 @@ final class ChatMessageFormatter {
                         }()
 
                         var mentionStyle = AttributeContainer()
-                        mentionStyle.font = .bitchatSystem(
+                        mentionStyle.font = .yarikSystem(
                             size: 14,
                             weight: isSelf ? .bold : .semibold,
                             design: design
@@ -273,11 +273,11 @@ final class ChatMessageFormatter {
 
                         var tagStyle = AttributeContainer()
                         tagStyle.font = isSelf
-                            ? .bitchatSystem(size: 14, weight: .bold, design: design)
-                            : .bitchatSystem(size: 14, design: design)
+                            ? .yarikSystem(size: 14, weight: .bold, design: design)
+                            : .yarikSystem(size: 14, design: design)
                         tagStyle.foregroundColor = baseColor
                         if isGeohash && !attachedToMentionToken && standalone,
-                           let url = URL(string: "bitchat://geohash/\(token)") {
+                           let url = URL(string: "yarik://geohash/\(token)") {
                             tagStyle.link = url
                             tagStyle.underlineStyle = .single
                         }
@@ -286,12 +286,12 @@ final class ChatMessageFormatter {
                         var spacer = AttributeContainer()
                         spacer.foregroundColor = baseColor
                         spacer.font = isSelf
-                            ? .bitchatSystem(size: 14, weight: .bold, design: design)
-                            : .bitchatSystem(size: 14, design: design)
+                            ? .yarikSystem(size: 14, weight: .bold, design: design)
+                            : .yarikSystem(size: 14, design: design)
                         result.append(AttributedString(" ").mergingAttributes(spacer))
                     } else {
                         var matchStyle = AttributeContainer()
-                        matchStyle.font = .bitchatSystem(
+                        matchStyle.font = .yarikSystem(
                             size: 14,
                             weight: isSelf ? .bold : .semibold,
                             design: design
@@ -316,8 +316,8 @@ final class ChatMessageFormatter {
                     var remainingStyle = AttributeContainer()
                     remainingStyle.foregroundColor = baseColor
                     remainingStyle.font = isSelf
-                        ? .bitchatSystem(size: 14, weight: .bold, design: design)
-                        : .bitchatSystem(size: 14, design: design)
+                        ? .yarikSystem(size: 14, weight: .bold, design: design)
+                        : .yarikSystem(size: 14, design: design)
                     if isMentioned {
                         remainingStyle.font = remainingStyle.font?.bold()
                     }
@@ -328,19 +328,19 @@ final class ChatMessageFormatter {
             let timestamp = AttributedString(" [\(message.formattedTimestamp)]")
             var timestampStyle = AttributeContainer()
             timestampStyle.foregroundColor = Color.gray.opacity(0.7)
-            timestampStyle.font = .bitchatSystem(size: 10, design: design)
+            timestampStyle.font = .yarikSystem(size: 10, design: design)
             result.append(timestamp.mergingAttributes(timestampStyle))
         } else {
             var contentStyle = AttributeContainer()
             contentStyle.foregroundColor = Color.gray
             let content = AttributedString("* \(message.content) *")
-            contentStyle.font = .bitchatSystem(size: 12, design: design).italic()
+            contentStyle.font = .yarikSystem(size: 12, design: design).italic()
             result.append(content.mergingAttributes(contentStyle))
 
             let timestamp = AttributedString(" [\(message.formattedTimestamp)]")
             var timestampStyle = AttributeContainer()
             timestampStyle.foregroundColor = Color.gray.opacity(0.5)
-            timestampStyle.font = .bitchatSystem(size: 10, design: design)
+            timestampStyle.font = .yarikSystem(size: 10, design: design)
             result.append(timestamp.mergingAttributes(timestampStyle))
         }
 
@@ -348,7 +348,7 @@ final class ChatMessageFormatter {
         return result
     }
 
-    func formatMessageHeader(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme = .matrix) -> AttributedString {
+    func formatMessageHeader(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme = .matrix) -> AttributedString {
         let design = theme.bodyFontDesign
         let isSelf: Bool = {
             if let spid = message.senderPeerID {
@@ -370,7 +370,7 @@ final class ChatMessageFormatter {
         if message.sender == "system" {
             var style = AttributeContainer()
             style.foregroundColor = baseColor
-            style.font = .bitchatSystem(size: 14, weight: .medium, design: design)
+            style.font = .yarikSystem(size: 14, weight: .medium, design: design)
             return AttributedString(message.sender).mergingAttributes(style)
         }
 
@@ -378,9 +378,9 @@ final class ChatMessageFormatter {
         let (baseName, suffix) = message.sender.splitSuffix()
         var senderStyle = AttributeContainer()
         senderStyle.foregroundColor = baseColor
-        senderStyle.font = .bitchatSystem(size: 14, weight: isSelf ? .bold : .medium, design: design)
+        senderStyle.font = .yarikSystem(size: 14, weight: isSelf ? .bold : .medium, design: design)
         if let spid = message.senderPeerID,
-           let url = URL(string: "bitchat://user/\(spid.id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? spid.id)") {
+           let url = URL(string: "yarik://user/\(spid.id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? spid.id)") {
             senderStyle.link = url
         }
 
@@ -398,7 +398,7 @@ final class ChatMessageFormatter {
         return result
     }
 
-    func isSelfMessage(_ message: BitchatMessage) -> Bool {
+    func isSelfMessage(_ message: YarikMessage) -> Bool {
         if let spid = message.senderPeerID {
             if case .location(let channel) = viewModel.activeChannel, spid.isGeoChat {
                 let myGeo: NostrIdentity? = {
@@ -422,12 +422,12 @@ final class ChatMessageFormatter {
         return false
     }
 
-    func senderColor(for message: BitchatMessage, isDark: Bool) -> Color {
+    func senderColor(for message: YarikMessage, isDark: Bool) -> Color {
         peerColor(for: message, isDark: isDark)
     }
 
     func peerURL(for peerID: PeerID) -> URL? {
-        URL(string: "bitchat://user/\(peerID.toPercentEncoded())")
+        URL(string: "yarik://user/\(peerID.toPercentEncoded())")
     }
 
     func colorForNostrPubkey(_ pubkeyHexLowercased: String, isDark: Bool) -> Color {
@@ -443,7 +443,7 @@ private extension ChatMessageFormatter {
     /// Whether the message sender has a fingerprint the user has verified.
     /// Used for the in-chat seal next to `<@name>` so verification is visible
     /// without opening the fingerprint sheet (#1439).
-    func isVerifiedSender(of message: BitchatMessage) -> Bool {
+    func isVerifiedSender(of message: YarikMessage) -> Bool {
         guard let peerID = message.senderPeerID,
               let fingerprint = viewModel.getFingerprint(for: peerID) else {
             return false
@@ -459,11 +459,11 @@ private extension ChatMessageFormatter {
         var sealStyle = AttributeContainer()
         // Match the peer-list verified seal: filled checkmark in the sender tint.
         sealStyle.foregroundColor = baseColor
-        sealStyle.font = .bitchatSystem(size: 11, weight: .semibold, design: design)
+        sealStyle.font = .yarikSystem(size: 11, weight: .semibold, design: design)
         result.append(AttributedString(" ✓").mergingAttributes(sealStyle))
     }
 
-    func peerColor(for message: BitchatMessage, isDark: Bool) -> Color {
+    func peerColor(for message: YarikMessage, isDark: Bool) -> Color {
         if let spid = message.senderPeerID {
             if spid.isGeoChat || spid.isGeoDM {
                 let full = viewModel.nostrKeyMapping[spid]?.lowercased() ?? spid.bare.lowercased()

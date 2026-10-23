@@ -17,15 +17,15 @@ struct BLEPublicMessageHandlerEnvironment {
     /// Snapshot of known peers keyed by ID (registry read).
     let peersSnapshot: () -> [PeerID: BLEPeerInfo]
     /// Verifies a packet's signature against a known signing public key.
-    let verifyPacketSignature: (_ packet: BitchatPacket, _ signingPublicKey: Data) -> Bool
+    let verifyPacketSignature: (_ packet: YarikPacket, _ signingPublicKey: Data) -> Bool
     /// Resolves a display name from a verified packet signature for peers missing from the registry.
-    let signedSenderDisplayName: (_ packet: BitchatPacket, _ peerID: PeerID) -> String?
+    let signedSenderDisplayName: (_ packet: YarikPacket, _ peerID: PeerID) -> String?
     /// Tracks the broadcast message packet for gossip sync.
-    let trackPacketSeen: (BitchatPacket) -> Void
+    let trackPacketSeen: (YarikPacket) -> Void
     /// Direct link state for the peer (BLE-queue read).
     let linkState: (PeerID) -> (hasPeripheral: Bool, hasCentral: Bool)
     /// Resolves and consumes the original message ID for our own re-broadcast.
-    let takeSelfBroadcastMessageID: (BitchatPacket) -> String?
+    let takeSelfBroadcastMessageID: (YarikPacket) -> String?
     /// Delivers `.publicMessageReceived` to the UI as one main-actor hop.
     let deliverPublicMessage: (
         _ peerID: PeerID,
@@ -48,7 +48,7 @@ final class BLEPublicMessageHandler {
         self.environment = environment
     }
 
-    func handle(_ packet: BitchatPacket, from peerID: PeerID) {
+    func handle(_ packet: YarikPacket, from peerID: PeerID) {
         let env = environment
         let now = env.now()
         let messageDecision = BLEPublicMessagePolicy.evaluate(

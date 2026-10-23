@@ -1,6 +1,6 @@
 //
 // NotificationService.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -91,7 +91,7 @@ private struct NoopNotificationCategoryRegistrar: NotificationCategoryRegisterin
 final class NotificationService {
     static let shared = NotificationService()
 
-    /// Category for the "bitchatters nearby" notification, carrying the wave quick action.
+    /// Category for the "yarikters nearby" notification, carrying the wave quick action.
     static let nearbyCategoryID = "chat.bitchat.category.nearby"
     static let waveActionID = "chat.bitchat.action.wave"
 
@@ -254,7 +254,7 @@ final class NotificationService {
         let title = hidePreviews ? Redacted.geohashActivityTitle : "\(titlePrefix)\(geohash)"
         let body = hidePreviews ? Redacted.body : bodyPreview
         let identifier = "geo-activity-\(geohash)-\(Date().timeIntervalSince1970)"
-        let deeplink = "bitchat://geohash/\(geohash)"
+        let deeplink = "yarik://geohash/\(geohash)"
         let userInfo: [String: Any] = ["deeplink": deeplink]
         sendLocalNotification(title: title, body: body, identifier: identifier, userInfo: userInfo)
     }

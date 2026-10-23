@@ -1,6 +1,6 @@
 //
 // ChannelShareTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -13,7 +13,7 @@ struct ChannelShareTests {
     @Test func payloadIncludesGeohashDeepLinkAndStoreURL() {
         let text = ChannelShare.payload(forGeohash: "u4pru")
         #expect(text.contains("#u4pru"))
-        #expect(text.contains("bitchat://geohash/u4pru"))
+        #expect(text.contains("yarik://geohash/u4pru"))
         #expect(text.contains(ChannelShare.appStoreURL))
         #expect(!text.lowercased().contains("i'm in"))
     }

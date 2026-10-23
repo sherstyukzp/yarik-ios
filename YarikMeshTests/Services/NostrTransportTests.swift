@@ -1,6 +1,6 @@
 //
 // NostrTransportTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -520,7 +520,7 @@ struct NostrTransportTests {
     private func decodeEmbeddedPayload(
         from event: NostrEvent,
         recipient: NostrIdentity
-    ) throws -> (packet: BitchatPacket, payload: NoisePayload, senderPubkey: String, packetData: Data) {
+    ) throws -> (packet: YarikPacket, payload: NoisePayload, senderPubkey: String, packetData: Data) {
         let (content, senderPubkey, _) = try NostrProtocol.decryptPrivateMessage(
             giftWrap: event,
             recipientIdentity: recipient
@@ -530,7 +530,7 @@ struct NostrTransportTests {
         }
         let encoded = String(content.dropFirst("bitchat1:".count))
         guard let packetData = base64URLDecode(encoded),
-              let packet = BitchatPacket.from(packetData),
+              let packet = YarikPacket.from(packetData),
               let payload = NoisePayload.decode(packet.payload) else {
             throw NostrTransportTestError.invalidPacket
         }

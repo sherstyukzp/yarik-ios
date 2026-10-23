@@ -1,6 +1,6 @@
 //
 // GeohashChatActivityTracker.swift
-// bitchat
+// yarik
 //
 // Tracks actual chat-message activity per sampled geohash so the empty mesh
 // timeline can point at a nearby channel where a conversation is happening —

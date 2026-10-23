@@ -15,7 +15,7 @@ struct IRCToggleStyle: ToggleStyle {
                 Spacer()
                 Text(configuration.isOn ? onLabel : offLabel)
                     .textCase(.uppercase)
-                    .bitchatFont(size: 12, weight: .semibold)
+                    .yarikFont(size: 12, weight: .semibold)
                     .foregroundColor(configuration.isOn ? accent : .secondary)
                     .padding(.vertical, 4)
                     .padding(.horizontal, 10)

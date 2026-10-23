@@ -1,6 +1,6 @@
 //
 // ChatViewModelTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for ChatViewModel using MockTransport for isolation.
 // This is free and unencumbered software released into the public domain.
@@ -138,7 +138,7 @@ struct ChatViewModelIdentityTests {
         }, timeout: TestConstants.longTimeout)
         #expect(oldPeerBound)
 
-        let existingMessage = BitchatMessage(
+        let existingMessage = YarikMessage(
             id: "pm-migrate-1",
             sender: "Alice",
             content: "Still here",
@@ -399,7 +399,7 @@ struct ChatViewModelServiceLifecycleTests {
         let peerID = PeerID(str: "0000000000000001")
         transport.simulateConnect(peerID, nickname: "Alice")
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "read-1",
             sender: "Alice",
             content: "Hello from Alice",
@@ -470,7 +470,7 @@ struct ChatViewModelReceivingTests {
     func didReceiveMessage_callsDelegate() async {
         let (viewModel, transport) = makeTestableViewModel()
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "msg-001",
             sender: "Alice",
             content: "Hello from Alice",
@@ -553,7 +553,7 @@ struct ChatViewModelNoisePayloadTests {
         let peerID = PeerID(str: "0000000000000004")
         transport.simulateConnect(peerID, nickname: "Bob")
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "pm-delivered-1",
             sender: viewModel.nickname,
             content: "Waiting on ack",
@@ -591,7 +591,7 @@ struct ChatViewModelNoisePayloadTests {
         let (viewModel, _) = makeTestableViewModel()
         let peerID = PeerID(str: "0000000000000005")
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "pm-read-before-name",
             sender: viewModel.nickname,
             content: "Waiting on read receipt",
@@ -642,7 +642,7 @@ struct ChatViewModelFormattingTests {
     @Test @MainActor
     func formatMessageAsText_formatsSenderContentAndTimestamp() async {
         let (viewModel, _) = makeTestableViewModel()
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "fmt-1",
             sender: "Alice#a1b2",
             content: "hello #mesh",
@@ -661,7 +661,7 @@ struct ChatViewModelFormattingTests {
         let (viewModel, _) = makeTestableViewModel()
         let cashu = "cashuA" + String(repeating: "a", count: 40)
         let longContent = "hi @bob " + cashu + " " + String(repeating: "x", count: 4_100)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "fmt-long-cashu",
             sender: "Alice#a1b2",
             content: longContent,
@@ -678,7 +678,7 @@ struct ChatViewModelFormattingTests {
     @Test @MainActor
     func formatMessageHeader_formatsSenderHeader() async {
         let (viewModel, _) = makeTestableViewModel()
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "fmt-2",
             sender: "Alice#a1b2",
             content: "hello",
@@ -762,7 +762,7 @@ struct ChatViewModelRateLimitingTests {
         let now = Date()
 
         for i in 0..<6 {
-            let message = BitchatMessage(
+            let message = YarikMessage(
                 id: "rate-\(i)",
                 sender: "Spammer",
                 content: "rate-msg-\(i)",
@@ -794,7 +794,7 @@ struct ChatViewModelPublicConversationTests {
         let (viewModel, _) = makeTestableViewModel()
         let content = "same bridge and radio payload"
         let timestamp = Date()
-        let bridgeMessage = BitchatMessage(
+        let bridgeMessage = YarikMessage(
             id: "bridge-event-id",
             sender: "remote#beef",
             content: content,
@@ -808,7 +808,7 @@ struct ChatViewModelPublicConversationTests {
         #expect(viewModel.publicConversationContainsMessage(withID: bridgeMessage.id, in: .mesh))
 
         viewModel.removeBridgeInjectedPublicMessage(withID: bridgeMessage.id)
-        let radioMessage = BitchatMessage(
+        let radioMessage = YarikMessage(
             id: "radio-stable-id",
             sender: "remote",
             content: content,
@@ -870,7 +870,7 @@ struct ChatViewModelPeerTests {
     func typedPeerLifecycleEvents_applyBeforeReturning() {
         let (viewModel, _) = makeTestableViewModel()
         let peerID = PeerID(str: "1122334455667788")
-        let incoming = BitchatMessage(
+        let incoming = YarikMessage(
             id: "typed-peer-incoming",
             sender: "Alice",
             content: "Hello",
@@ -902,7 +902,7 @@ struct ChatViewModelPeerTests {
             to: "Alice",
             at: Date(timeIntervalSince1970: 1_234)
         )
-        let outgoing = BitchatMessage(
+        let outgoing = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "On the way",
@@ -993,7 +993,7 @@ struct ChatViewModelPeerTests {
     func didUpdatePeerList_preservesStableUnreadPeerWhenMessagesExist() async {
         let (viewModel, _) = makeTestableViewModel()
         let stablePeer = PeerID(str: String(repeating: "a", count: 64))
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "stable-noise-1",
             sender: "Alice",
             content: "Offline hello",
@@ -1084,7 +1084,7 @@ struct ChatViewModelPrivateChatSelectionTests {
         let newer = Date().addingTimeInterval(-30)
 
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "a-1",
                 sender: "A",
                 content: "Old",
@@ -1096,7 +1096,7 @@ struct ChatViewModelPrivateChatSelectionTests {
             )
         ], for: peerA)
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "b-1",
                 sender: "B",
                 content: "New",
@@ -1125,7 +1125,7 @@ struct ChatViewModelPrivateChatSelectionTests {
         let newer = Date().addingTimeInterval(-20)
 
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "a-1",
                 sender: "A",
                 content: "Old",
@@ -1137,7 +1137,7 @@ struct ChatViewModelPrivateChatSelectionTests {
             )
         ], for: peerA)
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "b-1",
                 sender: "B",
                 content: "New",
@@ -1305,7 +1305,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
                 recipient: "Peer",
                 filename: "outgoing.jpg"
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "ordinary-message",
                 sender: "Peer",
                 content: "hello",
@@ -1359,7 +1359,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
                 recipient: "Peer",
                 filename: "outgoing.jpg"
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "ordinary-message",
                 sender: "Peer",
                 content: "keep me on failure",
@@ -1482,7 +1482,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
                 recipient: viewModel.nickname,
                 filename: "incoming.jpg"
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "captured-text",
                 sender: "Peer",
                 content: "old",
@@ -1495,7 +1495,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
         ], for: peerID)
 
         viewModel.clearPrivateChat(peerID)
-        let arrival = BitchatMessage(
+        let arrival = YarikMessage(
             id: "concurrent-arrival",
             sender: "Peer",
             content: "new",
@@ -1551,7 +1551,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
             viewModel.privateChats[peerID]?.first
         )
         #expect(coordinator.isLiveVoiceMessage(liveMessage))
-        let ordinary = BitchatMessage(
+        let ordinary = YarikMessage(
             id: "clear-around-live-voice",
             sender: "Peer",
             content: "old text",
@@ -1617,7 +1617,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
 
         viewModel.clearPrivateChat(firstPeerID)
         viewModel.clearPrivateChat(secondPeerID)
-        let queuedArrival = BitchatMessage(
+        let queuedArrival = YarikMessage(
             id: "arrival-after-queued-clear",
             sender: "Peer",
             content: "new",
@@ -1672,7 +1672,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
                 recipient: viewModel.nickname,
                 filename: "migrated.jpg"
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "captured-before-migration",
                 sender: "Peer",
                 content: "old",
@@ -1690,7 +1690,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
             to: destinationPeerID
         )
         viewModel.selectedPrivateChatPeer = thirdPeerID
-        let arrival = BitchatMessage(
+        let arrival = YarikMessage(
             id: "arrival-after-migration",
             sender: "Peer",
             content: "new",
@@ -1728,7 +1728,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
                 recipient: viewModel.nickname,
                 filename: "migrated-recreated.jpg"
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "captured-before-recreation",
                 sender: "Peer",
                 content: "old",
@@ -1745,7 +1745,7 @@ struct ChatViewModelPrivateMediaDeletionTests {
             from: sourcePeerID,
             to: destinationPeerID
         )
-        let recreatedArrival = BitchatMessage(
+        let recreatedArrival = YarikMessage(
             id: "arrival-recreating-source",
             sender: "Peer",
             content: "new",
@@ -2059,8 +2059,8 @@ struct ChatViewModelPrivateMediaDeletionTests {
         senderPeerID: PeerID,
         recipient: String,
         filename: String
-    ) -> BitchatMessage {
-        BitchatMessage(
+    ) -> YarikMessage {
+        YarikMessage(
             id: id,
             sender: sender,
             content: "\(MimeType.Category.image.messagePrefix)\(filename)",
@@ -2237,7 +2237,7 @@ struct ChatViewModelPanicTests {
         // Set up some state
         transport.connectedPeers.insert(PeerID(str: "PEER1"))
         viewModel.seedPublicMessages([
-            BitchatMessage(
+            YarikMessage(
                 id: "panic-1",
                 sender: "Tester",
                 content: "Before",
@@ -2246,7 +2246,7 @@ struct ChatViewModelPanicTests {
             )
         ])
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-1",
                 sender: "Peer",
                 content: "Secret",

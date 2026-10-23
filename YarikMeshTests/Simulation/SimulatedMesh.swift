@@ -26,18 +26,18 @@ final class SimulatedMesh {
     }
 
     private let lock = NSLock()
-    private var pendingDeliveries: [(from: Int, packet: BitchatPacket)] = []
+    private var pendingDeliveries: [(from: Int, packet: YarikPacket)] = []
     /// Total (packet, receiving-node) deliveries pumped — the storm bound.
     private(set) var deliveredFrameCount = 0
 
     private(set) var nodes: [Node] = []
     private var neighbors: [Set<Int>] = []
     private var duplicateLinkEdges: Set<String> = []
-    private var emitted: [[BitchatPacket]] = []
+    private var emitted: [[YarikPacket]] = []
 
     /// Every packet a node has put on the wire — the attacker's capture
     /// buffer for replay tests.
-    func emittedPackets(from index: Int) -> [BitchatPacket] {
+    func emittedPackets(from index: Int) -> [YarikPacket] {
         lock.lock()
         defer { lock.unlock() }
         return emitted[index]

@@ -9,7 +9,7 @@ import Testing
 /// cached copy.
 struct TorPreferenceReadTests {
     private func makeDefaults() -> UserDefaults {
-        UserDefaults(suiteName: "bitchat.tests.tor.\(UUID().uuidString)")!
+        UserDefaults(suiteName: "yarik.tests.tor.\(UUID().uuidString)")!
     }
 
     @Test func defaultsToOnWhenNothingHasBeenStored() {

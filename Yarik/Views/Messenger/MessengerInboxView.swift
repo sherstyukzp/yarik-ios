@@ -500,7 +500,7 @@ struct MessengerInboxView: View {
         privateInboxModel.messages(for: peerID).last?.timestamp
     }
 
-    private func previewText(_ message: BitchatMessage) -> String {
+    private func previewText(_ message: YarikMessage) -> String {
         let flat = message.content.replacingOccurrences(of: "\n", with: " ")
         if message.sender == "system" { return flat }
         if conversationUIModel.mediaAttachment(for: message) != nil {

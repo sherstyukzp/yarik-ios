@@ -1,6 +1,6 @@
 //
 // NostrProcessedEventStore.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -9,7 +9,7 @@
 import BitLogger
 import Foundation
 
-/// Disk persistence for processed private-envelope event IDs. BitChat
+/// Disk persistence for processed private-envelope event IDs. Yarik
 /// randomizes envelope timestamps, so DM subscriptions must look back
 /// generously (24h)
 /// and relays redeliver the same events on every launch — without a

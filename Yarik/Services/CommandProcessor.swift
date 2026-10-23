@@ -1,8 +1,8 @@
 //
 // CommandProcessor.swift
-// bitchat
+// yarik
 //
-// Handles command parsing and execution for BitChat
+// Handles command parsing and execution for Yarik
 // This is free and unencumbered software released into the public domain.
 //
 

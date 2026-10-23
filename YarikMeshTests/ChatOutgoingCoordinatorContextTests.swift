@@ -1,6 +1,6 @@
 //
 // ChatOutgoingCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatOutgoingCoordinator` against a mock `ChatOutgoingContext` —
 // proving the coordinator works without a `ChatViewModel`, following the
@@ -49,7 +49,7 @@ private final class MockChatOutgoingContext: ChatOutgoingContext {
     }
 
     // Public timeline (local echo)
-    private(set) var appendedPublicMessages: [(message: BitchatMessage, conversationID: ConversationID)] = []
+    private(set) var appendedPublicMessages: [(message: YarikMessage, conversationID: ConversationID)] = []
     private(set) var systemMessages: [String] = []
 
     func parseMentions(from content: String) -> [String] {
@@ -57,7 +57,7 @@ private final class MockChatOutgoingContext: ChatOutgoingContext {
     }
 
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool {
         appendedPublicMessages.append((message, conversationID))
         return true
     }

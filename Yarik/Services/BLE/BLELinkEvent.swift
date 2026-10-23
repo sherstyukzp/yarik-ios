@@ -15,7 +15,7 @@ enum BLELinkEvent {
     /// A decoded frame arrived on a link. Attribution — binding lookup,
     /// spoof rejection, raw-announce binding, ingress recording — is
     /// engine work. Emission captures the panic lifecycle at the handoff.
-    case frameDecoded(BitchatPacket, link: BLEIngressLinkID, linkDescription: String)
+    case frameDecoded(YarikPacket, link: BLEIngressLinkID, linkDescription: String)
 
     /// One peripheral link ended (disconnect, connect failure, or radio
     /// policy teardown). The engine retires the link's identity half —

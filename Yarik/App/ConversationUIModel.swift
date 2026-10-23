@@ -58,7 +58,7 @@ final class ConversationUIModel: ObservableObject {
     /// Resends a failed private message through the normal send path,
     /// removing the failed original so the re-submission replaces it
     /// instead of stacking a duplicate under the red bubble.
-    func resendFailedPrivateMessage(_ message: BitchatMessage) {
+    func resendFailedPrivateMessage(_ message: YarikMessage) {
         chatViewModel.removePrivateMessage(withID: message.id)
         chatViewModel.sendMessage(message.content)
     }
@@ -135,15 +135,15 @@ final class ConversationUIModel: ObservableObject {
         chatViewModel.selectedAutocompleteIndex = next
     }
 
-    func formatMessage(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
+    func formatMessage(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
         chatViewModel.formatMessageAsText(message, colorScheme: colorScheme, theme: theme)
     }
 
-    func formatMessageHeader(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
+    func formatMessageHeader(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
         chatViewModel.formatMessageHeader(message, colorScheme: colorScheme, theme: theme)
     }
 
-    func mediaAttachment(for message: BitchatMessage) -> BitchatMessage.Media? {
+    func mediaAttachment(for message: YarikMessage) -> YarikMessage.Media? {
         message.mediaAttachment(for: currentNickname)
     }
 
@@ -151,18 +151,18 @@ final class ConversationUIModel: ObservableObject {
         chatViewModel.isSelfSender(peerID: peerID, displayName: displayName)
     }
 
-    func isSentByCurrentUser(_ message: BitchatMessage) -> Bool {
+    func isSentByCurrentUser(_ message: YarikMessage) -> Bool {
         message.sender == currentNickname || message.sender.hasPrefix(currentNickname + "#")
     }
 
-    func isMediaMessageFromCurrentUser(_ message: BitchatMessage) -> Bool {
+    func isMediaMessageFromCurrentUser(_ message: YarikMessage) -> Bool {
         message.sender == currentNickname || message.senderPeerID == chatViewModel.meshService.myPeerID
     }
 
     /// Whether a private-message row should show the filled verification seal
     /// next to the sender name (#1439). Scoped to DMs only — public timelines
     /// have different trust semantics and stay undressed.
-    func showsVerifiedSeal(for message: BitchatMessage) -> Bool {
+    func showsVerifiedSeal(for message: YarikMessage) -> Bool {
         guard message.isPrivate,
               message.sender != "system",
               !isSentByCurrentUser(message),
@@ -171,7 +171,7 @@ final class ConversationUIModel: ObservableObject {
         return chatViewModel.peerIdentityStore.isVerified(fingerprint)
     }
 
-    func senderDisplayName(for peerID: PeerID, fallbackMessages: [BitchatMessage]) -> String? {
+    func senderDisplayName(for peerID: PeerID, fallbackMessages: [YarikMessage]) -> String? {
         if peerID.isGeoDM || peerID.isGeoChat {
             return chatViewModel.geohashDisplayName(for: peerID)
         }
@@ -211,7 +211,7 @@ final class ConversationUIModel: ObservableObject {
     }
 
     /// Whether this message is a live voice burst still streaming in.
-    func isLiveVoiceMessage(_ message: BitchatMessage) -> Bool {
+    func isLiveVoiceMessage(_ message: YarikMessage) -> Bool {
         chatViewModel.liveVoiceCoordinator.isLiveVoiceMessage(message)
     }
 

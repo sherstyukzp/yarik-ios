@@ -1,6 +1,6 @@
 //
 // ChatLiveVoiceCoordinatorTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -19,10 +19,10 @@ private final class MockChatLiveVoiceContext: ChatLiveVoiceContext {
     var isViewingPublicMeshTimeline = false
     var blockedPeers: Set<PeerID> = []
 
-    private(set) var handledPrivateMessages: [BitchatMessage] = []
-    private(set) var appendedPublicMessages: [BitchatMessage] = []
-    private(set) var upsertedMessages: [(message: BitchatMessage, peerID: PeerID)] = []
-    private(set) var upsertedPublicMessages: [BitchatMessage] = []
+    private(set) var handledPrivateMessages: [YarikMessage] = []
+    private(set) var appendedPublicMessages: [YarikMessage] = []
+    private(set) var upsertedMessages: [(message: YarikMessage, peerID: PeerID)] = []
+    private(set) var upsertedPublicMessages: [YarikMessage] = []
     private(set) var removedMessageIDs: [String] = []
     private(set) var sentReadReceipts: [(receipt: ReadReceipt, peerID: PeerID)] = []
     private(set) var talkerUpdates: [String?] = []
@@ -31,17 +31,17 @@ private final class MockChatLiveVoiceContext: ChatLiveVoiceContext {
 
     func isPeerBlocked(_ peerID: PeerID) -> Bool { blockedPeers.contains(peerID) }
     func resolveNickname(for peerID: PeerID) -> String { "alice" }
-    func handlePrivateMessage(_ message: BitchatMessage) { handledPrivateMessages.append(message) }
-    func appendPublicMeshMessage(_ message: BitchatMessage) { appendedPublicMessages.append(message) }
-    func upsertPrivateMessage(_ message: BitchatMessage, in peerID: PeerID) {
+    func handlePrivateMessage(_ message: YarikMessage) { handledPrivateMessages.append(message) }
+    func appendPublicMeshMessage(_ message: YarikMessage) { appendedPublicMessages.append(message) }
+    func upsertPrivateMessage(_ message: YarikMessage, in peerID: PeerID) {
         upsertedMessages.append((message, peerID))
         privateMutationLog.append("upsert:\(message.id)")
     }
-    func upsertPublicMeshMessage(_ message: BitchatMessage) {
+    func upsertPublicMeshMessage(_ message: YarikMessage) {
         upsertedPublicMessages.append(message)
     }
     @discardableResult
-    func removePrivateMessage(withID messageID: String) -> BitchatMessage? {
+    func removePrivateMessage(withID messageID: String) -> YarikMessage? {
         removedMessageIDs.append(messageID)
         privateMutationLog.append("remove:\(messageID)")
         return nil
@@ -185,7 +185,7 @@ struct ChatLiveVoiceCoordinatorTests {
         #expect(context.markReadReceiptSent(bubble.id))
         context.selectedPrivateChatPeer = nil
 
-        let note = BitchatMessage(
+        let note = YarikMessage(
             id: stableMessageID,
             sender: "alice",
             content: "[voice] \(fileName)",
@@ -226,18 +226,18 @@ struct ChatLiveVoiceCoordinatorTests {
 
         // A classic voice note (date-stamped name) and a live-capture name
         // must both pass through untouched.
-        let classic = BitchatMessage(
+        let classic = YarikMessage(
             sender: "alice", content: "[voice] voice_20260708_1201.m4a", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: peer
         )
         #expect(!coordinator.absorbFinalizedVoiceNote(classic))
-        let liveCapture = BitchatMessage(
+        let liveCapture = YarikMessage(
             sender: "alice", content: "[voice] voice_live_aabbccdd00112233.aac", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: peer
         )
         #expect(!coordinator.absorbFinalizedVoiceNote(liveCapture))
         // Unknown burst ID.
-        let unknown = BitchatMessage(
+        let unknown = YarikMessage(
             sender: "alice", content: "[voice] voice_ffffffffffffffff.m4a", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: peer
         )
@@ -355,7 +355,7 @@ struct ChatLiveVoiceCoordinatorTests {
         #expect(context.upsertedPublicMessages.contains { $0.id == bubble.id })
 
         // The broadcast finalized note absorbs into the same bubble.
-        let note = BitchatMessage(
+        let note = YarikMessage(
             sender: "bob", content: "[voice] voice_\(burstID.hexEncodedString()).m4a", timestamp: Date(),
             isRelay: false, isPrivate: false, senderPeerID: peer
         )
@@ -377,7 +377,7 @@ struct ChatLiveVoiceCoordinatorTests {
         send(try #require(VoiceBurstPacket(burstID: burstID, seq: 2, kind: .end(totalDataPackets: 1, durationMs: 64))), to: coordinator, from: peer)
 
         // ...must not be replaced by a *public* note claiming the same burst.
-        let publicNote = BitchatMessage(
+        let publicNote = YarikMessage(
             sender: "alice", content: "[voice] voice_\(burstID.hexEncodedString()).m4a", timestamp: Date(),
             isRelay: false, isPrivate: false, senderPeerID: peer
         )
@@ -480,7 +480,7 @@ struct ChatLiveVoiceCoordinatorTests {
         #expect(try Data(contentsOf: publicURL) == ADTSFramer.frame(publicFrame))
 
         // Absorption still routes each note by its scope.
-        let dmNote = BitchatMessage(
+        let dmNote = YarikMessage(
             sender: "alice", content: "[voice] voice_\(burstID.hexEncodedString()).m4a", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: peer
         )
@@ -510,7 +510,7 @@ struct ChatLiveVoiceCoordinatorTests {
         let victimBubble = try #require(context.handledPrivateMessages.last)
 
         // The real sender's note absorbs into the real sender's bubble.
-        let note = BitchatMessage(
+        let note = YarikMessage(
             sender: "alice", content: "[voice] voice_\(hex).m4a", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: peer
         )
@@ -521,7 +521,7 @@ struct ChatLiveVoiceCoordinatorTests {
         #expect(context.removedMessageIDs.contains(victimBubble.id))
 
         // The attacker's note can only ever claim the attacker's own bubble.
-        let attackerNote = BitchatMessage(
+        let attackerNote = YarikMessage(
             sender: "mallory", content: "[voice] voice_\(hex).m4a", timestamp: Date(),
             isRelay: false, isPrivate: true, recipientNickname: "me", senderPeerID: attacker
         )

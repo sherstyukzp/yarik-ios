@@ -1,8 +1,8 @@
-# Verifying bitchat
+# Verifying yarik
 
-This document is about a specific risk: getting a copy of bitchat that someone has modified.
+This document is about a specific risk: getting a copy of yarik that someone has modified.
 
-It matters because the repository has been the target of takedown demands. When a repository or a releases page becomes unavailable, mirrors appear, and people who need the app during a shutdown install whatever they can find. That is exactly the moment a trojaned build reaches the people with the most to lose. A modified bitchat can log plaintext, ship keys off the device, or weaken the mesh, and it will look and behave normally while doing it.
+It matters because the repository has been the target of takedown demands. When a repository or a releases page becomes unavailable, mirrors appear, and people who need the app during a shutdown install whatever they can find. That is exactly the moment a trojaned build reaches the people with the most to lose. A modified yarik can log plaintext, ship keys off the device, or weaken the mesh, and it will look and behave normally while doing it.
 
 The honest summary is short. **Source can be verified. Compiled apps cannot, unless they come from the App Store.** Everything below elaborates on that.
 

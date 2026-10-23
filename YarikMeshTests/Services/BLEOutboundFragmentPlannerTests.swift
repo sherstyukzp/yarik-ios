@@ -113,7 +113,7 @@ struct BLEOutboundFragmentPlannerTests {
         let maxPayload = makePayload(count: 160 * 1024, seed: 0xFACE_CAFE)
 
         func plan(payloadCount: Int) throws -> BLEOutboundFragmentPlan {
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.noiseEncrypted.rawValue,
                 senderID: Data(hexString: "0011223344556677") ?? Data(),
                 recipientID: Data(hexString: "8877665544332211"),
@@ -164,8 +164,8 @@ struct BLEOutboundFragmentPlannerTests {
         payload: Data,
         route: [Data]? = nil,
         isRSR: Bool = false
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]),
             recipientID: nil,

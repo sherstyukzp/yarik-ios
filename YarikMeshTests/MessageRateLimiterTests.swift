@@ -1,6 +1,6 @@
 //
 // MessageRateLimiterTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for the public-intake token buckets, including the NIP-13
 // proof-of-work relaxation of the per-sender bucket.

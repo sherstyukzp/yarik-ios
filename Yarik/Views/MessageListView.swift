@@ -1,6 +1,6 @@
 //
 //  MessageListView.swift
-//  bitchat
+//  yarik
 //
 //  Created by Islam on 30/03/2026.
 //
@@ -11,7 +11,7 @@ import SwiftUI
 
 private struct MessageDisplayItem: Identifiable {
     let id: String
-    let message: BitchatMessage
+    let message: YarikMessage
 }
 
 struct MessageListView: View {
@@ -320,11 +320,11 @@ private extension MessageListView {
         } label: {
             HStack(spacing: 6) {
                 Text(verbatim: "📍 \(text)")
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.primary)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.bitchatSystem(size: 10))
+                    .font(.yarikSystem(size: 10))
                     .foregroundColor(palette.secondary)
             }
             .padding(.horizontal, 12)
@@ -404,7 +404,7 @@ private extension MessageListView {
         // Non-breaking space before the closing asterisk so a tight wrap
         // can't orphan a lone "*" onto its own line.
         Text(verbatim: "* \(text)\u{00A0}*")
-            .bitchatFont(size: 13)
+            .yarikFont(size: 13)
             .foregroundColor(palette.secondary.opacity(0.9))
             .fixedSize(horizontal: false, vertical: true)
     }
@@ -412,7 +412,7 @@ private extension MessageListView {
     /// Messages the unseen counters may book as "new": rows that render as
     /// human messages. System lines render as narration and whitespace-only
     /// content never renders at all, so neither belongs in the pill count.
-    func unseenEligibleCount(in messages: [BitchatMessage]) -> Int {
+    func unseenEligibleCount(in messages: [YarikMessage]) -> Int {
         messages.filter { $0.sender != "system" && !$0.content.trimmed.isEmpty }.count
     }
 
@@ -436,7 +436,7 @@ private extension MessageListView {
     /// A failed private text message of our own can be resent through the
     /// normal send path (the context menu removes the failed original and
     /// re-submits its content).
-    func isResendableFailedMessage(_ message: BitchatMessage) -> Bool {
+    func isResendableFailedMessage(_ message: YarikMessage) -> Bool {
         guard message.isPrivate,
               conversationUIModel.isSentByCurrentUser(message),
               conversationUIModel.mediaAttachment(for: message) == nil,
@@ -468,7 +468,7 @@ private extension MessageListView {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.down")
-                    .font(.bitchatSystem(size: 11, weight: .semibold))
+                    .font(.yarikSystem(size: 11, weight: .semibold))
                 if unseenCount > 0 {
                     Text(
                         String(
@@ -477,7 +477,7 @@ private extension MessageListView {
                             unseenCount
                         )
                     )
-                    .bitchatFont(size: 12, weight: .medium)
+                    .yarikFont(size: 12, weight: .medium)
                 }
             }
             .foregroundColor(palette.primary)
@@ -504,7 +504,7 @@ private extension MessageListView {
     }
 
     @ViewBuilder
-    func messageRow(for message: BitchatMessage) -> some View {
+    func messageRow(for message: YarikMessage) -> some View {
         MessengerMessageRow(
             message: message,
             showsSenderName: privatePeer == nil || privatePeer?.isGroup == true,
@@ -513,8 +513,8 @@ private extension MessageListView {
         .opacity(message.isArchivedEcho ? 0.55 : 1)
     }
 
-    func expandWindow(ifNeededFor message: BitchatMessage,
-                      allMessages: [BitchatMessage],
+    func expandWindow(ifNeededFor message: YarikMessage,
+                      allMessages: [YarikMessage],
                       privatePeer: PeerID?,
                       proxy: ScrollViewProxy) {
         let step = TransportConfig.uiWindowStepCount
@@ -547,7 +547,7 @@ private extension MessageListView {
     }
 
     func handleOpenURL(_ url: URL) {
-        guard url.scheme == "bitchat" else { return }
+        guard url.scheme == "yarik" else { return }
         switch url.host {
         case "user":
             let id = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
@@ -716,7 +716,7 @@ private extension MessageListView {
         }
     }
 
-    func conversationMessages(for privatePeer: PeerID?) -> [BitchatMessage] {
+    func conversationMessages(for privatePeer: PeerID?) -> [YarikMessage] {
         if let privatePeer {
             return privateInboxModel.messages(for: privatePeer)
         }

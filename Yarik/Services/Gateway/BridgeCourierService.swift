@@ -1,6 +1,6 @@
 //
 // BridgeCourierService.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -222,7 +222,7 @@ final class BridgeCourierService: ObservableObject {
         messageID: String,
         recipientNoiseKey: Data
     ) -> String {
-        var material = Data("bitchat-bridge-drop-dedup-v2".utf8)
+        var material = Data("yarik-bridge-drop-dedup-v2".utf8)
         appendLengthPrefixed(Data(messageID.utf8), to: &material)
         appendLengthPrefixed(recipientNoiseKey, to: &material)
         return "v2:\(material.sha256Hex())"

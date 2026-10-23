@@ -1,6 +1,6 @@
 //
 // ChatLifecycleCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatLifecycleCoordinator` against a mock `ChatLifecycleContext`
 // — proving the coordinator works without a `ChatViewModel`, following the
@@ -25,10 +25,10 @@ import BitFoundation
 @MainActor
 private final class MockChatLifecycleContext: ChatLifecycleContext {
     // Chat & receipt state
-    var messages: [BitchatMessage] = []
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var messages: [YarikMessage] = []
+    var privateChats: [PeerID: [YarikMessage]] = [:]
 
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         privateChats[peerID] ?? []
     }
     var unreadPrivateMessages: Set<PeerID> = []
@@ -43,7 +43,7 @@ private final class MockChatLifecycleContext: ChatLifecycleContext {
 
     // Conversation store intents
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool {
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool {
         var chat = privateChats[peerID] ?? []
         guard !chat.contains(where: { $0.id == message.id }) else { return false }
         let index = chat.firstIndex(where: { $0.timestamp > message.timestamp }) ?? chat.count
@@ -78,13 +78,13 @@ private final class MockChatLifecycleContext: ChatLifecycleContext {
 
     // Peers & sessions
     var nicknamesByPeerID: [PeerID: String] = [:]
-    var peersByID: [PeerID: BitchatPeer] = [:]
+    var peersByID: [PeerID: YarikPeer] = [:]
     var noiseSessionStates: [PeerID: LazyHandshakeState] = [:]
     private(set) var stopMeshServicesCount = 0
     private(set) var refreshBluetoothStateCount = 0
 
     func peerNickname(for peerID: PeerID) -> String? { nicknamesByPeerID[peerID] }
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer? { peersByID[peerID] }
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer? { peersByID[peerID] }
     func noiseSessionState(for peerID: PeerID) -> LazyHandshakeState {
         noiseSessionStates[peerID] ?? .none
     }
@@ -168,8 +168,8 @@ private func makePrivateMessage(
     senderPeerID: PeerID? = nil,
     isRelay: Bool = false,
     deliveryStatus: DeliveryStatus? = nil
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: sender,
         content: "hello",
@@ -195,7 +195,7 @@ struct ChatLifecycleCoordinatorContextTests {
         let peerID = PeerID(str: "1122334455667788")
         let noiseKey = Data(repeating: 0xAB, count: 32)
         let stablePeerID = PeerID(hexData: noiseKey)
-        context.peersByID[peerID] = BitchatPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
+        context.peersByID[peerID] = YarikPeer(peerID: peerID, noisePublicKey: noiseKey, nickname: "alice")
 
         let t1 = Date(timeIntervalSince1970: 1)
         let t2 = Date(timeIntervalSince1970: 2)

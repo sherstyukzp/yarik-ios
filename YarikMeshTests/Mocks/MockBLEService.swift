@@ -1,6 +1,6 @@
 //
 // MockBLEService.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -31,16 +31,16 @@ final class MockBLEService: NSObject {
     
     // MARK: - Properties matching BLEService
     
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     var myPeerID = PeerID(str: "MOCK1234")
     var myNickname: String = "MockUser"
 
     // Test-specific properties
-    var sentMessages: [(message: BitchatMessage, packet: BitchatPacket)] = []
-    var sentPackets: [BitchatPacket] = []
+    var sentMessages: [(message: YarikMessage, packet: YarikPacket)] = []
+    var sentPackets: [YarikPacket] = []
     var connectedPeers: Set<PeerID> = []
-    var messageDeliveryHandler: ((BitchatMessage) -> Void)?
-    var packetDeliveryHandler: ((BitchatPacket) -> Void)?
+    var messageDeliveryHandler: ((YarikMessage) -> Void)?
+    var packetDeliveryHandler: ((YarikPacket) -> Void)?
     
     // Compatibility properties for old tests
     var mockNickname: String {
@@ -91,12 +91,12 @@ final class MockBLEService: NSObject {
     }
 
     /// Keep local echo synchronous so Swift Testing confirmations observe it deterministically.
-    private func deliverLocalEcho(_ message: BitchatMessage) {
+    private func deliverLocalEcho(_ message: YarikMessage) {
         delegate?.didReceiveMessage(message)
     }
     
     func sendMessage(_ content: String, mentions: [String] = [], to recipientID: String? = nil, messageID: String? = nil, timestamp: Date? = nil) {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID ?? UUID().uuidString,
             sender: myNickname,
             content: content,
@@ -110,7 +110,7 @@ final class MockBLEService: NSObject {
         )
         
         if let payload = message.toBinaryPayload() {
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: 0x01,
                 senderID: myPeerID.id.data(using: .utf8)!,
                 recipientID: recipientID?.data(using: .utf8),
@@ -138,7 +138,7 @@ final class MockBLEService: NSObject {
     }
 
     func sendPrivateMessage(_ content: String, to recipientPeerID: PeerID, recipientNickname: String, messageID: String) {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: myNickname,
             content: content,
@@ -152,7 +152,7 @@ final class MockBLEService: NSObject {
         )
         
         if let payload = message.toBinaryPayload() {
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: 0x01,
                 senderID: myPeerID.id.data(using: .utf8)!,
                 recipientID: recipientPeerID.id.data(using: .utf8)!,
@@ -200,7 +200,7 @@ final class MockBLEService: NSObject {
         delegate?.didUpdatePeerList(Array(connectedPeers))
     }
     
-    func simulateIncomingMessage(_ message: BitchatMessage) {
+    func simulateIncomingMessage(_ message: YarikMessage) {
         delegate?.didReceiveMessage(message)
         // Also surface via test handler for E2E/Integration
         messageDeliveryHandler?(message)
@@ -209,9 +209,9 @@ final class MockBLEService: NSObject {
     private var seenMessageIDs: Set<String> = []
     private let seenLock = NSLock()
 
-    func simulateIncomingPacket(_ packet: BitchatPacket) {
+    func simulateIncomingPacket(_ packet: YarikPacket) {
         // Process through the actual handling logic
-        if let message = BitchatMessage(packet.payload) {
+        if let message = YarikMessage(packet.payload) {
             var shouldDeliver = false
             seenLock.lock()
             if !seenMessageIDs.contains(message.id) {

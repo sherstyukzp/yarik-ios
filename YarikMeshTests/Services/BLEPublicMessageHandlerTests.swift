@@ -15,8 +15,8 @@ struct BLEPublicMessageHandlerTests {
         var peersSnapshotReads = 0
         var verifyPacketSignatureQueries: [PeerID] = []
         var signedNameQueries: [PeerID] = []
-        var trackedPackets: [BitchatPacket] = []
-        var selfBroadcastTakes: [BitchatPacket] = []
+        var trackedPackets: [YarikPacket] = []
+        var selfBroadcastTakes: [YarikPacket] = []
         var deliveries: [(peerID: PeerID, nickname: String, content: String, timestamp: Date, messageID: String?)] = []
     }
 
@@ -331,8 +331,8 @@ struct BLEPublicMessageHandlerTests {
         timestamp: UInt64,
         ttl: UInt8 = TransportConfig.messageTTLDefault,
         recipientID: Data? = nil
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipientID,

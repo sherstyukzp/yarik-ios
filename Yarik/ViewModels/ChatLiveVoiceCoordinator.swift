@@ -19,18 +19,18 @@ protocol ChatLiveVoiceContext: AnyObject {
     func resolveNickname(for peerID: PeerID) -> String
     /// Routes an inbound private message through the full pipeline
     /// (store append, unread state, notification, read receipt).
-    func handlePrivateMessage(_ message: BitchatMessage)
+    func handlePrivateMessage(_ message: YarikMessage)
     /// Appends directly to the public mesh timeline, bypassing the batched
     /// public pipeline: a live bubble must be removable when its burst is
     /// canceled or empty, which a pipeline-buffered entry is not (it would
     /// re-commit at the next flush).
-    func appendPublicMeshMessage(_ message: BitchatMessage)
+    func appendPublicMeshMessage(_ message: YarikMessage)
     /// Replace-or-append by message ID via the single-writer store intent.
-    func upsertPrivateMessage(_ message: BitchatMessage, in peerID: PeerID)
+    func upsertPrivateMessage(_ message: YarikMessage, in peerID: PeerID)
     /// Replace-or-append by message ID in the public mesh timeline.
-    func upsertPublicMeshMessage(_ message: BitchatMessage)
+    func upsertPublicMeshMessage(_ message: YarikMessage)
     @discardableResult
-    func removePrivateMessage(withID messageID: String) -> BitchatMessage?
+    func removePrivateMessage(withID messageID: String) -> YarikMessage?
     /// Records and sends the finalized note's read receipt after a live
     /// bubble adopts its wire-derivable message ID.
     func hasSentReadReceipt(_ messageID: String) -> Bool
@@ -50,11 +50,11 @@ extension ChatViewModel: ChatLiveVoiceContext {
         selectedPrivateChatPeer == nil && activeChannel == .mesh
     }
 
-    func appendPublicMeshMessage(_ message: BitchatMessage) {
+    func appendPublicMeshMessage(_ message: YarikMessage) {
         _ = appendPublicMessage(message, to: ConversationID(channelID: .mesh))
     }
 
-    func upsertPublicMeshMessage(_ message: BitchatMessage) {
+    func upsertPublicMeshMessage(_ message: YarikMessage) {
         conversations.upsertByID(message, in: ConversationID(channelID: .mesh))
     }
 
@@ -94,7 +94,7 @@ final class ChatLiveVoiceCoordinator {
         let peerID: PeerID
         let scope: VoiceBurstScope
         let nickname: String
-        let message: BitchatMessage
+        let message: YarikMessage
         var messageID: String { message.id }
         var messageTimestamp: Date { message.timestamp }
         let fileURL: URL
@@ -116,7 +116,7 @@ final class ChatLiveVoiceCoordinator {
 
         var key: AssemblyKey { AssemblyKey(peerID: peerID, scope: scope, burstID: burstID) }
 
-        init(burstID: Data, peerID: PeerID, scope: VoiceBurstScope, nickname: String, message: BitchatMessage, fileURL: URL, fileHandle: FileHandle) {
+        init(burstID: Data, peerID: PeerID, scope: VoiceBurstScope, nickname: String, message: YarikMessage, fileURL: URL, fileHandle: FileHandle) {
             self.burstID = burstID
             self.peerID = peerID
             self.scope = scope
@@ -229,7 +229,7 @@ final class ChatLiveVoiceCoordinator {
     }
 
     /// Whether this message is the bubble of a burst still streaming in.
-    func isLiveVoiceMessage(_ message: BitchatMessage) -> Bool {
+    func isLiveVoiceMessage(_ message: YarikMessage) -> Bool {
         assemblies.values.contains { $0.messageID == message.id }
     }
 
@@ -253,7 +253,7 @@ final class ChatLiveVoiceCoordinator {
     /// name), swap it into the existing live bubble and report `true` so the
     /// caller skips normal handling — no duplicate row, no second
     /// notification.
-    func absorbFinalizedVoiceNote(_ message: BitchatMessage) -> Bool {
+    func absorbFinalizedVoiceNote(_ message: YarikMessage) -> Bool {
         let prefix = MimeType.Category.audio.messagePrefix
         guard message.content.hasPrefix(prefix),
               let burstID = Self.burstID(fromVoiceFileName: String(message.content.dropFirst(prefix.count)))
@@ -287,7 +287,7 @@ final class ChatLiveVoiceCoordinator {
         let replacementID = finished.scope == .directMessage
             ? message.id
             : finished.messageID
-        let replacement = BitchatMessage(
+        let replacement = YarikMessage(
             id: replacementID,
             sender: message.sender,
             content: message.content,
@@ -365,7 +365,7 @@ final class ChatLiveVoiceCoordinator {
         }
 
         let isPrivate = scope == .directMessage
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: nickname,
             content: "\(MimeType.Category.audio.messagePrefix)\(fileURL.lastPathComponent)",
             timestamp: timestamp,
@@ -579,7 +579,7 @@ final class ChatLiveVoiceCoordinator {
         // Same row (same ID), content re-pointed at `fileURL`; the delivery
         // status is carried over because the inbound pipeline may have
         // updated it on the shared original.
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: assembly.messageID,
             sender: assembly.nickname,
             content: "\(MimeType.Category.audio.messagePrefix)\(fileURL.lastPathComponent)",

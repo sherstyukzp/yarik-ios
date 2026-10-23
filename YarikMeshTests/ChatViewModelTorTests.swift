@@ -1,6 +1,6 @@
 //
 // ChatViewModelTorTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for ChatViewModel+Tor.swift Tor lifecycle notification handlers.
 //

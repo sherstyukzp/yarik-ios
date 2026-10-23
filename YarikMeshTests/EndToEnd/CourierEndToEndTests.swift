@@ -1,6 +1,6 @@
 //
 // CourierEndToEndTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -23,13 +23,13 @@ struct CourierEndToEndTests {
 
     private final class PacketTap {
         private let lock = NSLock()
-        private var packets: [BitchatPacket] = []
+        private var packets: [YarikPacket] = []
 
-        func record(_ packet: BitchatPacket) {
+        func record(_ packet: YarikPacket) {
             lock.lock(); packets.append(packet); lock.unlock()
         }
 
-        func first(ofType type: MessageType) -> BitchatPacket? {
+        func first(ofType type: MessageType) -> YarikPacket? {
             lock.lock(); defer { lock.unlock() }
             return packets.first { $0.type == type.rawValue }
         }
@@ -39,13 +39,13 @@ struct CourierEndToEndTests {
             return packets.filter { $0.type == type.rawValue }.count
         }
 
-        func all(ofType type: MessageType) -> [BitchatPacket] {
+        func all(ofType type: MessageType) -> [YarikPacket] {
             lock.lock(); defer { lock.unlock() }
             return packets.filter { $0.type == type.rawValue }
         }
     }
 
-    private final class NoiseCaptureDelegate: BitchatDelegate {
+    private final class NoiseCaptureDelegate: YarikDelegate {
         private let lock = NSLock()
         private var payloads: [(peerID: PeerID, type: NoisePayloadType, payload: Data)] = []
 
@@ -58,8 +58,8 @@ struct CourierEndToEndTests {
             return payloads
         }
 
-        // Unused BitchatDelegate requirements.
-        func didReceiveMessage(_ message: BitchatMessage) {}
+        // Unused YarikDelegate requirements.
+        func didReceiveMessage(_ message: YarikMessage) {}
         func didConnectToPeer(_ peerID: PeerID) {}
         func didDisconnectFromPeer(_ peerID: PeerID) {}
         func didUpdatePeerList(_ peers: [PeerID]) {}
@@ -84,7 +84,7 @@ struct CourierEndToEndTests {
     /// Handling any packet from a peer preseeds it as a connected,
     /// verified entry in the receiving service's registry.
     private func preseedConnectedPeer(_ peer: BLEService, in service: BLEService) {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: peer.myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -480,7 +480,7 @@ struct CourierEndToEndTests {
             ciphertext: sealed
         )
         let alicePeerID = PeerID(publicKey: alice.getStaticPublicKeyData())
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.courierEnvelope.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: carol.myPeerID.id),
@@ -519,7 +519,7 @@ struct CourierEndToEndTests {
         let alicePeerID = PeerID(publicKey: alice.getStaticPublicKeyData())
         // Correct sender, willing policy — but no packet signature: the
         // courier cannot authenticate the depositor, so it must not carry.
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.courierEnvelope.rawValue,
             senderID: Data(hexString: alicePeerID.id) ?? Data(),
             recipientID: Data(hexString: carol.myPeerID.id),
@@ -562,7 +562,7 @@ struct CourierEndToEndTests {
             expiry: UInt64((now.timeIntervalSince1970 + 3600) * 1000),
             ciphertext: sealed
         )
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.courierEnvelope.rawValue,
             senderID: Data(hexString: alice.myPeerID.id) ?? Data(),
             recipientID: Data(hexString: carol.myPeerID.id),
@@ -644,7 +644,7 @@ struct CourierEndToEndTests {
         #expect(initiatedForPresent)
     }
 
-    private func makeUnsignedAnnounce(from service: BLEService) throws -> BitchatPacket {
+    private func makeUnsignedAnnounce(from service: BLEService) throws -> YarikPacket {
         let announcement = AnnouncementPacket(
             nickname: "Unsigned",
             noisePublicKey: service.noiseStaticPublicKeyData(),
@@ -653,7 +653,7 @@ struct CourierEndToEndTests {
         )
         let payload = try #require(announcement.encode())
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: service.myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -670,7 +670,7 @@ struct CourierEndToEndTests {
 /// Minimal transport stub for exercising MessageRouter's courier deposit
 /// logic without BLE plumbing.
 private final class CourierCaptureTransport: Transport, MeshCourierTransporting {
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     weak var eventDelegate: TransportEventDelegate?
     weak var peerEventsDelegate: TransportPeerEventsDelegate?
 

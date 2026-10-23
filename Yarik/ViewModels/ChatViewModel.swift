@@ -1,6 +1,6 @@
 //
 // ChatViewModel.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -9,12 +9,12 @@
 ///
 /// # ChatViewModel
 ///
-/// The central business logic and state management component for BitChat.
+/// The central business logic and state management component for Yarik.
 /// Coordinates between the UI layer and the networking/encryption services.
 ///
 /// ## Overview
 /// ChatViewModel implements the MVVM pattern, serving as the binding layer between
-/// SwiftUI views and the underlying BitChat services. It manages:
+/// SwiftUI views and the underlying Yarik services. It manages:
 /// - Message state and delivery
 /// - Peer connections and presence
 /// - Private chat sessions
@@ -23,7 +23,7 @@
 ///
 /// ## Architecture
 /// The ViewModel acts as:
-/// - **BitchatDelegate**: Receives messages and events from BLEService
+/// - **YarikDelegate**: Receives messages and events from BLEService
 /// - **State Manager**: Maintains all UI-relevant state with @Published properties
 /// - **Command Processor**: Handles IRC-style commands (/msg, /who, etc.)
 /// - **Message Router**: Directs messages to appropriate chats (public/private)
@@ -112,17 +112,17 @@ struct PanicNetworkLifecycle {
 private struct PendingPrivateChatClear {
     let peerID: PeerID
     let sourceConversationID: ConversationID
-    let messages: [BitchatMessage]
+    let messages: [YarikMessage]
     let otherMessageIDs: Set<String>
     let localPeerID: PeerID
     let nickname: String
-    let outgoingMedia: [BitchatMessage]
+    let outgoingMedia: [YarikMessage]
 }
 
-/// Manages the application state and business logic for BitChat.
+/// Manages the application state and business logic for Yarik.
 /// Acts as the primary coordinator between UI components and backend services,
-/// implementing the BitchatDelegate protocol to handle network events.
-final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessageTransportEventDelegate, CommandContextProvider, GeohashParticipantContext, MessageFormattingContext {
+/// implementing the YarikDelegate protocol to handle network events.
+final class ChatViewModel: ObservableObject, YarikDelegate, SynchronousMessageTransportEventDelegate, CommandContextProvider, GeohashParticipantContext, MessageFormattingContext {
     // Use MessageFormattingEngine.Patterns for regex matching (shared, precompiled)
     typealias Patterns = MessageFormattingEngine.Patterns
 
@@ -159,7 +159,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// active conversation) and on channel switches. `objectWillChange`
     /// fires on every store change via the sink in `init`.
     @MainActor
-    var messages: [BitchatMessage] {
+    var messages: [YarikMessage] {
         if let cached = visibleMessagesCache { return cached }
         // Read-only lookup (never creates the conversation): this getter
         // runs during SwiftUI renders, where mutating the store's
@@ -168,7 +168,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
         visibleMessagesCache = current
         return current
     }
-    private var visibleMessagesCache: [BitchatMessage]?
+    private var visibleMessagesCache: [YarikMessage]?
     @Published var currentColorScheme: ColorScheme = .light
     @Published var currentTheme: AppTheme = .matrix
     @Published var isConnected = false
@@ -222,7 +222,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     // Computed properties for compatibility
     @MainActor
     var connectedPeers: Set<PeerID> { unifiedPeerService.connectedPeerIDs }
-    @Published var allPeers: [BitchatPeer] = []
+    @Published var allPeers: [YarikPeer] = []
     /// Nickname of whoever is talking live in the public mesh channel right
     /// now (floor-courtesy indicator on the composer mic), nil when nobody.
     @Published var activePublicVoiceTalker: String?
@@ -237,7 +237,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// change-invalidated cache on `pipeline.privateIngest`, so the simpler
     /// form wins.
     @MainActor
-    var privateChats: [PeerID: [BitchatMessage]] {
+    var privateChats: [PeerID: [YarikMessage]] {
         conversations.directMessagesByRoutingPeerID()
     }
     @MainActor
@@ -304,7 +304,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
         selectedPrivateChatFingerprint != nil
     }
 
-    var peerIndex: [PeerID: BitchatPeer] = [:]
+    var peerIndex: [PeerID: YarikPeer] = [:]
 
     // MARK: - Autocomplete Properties
 
@@ -334,7 +334,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     private var isPanicResetting = false
     /// Private group membership: keys in the keychain, metadata on disk.
     let groupStore: GroupStore
-    private let nicknameKey = "bitchat.nickname"
+    private let nicknameKey = "yarik.nickname"
     // Location channel state (macOS supports manual geohash selection)
     var activeChannel: ChannelID {
         get { conversations.activeChannel }
@@ -630,14 +630,14 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// conversation's ID index).
     @MainActor
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool {
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool {
         conversations.append(message, to: .directPeer(peerID))
     }
 
     /// Replace-or-append a private message by ID (media progress, mirrored
     /// copies); an existing message keeps its timeline position.
     @MainActor
-    func upsertPrivateMessage(_ message: BitchatMessage, in peerID: PeerID) {
+    func upsertPrivateMessage(_ message: YarikMessage, in peerID: PeerID) {
         conversations.upsertByID(message, in: .directPeer(peerID))
     }
 
@@ -770,10 +770,10 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
             MimeType.Category.file.messagePrefix
         ]
         let localPeerID = request.localPeerID
-        let isMedia: (BitchatMessage) -> Bool = { message in
+        let isMedia: (YarikMessage) -> Bool = { message in
             mediaPrefixes.contains(where: message.content.hasPrefix)
         }
-        let isFromMe: (BitchatMessage) -> Bool = { [nickname = request.nickname] message in
+        let isFromMe: (YarikMessage) -> Bool = { [nickname = request.nickname] message in
             if let senderPeerID = message.senderPeerID {
                 return senderPeerID.toShort() == localPeerID
             }
@@ -965,7 +965,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// an O(1) lookup that skips the `privateChats` dictionary build. The
     /// context protocols' simple per-peer reads dispatch here.
     @MainActor
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         conversations.conversationsByID[.directPeer(peerID)]?.messages ?? []
     }
 
@@ -986,8 +986,8 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// dropping chats that become empty. Returns the removed message, if any.
     @MainActor
     @discardableResult
-    func removePrivateMessage(withID messageID: String) -> BitchatMessage? {
-        var removed: BitchatMessage?
+    func removePrivateMessage(withID messageID: String) -> YarikMessage? {
+        var removed: YarikMessage?
         for (id, conversation) in conversations.conversationsByID {
             guard case .direct = id, conversation.containsMessage(withID: messageID) else { continue }
             let message = conversations.removeMessage(withID: messageID, from: id)
@@ -1011,7 +1011,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// via the conversation's ID index).
     @MainActor
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool {
         conversations.append(message, to: conversationID)
     }
 
@@ -1019,13 +1019,13 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// (the legacy `PublicTimelineStore.appendIfAbsent` contract).
     @MainActor
     @discardableResult
-    func appendGeohashMessageIfAbsent(_ message: BitchatMessage, toGeohash geohash: String) -> Bool {
+    func appendGeohashMessageIfAbsent(_ message: YarikMessage, toGeohash geohash: String) -> Bool {
         conversations.append(message, to: .geohash(geohash.lowercased()))
     }
 
     /// A public (mesh/geohash) channel's full timeline.
     @MainActor
-    func publicMessages(for channel: ChannelID) -> [BitchatMessage] {
+    func publicMessages(for channel: ChannelID) -> [YarikMessage] {
         conversations.conversation(for: ConversationID(channelID: channel)).messages
     }
 
@@ -1045,7 +1045,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// it. Returns the removed message, if any.
     @MainActor
     @discardableResult
-    func removePublicMessage(withID messageID: String) -> BitchatMessage? {
+    func removePublicMessage(withID messageID: String) -> YarikMessage? {
         publicMessagePipeline.removeMessage(withID: messageID)
         return conversations.removePublicMessage(withID: messageID)
     }
@@ -1064,7 +1064,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// Removes every message matching `predicate` from a geohash
     /// conversation (block-user purge).
     @MainActor
-    func removePublicMessages(fromGeohash geohash: String, where predicate: (BitchatMessage) -> Bool) {
+    func removePublicMessages(fromGeohash geohash: String, where predicate: (YarikMessage) -> Bool) {
         conversations.removeMessages(from: .geohash(geohash.lowercased()), where: predicate)
     }
 
@@ -1315,7 +1315,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
 
     // MARK: - Message Sending
 
-    /// Sends a message through the BitChat network.
+    /// Sends a message through the Yarik network.
     /// - Parameter content: The message content to send
     /// - Note: Automatically handles command processing if content starts with '/'
     ///         Routes to private chat if one is selected, otherwise broadcasts
@@ -1466,7 +1466,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// Add a local system message to a private chat (no network send)
     @MainActor
     func addLocalPrivateSystemMessage(_ content: String, to peerID: PeerID) {
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             sender: "system",
             content: content,
             timestamp: Date(),
@@ -1604,8 +1604,8 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
         }
 
         // Clear UserDefaults identity data
-        userDefaults.removeObject(forKey: "bitchat.noiseIdentityKey")
-        userDefaults.removeObject(forKey: "bitchat.messageRetentionKey")
+        userDefaults.removeObject(forKey: "yarik.noiseIdentityKey")
+        userDefaults.removeObject(forKey: "yarik.messageRetentionKey")
 
         // Wipe persisted location state (selected channel, teleport set,
         // bookmarks). For an activist-safety wipe, where the user has been is
@@ -1661,7 +1661,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
         // crash-recovery replay calls this method directly and would otherwise
         // let a staged envelope survive the wipe. Clearing here is idempotent
         // (it only removes the app-group key), so the double-clear is harmless.
-        if let sharedDefaults = UserDefaults(suiteName: BitchatApp.groupID) {
+        if let sharedDefaults = UserDefaults(suiteName: YarikAppIdentity.groupID) {
             SharedContentStore(defaults: sharedDefaults).discardAll()
         }
 
@@ -1822,12 +1822,12 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     // MARK: - Message Formatting
 
     @MainActor
-    func formatMessageAsText(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
+    func formatMessageAsText(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
         messageFormatter.formatMessageAsText(message, colorScheme: colorScheme, theme: theme ?? currentTheme)
     }
 
     @MainActor
-    func formatMessageHeader(_ message: BitchatMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
+    func formatMessageHeader(_ message: YarikMessage, colorScheme: ColorScheme, theme: AppTheme? = nil) -> AttributedString {
         messageFormatter.formatMessageHeader(message, colorScheme: colorScheme, theme: theme ?? currentTheme)
     }
 
@@ -1887,19 +1887,19 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     }
 
     @MainActor
-    private func peerColor(for message: BitchatMessage, isDark: Bool) -> Color {
+    private func peerColor(for message: YarikMessage, isDark: Bool) -> Color {
         messageFormatter.senderColor(for: message, isDark: isDark)
     }
 
     // MARK: - MessageFormattingContext Protocol
 
     @MainActor
-    func isSelfMessage(_ message: BitchatMessage) -> Bool {
+    func isSelfMessage(_ message: YarikMessage) -> Bool {
         messageFormatter.isSelfMessage(message)
     }
 
     @MainActor
-    func senderColor(for message: BitchatMessage, isDark: Bool) -> Color {
+    func senderColor(for message: YarikMessage, isDark: Bool) -> Color {
         peerColor(for: message, isDark: isDark)
     }
 
@@ -1927,7 +1927,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
 
     // MARK: - Peer Lookup Helpers
 
-    func getPeer(byID peerID: PeerID) -> BitchatPeer? {
+    func getPeer(byID peerID: PeerID) -> YarikPeer? {
         return peerIndex[peerID]
     }
 
@@ -1974,7 +1974,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
         identityManager.isVouched(fingerprint: fingerprint)
     }
 
-    // MARK: - BitchatDelegate Methods
+    // MARK: - YarikDelegate Methods
 
     // MARK: - Command Handling
 
@@ -2117,11 +2117,11 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     }
 
     @MainActor
-    func didReceiveTransportMessageSynchronously(_ message: BitchatMessage) -> Bool {
+    func didReceiveTransportMessageSynchronously(_ message: YarikMessage) -> Bool {
         transportEventCoordinator.didReceiveMessageSynchronously(message)
     }
 
-    func didReceiveMessage(_ message: BitchatMessage) {
+    func didReceiveMessage(_ message: YarikMessage) {
         transportEventCoordinator.didReceiveMessage(message)
     }
 
@@ -2294,7 +2294,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// not. Used by the board's new-pin alerts to scope-match the pin's channel.
     @MainActor
     func addGeohashSystemMessage(_ content: String, geohash: String) {
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             sender: "system",
             content: content,
             timestamp: Date(),
@@ -2319,7 +2319,7 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
 
     /// Handle incoming public message
     @MainActor
-    func handlePublicMessage(_ message: BitchatMessage) {
+    func handlePublicMessage(_ message: YarikMessage) {
         // Bridge hints are unauthenticated and may never suppress a genuine
         // BLE sender. Once the radio packet has passed BLE signature checks,
         // replace any earlier bridge alias before this row is enqueued.
@@ -2337,17 +2337,17 @@ final class ChatViewModel: ObservableObject, BitchatDelegate, SynchronousMessage
     /// Handle an incoming public Nostr message with its validated NIP-13
     /// difficulty; sufficient PoW relaxes the per-sender rate limit.
     @MainActor
-    func handlePublicMessage(_ message: BitchatMessage, powBits: Int) {
+    func handlePublicMessage(_ message: YarikMessage, powBits: Int) {
         publicConversationCoordinator.handlePublicMessage(message, powBits: powBits)
     }
 
     /// Check for mentions and send notifications
-    func checkForMentions(_ message: BitchatMessage) {
+    func checkForMentions(_ message: YarikMessage) {
         publicConversationCoordinator.checkForMentions(message)
     }
 
     /// Send haptic feedback for special messages (iOS only)
-    func sendHapticFeedback(for message: BitchatMessage) {
+    func sendHapticFeedback(for message: YarikMessage) {
         publicConversationCoordinator.sendHapticFeedback(for: message)
     }
 }

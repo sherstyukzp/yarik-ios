@@ -67,7 +67,7 @@ private extension GeoRelayDirectoryDependencies {
             userDefaults: .standard,
             notificationCenter: .default,
             now: Date.init,
-            // Runtime refreshes only from bitchat's reviewed copy. Upstream
+            // Runtime refreshes only from yarik's reviewed copy. Upstream
             // georelays/main is imported by a validator-backed pull request,
             // so an upstream mutation cannot immediately retarget clients.
             remoteURL: URL(string: "https://raw.githubusercontent.com/permissionlesstech/bitchat/refs/heads/main/relays/online_relays_gps.csv")!,
@@ -127,7 +127,7 @@ private extension GeoRelayDirectoryDependencies {
                         appropriateFor: nil,
                         create: true
                     )
-                    let dir = base.appendingPathComponent("bitchat", isDirectory: true)
+                    let dir = base.appendingPathComponent("yarik", isDirectory: true)
                     try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                     // v2 ignores caches populated from the old direct-upstream
                     // trust path and subjects every load to strict validation.

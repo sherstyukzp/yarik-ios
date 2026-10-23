@@ -1,6 +1,6 @@
 //
 // ChatVouchCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatVouchCoordinator` against a mock `ChatVouchContext` —
 // proving the exchange policy (verified + capable peers only, batch cap,

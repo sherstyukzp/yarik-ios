@@ -1,6 +1,6 @@
 //
 // CashuTokenDecoderTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for the Cashu token summary decoder: V3 JSON decode, minimal V4
 // CBOR traversal, URI normalization, detection ranges, and adversarial

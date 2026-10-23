@@ -1,6 +1,6 @@
 //
 // GroupStoreTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -35,7 +35,7 @@ struct GroupStoreTests {
         let creator = makeMember(seed: 0xC1, nickname: "me")
 
         let group = try #require(store.createGroup(named: "ops", creator: creator))
-        #expect(group.groupID.count == BitchatGroup.groupIDLength)
+        #expect(group.groupID.count == YarikGroup.groupIDLength)
         #expect(group.epoch == 1)
         #expect(group.members == [creator])
         #expect(group.creatorFingerprint == creator.fingerprint)
@@ -43,7 +43,7 @@ struct GroupStoreTests {
         #expect(store.group(withID: group.groupID) == group)
         #expect(store.group(for: group.peerID) == group)
         let key = try #require(store.key(forGroupID: group.groupID))
-        #expect(key.count == BitchatGroup.keyLength)
+        #expect(key.count == YarikGroup.keyLength)
         #expect(group.peerID.isGroup)
         #expect(group.peerID.groupIDData == group.groupID)
     }
@@ -58,12 +58,12 @@ struct GroupStoreTests {
         // Filling to the cap works…
         let fifteen = (1...15).map { makeMember(seed: UInt8($0)) }
         #expect(store.updateRoster(groupID: group.groupID, members: [creator] + fifteen) != nil)
-        #expect(store.group(withID: group.groupID)?.members.count == BitchatGroup.maxMembers)
+        #expect(store.group(withID: group.groupID)?.members.count == YarikGroup.maxMembers)
 
         // …one more is rejected.
         let overflow = [creator] + fifteen + [makeMember(seed: 0x99)]
         #expect(store.updateRoster(groupID: group.groupID, members: overflow) == nil)
-        #expect(store.group(withID: group.groupID)?.members.count == BitchatGroup.maxMembers)
+        #expect(store.group(withID: group.groupID)?.members.count == YarikGroup.maxMembers)
 
         // Direct upsert past the cap is rejected too.
         var oversized = group
@@ -94,7 +94,7 @@ struct GroupStoreTests {
         let realKey = try #require(store.key(forGroupID: group.groupID))
 
         // Same groupID at a higher epoch with the attacker as creator…
-        let hijack = BitchatGroup(
+        let hijack = YarikGroup(
             groupID: group.groupID,
             name: group.name,
             epoch: .max,
@@ -159,7 +159,7 @@ struct GroupStoreTests {
         defer { try? FileManager.default.removeItem(at: fileURL.deletingLastPathComponent()) }
 
         let creator = makeMember(seed: 0xC1, nickname: "me")
-        let group: BitchatGroup
+        let group: YarikGroup
         do {
             let store = GroupStore(keychain: keychain, fileURL: fileURL)
             group = try #require(store.createGroup(named: "hike", creator: creator))
@@ -175,7 +175,7 @@ struct GroupStoreTests {
         let fileURL = tempFileURL()
         defer { try? FileManager.default.removeItem(at: fileURL.deletingLastPathComponent()) }
 
-        let group: BitchatGroup
+        let group: YarikGroup
         do {
             let store = GroupStore(keychain: keychain, fileURL: fileURL)
             group = try #require(store.createGroup(named: "stale", creator: makeMember(seed: 0xC1)))
@@ -195,8 +195,8 @@ struct GroupStoreTests {
 
         let creator = makeMember(seed: 0xC1, nickname: "creator")
         let other = makeMember(seed: 0xEE, nickname: "other")
-        let kept: BitchatGroup
-        let orphaned: BitchatGroup
+        let kept: YarikGroup
+        let orphaned: YarikGroup
         do {
             let store = GroupStore(keychain: keychain, fileURL: fileURL)
             kept = try #require(store.createGroup(named: "kept", creator: creator))
@@ -204,14 +204,14 @@ struct GroupStoreTests {
         }
         // Loading bypasses `upsert`: a second entry handing `kept` to another
         // creator, and an entry whose creator is missing from its roster.
-        let rehomed = BitchatGroup(
+        let rehomed = YarikGroup(
             groupID: kept.groupID,
             name: kept.name,
             epoch: kept.epoch + 1,
             members: [other],
             creatorFingerprint: other.fingerprint
         )
-        let creatorless = BitchatGroup(
+        let creatorless = YarikGroup(
             groupID: orphaned.groupID,
             name: orphaned.name,
             epoch: orphaned.epoch,

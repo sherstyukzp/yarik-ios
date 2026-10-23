@@ -20,7 +20,7 @@ enum BLESourceRouteOriginationPolicy {
     ///   routed send, and
     /// - the topology yields a complete path.
     static func route(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         to recipient: PeerID,
         localPeerIDData: Data,
         isRecipientConnected: (PeerID) -> Bool,

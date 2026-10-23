@@ -7,13 +7,13 @@ import Security
 // Note: This file depends on Data extension from BinaryEncodingUtils.swift
 // Make sure BinaryEncodingUtils.swift is included in the target
 
-/// BitChat's private-envelope protocol transported over Nostr relays.
+/// Yarik's private-envelope protocol transported over Nostr relays.
 ///
-/// This construction is deliberately BitChat-specific and is **not** NIP-17,
+/// This construction is deliberately Yarik-specific and is **not** NIP-17,
 /// NIP-44, or NIP-59 compatible, even though it historically reuses those
 /// NIPs' kind numbers (1059/13/14) and a `v2:` content prefix. It uses Nostr
 /// events and secp256k1 identities, but the XChaCha20-Poly1305 payload layout
-/// and key derivation are proprietary and interoperate only with BitChat
+/// and key derivation are proprietary and interoperate only with Yarik
 /// clients.
 struct NostrProtocol {
 
@@ -21,9 +21,9 @@ struct NostrProtocol {
     enum EventKind: Int {
         case metadata = 0
         case textNote = 1
-        // BitChat's proprietary private-envelope layers. These reuse the
+        // Yarik's proprietary private-envelope layers. These reuse the
         // NIP-17/NIP-59 kind numbers (14/13/1059) for historical reasons, but
-        // the encrypted payloads are BitChat-specific and not NIP-compatible.
+        // the encrypted payloads are Yarik-specific and not NIP-compatible.
         case dm = 14 // unsigned inner message (inside ciphertext)
         case seal = 13 // sender-signed seal (inside ciphertext)
         case giftWrap = 1059 // public outer envelope (one-time key)
@@ -42,7 +42,7 @@ struct NostrProtocol {
     /// without letting an addressed relay event drive unbounded allocation.
     static let maximumPrivateEnvelopeCiphertextBytes = 64 * 1024
 
-    /// Create a BitChat private envelope for relay transport (outer kind 1059).
+    /// Create a Yarik private envelope for relay transport (outer kind 1059).
     static func createPrivateMessage(
         content: String,
         recipientPubkey: String,
@@ -93,7 +93,7 @@ struct NostrProtocol {
         return giftWrap
     }
 
-    /// Decrypt a received BitChat private envelope.
+    /// Decrypt a received Yarik private envelope.
     /// Returns the content, sender pubkey, and the actual message timestamp (not the randomized outer timestamp)
     static func decryptPrivateMessage(
         giftWrap: NostrEvent,
@@ -101,7 +101,7 @@ struct NostrProtocol {
     ) throws -> (content: String, senderPubkey: String, timestamp: Int) {
 
         // 0. Validate the untrusted outer envelope before any decryption work.
-        //    Every BitChat client (released iOS and current Android) publishes
+        //    Every Yarik client (released iOS and current Android) publishes
         //    exactly one outer recipient `p` tag on a validly signed kind-1059
         //    wrap; anything else is malformed or misbound.
         guard giftWrap.content.utf8.count <= maximumPrivateEnvelopeCiphertextBytes else {
@@ -130,7 +130,7 @@ struct NostrProtocol {
         
         // 2. Authenticate the seal. The seal MUST be signed by the sender's real
         //    identity key; without this check a DM is forgeable by anyone who
-        //    knows the recipient's npub. Every BitChat sender emits a tagless
+        //    knows the recipient's npub. Every Yarik sender emits a tagless
         //    kind-13 seal, so bind the decrypted layer to that exact shape.
         guard seal.kind == EventKind.seal.rawValue,
               seal.tags.isEmpty,
@@ -156,7 +156,7 @@ struct NostrProtocol {
         //    from the seal. The sender claimed inside the rumor must match the
         //    key that actually signed the seal, otherwise the sender field is
         //    unauthenticated and spoofable. Also bind the inner kind and tag
-        //    shape to what BitChat clients actually emit.
+        //    shape to what Yarik clients actually emit.
         guard rumor.kind == EventKind.dm.rawValue,
               validInnerMessageTags(rumor.tags, recipientPubkey: recipientIdentity.publicKeyHex),
               rumor.sig == nil,
@@ -580,11 +580,11 @@ struct NostrProtocol {
         return try NostrEvent(from: rumorDict)
     }
 
-    // MARK: - BitChat private-envelope encryption
+    // MARK: - Yarik private-envelope encryption
     //
     // Not NIP-44: the `v2:` prefix, base64url(nonce24 || ciphertext || tag)
     // layout, XChaCha20-Poly1305 cipher, and HKDF parameters are all
-    // BitChat-specific.
+    // Yarik-specific.
 
     private static func encrypt(
         plaintext: String,
@@ -601,7 +601,7 @@ struct NostrProtocol {
             privateKey: senderKey,
             publicKey: recipientPubkeyData
         )
-        // Derive the BitChat private-envelope symmetric key (HKDF-SHA256)
+        // Derive the Yarik private-envelope symmetric key (HKDF-SHA256)
         let key = try derivePrivateEnvelopeKey(from: sharedSecret)
 
         // 24-byte random nonce for XChaCha20-Poly1305
@@ -631,7 +631,7 @@ struct NostrProtocol {
         senderPubkey: String,
         recipientKey: P256K.Schnorr.PrivateKey
     ) throws -> String {
-        // Expect BitChat's historical `v2:` private-envelope framing, and
+        // Expect Yarik's historical `v2:` private-envelope framing, and
         // bound work before Base64 decoding attacker-sized input.
         guard ciphertext.utf8.count <= maximumPrivateEnvelopeCiphertextBytes,
               ciphertext.hasPrefix("v2:") else {
@@ -901,7 +901,7 @@ enum NostrError: Error {
     case cryptographicFailure
 }
 
-// MARK: - BitChat private-envelope key derivation
+// MARK: - Yarik private-envelope key derivation
 
 private extension NostrProtocol {
     /// The HKDF info string retains the historical "nip44-v2" label for wire

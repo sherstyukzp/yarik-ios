@@ -1,6 +1,6 @@
 //
 // SecureIdentityStateManager.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -165,7 +165,7 @@ final class SecureIdentityStateManager: SecureIdentityStateManagerProtocol {
     private var cache: IdentityCache = IdentityCache()
     
     // Thread safety
-    private let queue = DispatchQueue(label: "bitchat.identity.state", attributes: .concurrent)
+    private let queue = DispatchQueue(label: "yarik.identity.state", attributes: .concurrent)
     private let queueSpecificKey = DispatchSpecificKey<UInt8>()
     
     // Pending-save coalescing flag. Reads/writes are serialized on `queue`.

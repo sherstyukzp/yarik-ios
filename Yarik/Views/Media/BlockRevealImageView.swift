@@ -81,7 +81,7 @@ struct BlockRevealImageView: View {
             if let onCancel = onCancel, isSending {
                 Button(action: onCancel) {
                     Image(systemName: "xmark")
-                        .font(.bitchatSystem(size: 12, weight: .bold))
+                        .font(.yarikSystem(size: 12, weight: .bold))
                         .padding(8)
                         .background(Circle().fill(Color.black.opacity(0.7)))
                         .foregroundColor(.white)
@@ -161,11 +161,11 @@ struct BlockRevealImageView: View {
                             .overlay(
                                 VStack(spacing: 6) {
                                     Image(systemName: "eye.slash.fill")
-                                        .font(.bitchatSystem(size: 24, weight: .semibold))
+                                        .font(.yarikSystem(size: 24, weight: .semibold))
                                     Text(verbatim: Strings.tapToReveal)
                                         // Themed: monospaced under matrix,
                                         // system under liquid glass.
-                                        .bitchatFont(size: 12, weight: .medium)
+                                        .yarikFont(size: 12, weight: .medium)
                                 }
                                 .foregroundColor(.white.opacity(0.85))
                             )
@@ -178,7 +178,7 @@ struct BlockRevealImageView: View {
                 .overlay {
                     if loadFailed {
                         Image(systemName: "photo")
-                            .font(.bitchatSystem(size: 24, weight: .semibold))
+                            .font(.yarikSystem(size: 24, weight: .semibold))
                             .foregroundColor(palette.secondary)
                     } else {
                         ProgressView()

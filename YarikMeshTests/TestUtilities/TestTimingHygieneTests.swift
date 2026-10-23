@@ -29,7 +29,7 @@ struct TestTimingHygieneTests {
 
     private static let testsRoot = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()  // TestUtilities
-        .deletingLastPathComponent()  // bitchatTests
+        .deletingLastPathComponent()  // YarikMeshTests
 
     private struct Line {
         let file: String

@@ -89,7 +89,7 @@ final class AppRuntime: ObservableObject {
         let resolvedSharedContentStore: SharedContentStore?
         if let sharedContentStore {
             resolvedSharedContentStore = sharedContentStore
-        } else if let sharedDefaults = UserDefaults(suiteName: BitchatApp.groupID) {
+        } else if let sharedDefaults = UserDefaults(suiteName: YarikAppIdentity.groupID) {
             resolvedSharedContentStore = SharedContentStore(defaults: sharedDefaults)
         } else {
             resolvedSharedContentStore = nil
@@ -175,7 +175,7 @@ final class AppRuntime: ObservableObject {
     func handleOpenURL(_ url: URL) {
         record(.openedURL(url.absoluteString))
 
-        if url.scheme == "bitchat", url.host == "share" {
+        if url.scheme == "yarik", url.host == "share" {
             checkForSharedContent()
         }
     }

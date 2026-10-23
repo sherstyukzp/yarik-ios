@@ -1,4 +1,4 @@
-# bitchat Privacy Assessment
+# yarik Privacy Assessment
 
 Last reviewed: July 2026
 
@@ -29,9 +29,9 @@ Signed announces can expose:
 - A bounded set of short direct-neighbor identifiers
 - A coarse rendezvous geohash when the bridge capability is enabled
 
-The app does not advertise the device's assigned name. iOS manages BLE address randomization; bitchat does not attempt to create a stable MAC address.
+The app does not advertise the device's assigned name. iOS manages BLE address randomization; yarik does not attempt to create a stable MAC address.
 
-That randomization does not deliver the unlinkability it might suggest, because the application layer publishes stable identifiers above it. The 8-byte peer ID in every packet header is the first 8 bytes of the Noise static key fingerprint, so it does not rotate; announces carry the static keys themselves; and the fixed service UUID makes any bitchat device detectable as such by a passive scanner. A receiver in radio range can therefore recognise a specific device across sessions and locations, and detect that the app is in use at all. RSSI, timing, traffic volume, and radio fingerprints remain observable as well.
+That randomization does not deliver the unlinkability it might suggest, because the application layer publishes stable identifiers above it. The 8-byte peer ID in every packet header is the first 8 bytes of the Noise static key fingerprint, so it does not rotate; announces carry the static keys themselves; and the fixed service UUID makes any yarik device detectable as such by a passive scanner. A receiver in radio range can therefore recognise a specific device across sessions and locations, and detect that the app is in use at all. RSSI, timing, traffic volume, and radio fingerprints remain observable as well.
 
 Ingress validates announce structure, sender binding, signatures, payload sizes, and freshness. Current-link Noise authentication is required before destructive courier handoff or strict directed delivery. Floods, queues, fragments, ingress work, and per-peer state are bounded.
 
@@ -57,7 +57,7 @@ Public archives contain content already intended for public mesh/board distribut
 
 ## Nostr and Mesh Bridge
 
-- BitChat's proprietary private-envelope fallback protects plaintext with secp256k1 key agreement, HKDF-SHA256, and XChaCha20-Poly1305. It is not NIP-17, NIP-44, or NIP-59 compatible and does not provide forward secrecy against later compromise of the recipient's static Nostr private key. Relays still see the recipient public-key tag, event timing and size, and network metadata.
+- Yarik's proprietary private-envelope fallback protects plaintext with secp256k1 key agreement, HKDF-SHA256, and XChaCha20-Poly1305. It is not NIP-17, NIP-44, or NIP-59 compatible and does not provide forward secrecy against later compromise of the recipient's static Nostr private key. Relays still see the recipient public-key tag, event timing and size, and network metadata.
 - Bridge courier drops use a throwaway publisher key, an opaque Noise-sealed envelope, and a day-rotating recipient tag. Only a party already holding the recipient's Noise static key can compute candidate tags.
 - Relay publication is considered successful only after an explicit NIP-01 `OK true` from at least one target relay. Rejected, disconnected, timed-out, or merely socket-written events stay retryable.
 - When mesh bridge is enabled, public mesh messages not marked “nearby only” are signed under a per-cell Nostr identity and published to a neighborhood rendezvous geohash. Presence and public bridge traffic therefore expose a coarse area to relays and participants.
@@ -71,7 +71,7 @@ Residual risk: Nostr relay retention and logging are outside project control. Pu
 ## Location
 
 - When-in-use CoreLocation access computes geohash choices and bridge cells. Permission revocation stops live sampling and releases subscriptions.
-- Exact coordinates are not persisted by bitchat or placed into mesh/Nostr payloads.
+- Exact coordinates are not persisted by yarik or placed into mesh/Nostr payloads.
 - Selected/bookmarked geohashes, teleport flags, and display names persist in local preferences; a fine geohash can identify a small area.
 - Friendly place names use `CLGeocoder.reverseGeocodeLocation`. Apple may process the supplied location under its own privacy terms, so this operation is not accurately described as wholly on-device.
 - Automatic presence is limited to lower-precision geohashes; precise posts occur through user-selected channels, notes, notices, or the bridge behavior presented in the UI.
@@ -84,13 +84,13 @@ Residual risk: Nostr relay retention and logging are outside project control. Pu
 
 ## Privacy Manifests
 
-`bitchat/PrivacyInfo.xcprivacy` declares:
+`yarik/PrivacyInfo.xcprivacy` declares:
 
 - UserDefaults: `CA92.1` for app-only preferences and `1C8F.1` for the shared app group
 - File timestamps/metadata: `C617.1` for app-container files and `3B52.1` for user-granted files
 - System boot time: `35F9.1` for elapsed-time deadlines and timers
 
-`bitchatShareExtension/PrivacyInfo.xcprivacy` declares app-group UserDefaults reason `1C8F.1`. Both manifests declare no tracking domains and no data collection by the app developer. They must remain bundled in their respective executable bundles.
+`yarikShareExtension/PrivacyInfo.xcprivacy` declares app-group UserDefaults reason `1C8F.1`. Both manifests declare no tracking domains and no data collection by the app developer. They must remain bundled in their respective executable bundles.
 
 ## Locked and Seized Devices
 

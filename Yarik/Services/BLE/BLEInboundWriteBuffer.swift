@@ -15,7 +15,7 @@ struct BLEInboundWriteAppendMetadata: Equatable {
 
 struct BLEInboundWriteBuffer {
     enum AppendResult {
-        case decoded(packet: BitchatPacket, metadata: BLEInboundWriteAppendMetadata)
+        case decoded(packet: YarikPacket, metadata: BLEInboundWriteAppendMetadata)
         case waiting(metadata: BLEInboundWriteAppendMetadata)
         case oversized(metadata: BLEInboundWriteAppendMetadata)
     }

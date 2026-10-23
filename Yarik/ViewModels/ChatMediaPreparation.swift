@@ -9,11 +9,11 @@ enum ChatMediaPreparationError: Error, Equatable {
 
 struct ChatPreparedImage {
     let outputURL: URL
-    let packet: BitchatFilePacket
+    let packet: YarikFilePacket
 }
 
 enum ChatMediaPreparation {
-    static func prepareVoiceNotePacket(at url: URL) throws -> BitchatFilePacket {
+    static func prepareVoiceNotePacket(at url: URL) throws -> YarikFilePacket {
         let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
         guard let fileSize = attributes[.size] as? Int else {
             throw ChatMediaPreparationError.voiceNoteTooLarge(bytes: 0)
@@ -23,7 +23,7 @@ enum ChatMediaPreparation {
         }
 
         let data = try Data(contentsOf: url)
-        let packet = BitchatFilePacket(
+        let packet = YarikFilePacket(
             fileName: url.lastPathComponent,
             fileSize: UInt64(data.count),
             mimeType: "audio/mp4",
@@ -41,7 +41,7 @@ enum ChatMediaPreparation {
                 throw ChatMediaPreparationError.imageTooLarge(bytes: data.count)
             }
 
-            let packet = BitchatFilePacket(
+            let packet = YarikFilePacket(
                 fileName: outputURL.lastPathComponent,
                 fileSize: UInt64(data.count),
                 mimeType: "image/jpeg",

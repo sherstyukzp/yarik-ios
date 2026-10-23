@@ -26,7 +26,7 @@ protocol GeoPresenceContext: AnyObject {
     /// Appends a geohash message if absent (single-writer store intent).
     /// Returns `true` when stored.
     @discardableResult
-    func appendGeohashMessageIfAbsent(_ message: BitchatMessage, toGeohash geohash: String) -> Bool
+    func appendGeohashMessageIfAbsent(_ message: YarikMessage, toGeohash geohash: String) -> Bool
 
     /// Posts the sampled-geohash-activity local notification.
     func notifyGeohashActivity(geohash: String, bodyPreview: String)
@@ -179,7 +179,7 @@ final class GeoPresenceTracker {
             let rawTs = Date(timeIntervalSince1970: TimeInterval(event.created_at))
             let ts = min(rawTs, Date())
             let mentions = context.parseMentions(from: content)
-            let message = BitchatMessage(
+            let message = YarikMessage(
                 id: event.id,
                 sender: senderName,
                 content: content,

@@ -45,7 +45,7 @@ protocol ChatGroupContext: AnyObject {
 
     // MARK: Conversation intents (group chats are direct-keyed)
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool
     func markPrivateChatUnread(_ peerID: PeerID)
     func removePrivateChat(_ peerID: PeerID)
     func startPrivateChat(with peerID: PeerID)
@@ -226,11 +226,11 @@ final class ChatGroupCoordinator {
                 nickname
             ))
         }
-        guard group.members.count < BitchatGroup.maxMembers else {
+        guard group.members.count < YarikGroup.maxMembers else {
             return .error(message: String(
                 format: String(localized: "system.group.full", comment: "Error when the group is at the member cap; placeholder is the cap"),
                 locale: .current,
-                "\(BitchatGroup.maxMembers)"
+                "\(YarikGroup.maxMembers)"
             ))
         }
 
@@ -326,7 +326,7 @@ final class ChatGroupCoordinator {
         let myFingerprint = context.myNoiseFingerprint()
         let lines = groups.map { group -> String in
             let role = group.creatorFingerprint == myFingerprint ? " (creator)" : ""
-            return "#\(group.name)\(role) — \(group.members.count)/\(BitchatGroup.maxMembers)"
+            return "#\(group.name)\(role) — \(group.members.count)/\(YarikGroup.maxMembers)"
         }
         return .success(message: String(localized: "system.group.list_header", comment: "Header line for the /group list output") + "\n" + lines.joined(separator: "\n"))
     }
@@ -372,7 +372,7 @@ final class ChatGroupCoordinator {
             return
         }
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: context.nickname,
             content: content,
@@ -433,7 +433,7 @@ final class ChatGroupCoordinator {
         let messageDate = min(Date(timeIntervalSince1970: TimeInterval(plaintext.timestampMs) / 1000), Date())
         let senderName = member.nickname.isEmpty ? plaintext.senderNickname : member.nickname
         let senderPeerID = PeerID(str: String(member.fingerprint.prefix(16)))
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: plaintext.messageID,
             sender: senderName,
             content: plaintext.content,
@@ -490,12 +490,12 @@ private extension ChatGroupCoordinator {
         return trimmed.hasPrefix("@") ? String(trimmed.dropFirst()) : trimmed
     }
 
-    func selectedGroup() -> BitchatGroup? {
+    func selectedGroup() -> YarikGroup? {
         guard let selected = context.selectedPrivateChatPeer, selected.isGroup else { return nil }
         return context.groupStore.group(for: selected)
     }
 
-    func signedStatePayload(for group: BitchatGroup, key: Data) -> Data? {
+    func signedStatePayload(for group: YarikGroup, key: Data) -> Data? {
         GroupStatePayload.makeSigned(group: group, key: key) { [weak context] data in
             context?.signWithNoiseKey(data)
         }?.encode()
@@ -504,7 +504,7 @@ private extension ChatGroupCoordinator {
     /// Sends the state payload to every connected roster member except us and
     /// the excluded fingerprints. Offline members catch up the next time the
     /// creator sends them state (v1 limitation, documented in the PR).
-    func distributeState(_ payload: Data, group: BitchatGroup, excluding excludedFingerprints: Set<String>, type: StateSendType) {
+    func distributeState(_ payload: Data, group: YarikGroup, excluding excludedFingerprints: Set<String>, type: StateSendType) {
         let myFingerprint = context.myNoiseFingerprint()
         for member in group.members {
             guard member.fingerprint != myFingerprint,
@@ -532,9 +532,9 @@ private extension ChatGroupCoordinator {
     /// (and even if one did, its own missing-self check would not match).
     /// If the removee is offline the notice can't be delivered — same v1
     /// limitation as any other missed key update, documented in the PR.
-    func notifyRemovedMember(_ removed: GroupMember, rotated: BitchatGroup) {
+    func notifyRemovedMember(_ removed: GroupMember, rotated: YarikGroup) {
         guard let peerID = context.connectedPeerID(forFingerprint: removed.fingerprint) else { return }
-        let throwawayKey = Data(count: BitchatGroup.keyLength)
+        let throwawayKey = Data(count: YarikGroup.keyLength)
         guard let payload = signedStatePayload(for: rotated, key: throwawayKey) else { return }
         context.sendGroupKeyUpdatePayload(payload, to: peerID)
     }

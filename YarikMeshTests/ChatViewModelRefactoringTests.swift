@@ -1,6 +1,6 @@
 //
 // ChatViewModelRefactoringTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Pinning tests to characterize ChatViewModel behavior before refactoring.
 // These tests act as a safety net to ensure we don't break existing functionality.
@@ -95,7 +95,7 @@ struct ChatViewModelRefactoringTests {
         let senderID = PeerID(str: "sender_1")
 
         // Setup
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "msg_1",
             sender: "bob",
             content: "Secret",

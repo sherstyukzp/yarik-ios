@@ -1,6 +1,6 @@
 //
 // ChatViewModel+PrivateChat.swift
-// bitchat
+// yarik
 //
 // Private chat and media transfer logic for ChatViewModel
 //
@@ -137,7 +137,7 @@ extension ChatViewModel {
     }
 
     @MainActor
-    func enqueueMediaMessage(content: String, targetPeer: PeerID?) -> BitchatMessage {
+    func enqueueMediaMessage(content: String, targetPeer: PeerID?) -> YarikMessage {
         mediaTransferCoordinator.enqueueMediaMessage(content: content, targetPeer: targetPeer)
     }
 
@@ -160,7 +160,7 @@ extension ChatViewModel {
         mediaTransferCoordinator.handleTransferEvent(event)
     }
 
-    func cleanupLocalFile(forMessage message: BitchatMessage) {
+    func cleanupLocalFile(forMessage message: YarikMessage) {
         mediaTransferCoordinator.cleanupLocalFile(forMessage: message)
     }
 
@@ -175,7 +175,7 @@ extension ChatViewModel {
     }
 
     @MainActor
-    func handlePrivateMessage(_ message: BitchatMessage) {
+    func handlePrivateMessage(_ message: YarikMessage) {
         // A finalized voice note whose burst already streamed in live swaps
         // into the existing bubble instead of appearing (and notifying) twice.
         if liveVoiceCoordinator.absorbFinalizedVoiceNote(message) { return }
@@ -183,7 +183,7 @@ extension ChatViewModel {
     }
 
     @MainActor
-    func processActionMessage(_ message: BitchatMessage) -> BitchatMessage {
+    func processActionMessage(_ message: YarikMessage) -> YarikMessage {
         privateConversationCoordinator.processActionMessage(message)
     }
 
@@ -193,7 +193,7 @@ extension ChatViewModel {
     }
 
     @MainActor
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool {
+    func isMessageBlocked(_ message: YarikMessage) -> Bool {
         privateConversationCoordinator.isMessageBlocked(message)
     }
 }

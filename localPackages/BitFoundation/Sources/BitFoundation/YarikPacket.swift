@@ -1,6 +1,6 @@
 //
-// BitchatPacket.swift
-// bitchat
+// YarikPacket.swift
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -8,11 +8,11 @@
 
 import struct Foundation.Data
 
-/// The core packet structure for all BitChat protocol messages.
+/// The core packet structure for all Yarik protocol messages.
 /// Encapsulates all data needed for routing through the mesh network,
 /// including TTL for hop limiting and optional encryption.
 /// - Note: Packets larger than BLE MTU (512 bytes) are automatically fragmented
-public struct BitchatPacket: Codable {
+public struct YarikPacket: Codable {
     public let version: UInt8
     public let type: UInt8
     public let senderID: Data
@@ -51,7 +51,7 @@ public struct BitchatPacket: Codable {
     public func toBinaryDataForSigning() -> Data? {
         // Create a copy without signature and with fixed TTL for signing
         // TTL must be excluded because it changes during relay
-        let unsignedPacket = BitchatPacket(
+        let unsignedPacket = YarikPacket(
             type: type,
             senderID: senderID,
             recipientID: recipientID,
@@ -66,7 +66,7 @@ public struct BitchatPacket: Codable {
         return BinaryProtocol.encode(unsignedPacket)
     }
     
-    public static func from(_ data: Data) -> BitchatPacket? {
+    public static func from(_ data: Data) -> YarikPacket? {
         BinaryProtocol.decode(data)
     }
 }

@@ -1,6 +1,6 @@
 //
 // SyncTypeFlagsGroupTests.swift
-// bitchat
+// yarik
 //
 // Wire-compat proof for the groupMessage sync bit (bit 10): the types
 // bitfield widens from 1 to 2 bytes, and clients that don't know the bit

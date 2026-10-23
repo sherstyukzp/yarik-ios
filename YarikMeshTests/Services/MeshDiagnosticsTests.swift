@@ -1,6 +1,6 @@
 //
 // MeshDiagnosticsTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for /ping and /trace command handling and the topology snapshot
 // types backing the mesh topology map.

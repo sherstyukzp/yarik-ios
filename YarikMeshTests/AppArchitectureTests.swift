@@ -53,8 +53,8 @@ private func makeArchitectureMessage(
     content: String? = nil,
     isPrivate: Bool = false,
     senderPeerID: PeerID = PeerID(str: "peer-a")
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "alice",
         content: content ?? "message \(id)",
@@ -344,7 +344,7 @@ struct AppArchitectureTests {
     @MainActor
     func privateInboxModelRepublishesReadReceiptsForSelectedConversation() {
         // A DM's messages can live under BOTH .directPeer(ephemeral) and
-        // .directPeer(stableKey) (mirroring shares one BitchatMessage
+        // .directPeer(stableKey) (mirroring shares one YarikMessage
         // instance); the view's read-receipt update must fire no matter
         // which of the two keys the selection holds.
         let ephemeralPeerID = PeerID(str: "abcdef1234567890")
@@ -469,7 +469,7 @@ struct AppArchitectureTests {
         let privateInboxModel = PrivateInboxModel(conversations: ConversationStore())
         let chromeModel = AppChromeModel(chatViewModel: viewModel, privateInboxModel: privateInboxModel)
         viewModel.seedPublicMessages([
-            BitchatMessage(
+            YarikMessage(
                 id: "keep-1",
                 sender: "Tester",
                 content: "still here",
@@ -520,7 +520,7 @@ struct AppArchitectureTests {
         // A DM thread from a passerby who has since gone offline: not in
         // allPeers, not a favorite — previously unreachable once read.
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "dm-1",
                 sender: "passerby",
                 content: "hello from the train",
@@ -533,7 +533,7 @@ struct AppArchitectureTests {
         ], for: offlinePeerID)
         // Group threads have their own section and must not duplicate here.
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "gm-1",
                 sender: "member",
                 content: "group hello",
@@ -564,7 +564,7 @@ struct AppArchitectureTests {
         let pubkeyHex = String(repeating: "ab", count: 32)
         let geoDMPeer = PeerID(nostr_: pubkeyHex)
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: "geo-1",
                 sender: "stranger",
                 content: "hello from another cell",
@@ -623,7 +623,7 @@ struct AppArchitectureTests {
         transport.peerNicknames[shortPeerID] = "alice"
         transport.reachablePeers.insert(shortPeerID)
         viewModel.allPeers = [
-            BitchatPeer(
+            YarikPeer(
                 peerID: shortPeerID,
                 noisePublicKey: noiseKey,
                 nickname: "alice",
@@ -739,7 +739,7 @@ struct AppArchitectureTests {
         transport.peerFingerprints[peerID] = fingerprint
         transport.peerNicknames[peerID] = "alice"
         viewModel.allPeers = [
-            BitchatPeer(
+            YarikPeer(
                 peerID: peerID,
                 noisePublicKey: Data((0..<32).map(UInt8.init)),
                 nickname: "alice",

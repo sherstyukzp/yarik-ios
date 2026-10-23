@@ -1,6 +1,6 @@
 //
 // GroupStore.swift
-// bitchat
+// yarik
 //
 // Persistence for private groups: symmetric keys in the keychain, metadata
 // (roster, name, epoch) as protected JSON in Application Support. Both are
@@ -19,7 +19,7 @@ import Security
 @MainActor
 final class GroupStore: ObservableObject {
     /// All groups this device is a member of, in creation/join order.
-    @Published private(set) var groups: [BitchatGroup] = []
+    @Published private(set) var groups: [YarikGroup] = []
 
     private let keychain: KeychainManagerProtocol
     private let fileURL: URL?
@@ -34,11 +34,11 @@ final class GroupStore: ObservableObject {
 
     // MARK: - Reads
 
-    func group(withID groupID: Data) -> BitchatGroup? {
+    func group(withID groupID: Data) -> YarikGroup? {
         groups.first { $0.groupID == groupID }
     }
 
-    func group(for peerID: PeerID) -> BitchatGroup? {
+    func group(for peerID: PeerID) -> YarikGroup? {
         guard let groupID = peerID.groupIDData else { return nil }
         return group(withID: groupID)
     }
@@ -53,10 +53,10 @@ final class GroupStore: ObservableObject {
     /// Creates a new group with a random 16-byte ID and 32-byte key at
     /// epoch 1, with the creator as sole member. Returns nil when key
     /// generation or persistence fails.
-    func createGroup(named name: String, creator: GroupMember) -> BitchatGroup? {
-        guard let groupID = Self.randomBytes(BitchatGroup.groupIDLength),
-              let key = Self.randomBytes(BitchatGroup.keyLength) else { return nil }
-        let group = BitchatGroup(
+    func createGroup(named name: String, creator: GroupMember) -> YarikGroup? {
+        guard let groupID = Self.randomBytes(YarikGroup.groupIDLength),
+              let key = Self.randomBytes(YarikGroup.keyLength) else { return nil }
+        let group = YarikGroup(
             groupID: groupID,
             name: name,
             epoch: 1,
@@ -72,8 +72,8 @@ final class GroupStore: ObservableObject {
     /// change to the creator (fingerprint or signing key) of a group already
     /// held, so no caller can hand a known groupID to a different creator.
     @discardableResult
-    func upsert(_ group: BitchatGroup, key: Data) -> Bool {
-        guard key.count == BitchatGroup.keyLength,
+    func upsert(_ group: YarikGroup, key: Data) -> Bool {
+        guard key.count == YarikGroup.keyLength,
               Self.isWellFormed(group) else { return false }
         if let existing = self.group(withID: group.groupID), !existing.hasSameCreator(as: group) {
             SecureLogger.warning(
@@ -99,7 +99,7 @@ final class GroupStore: ObservableObject {
     /// (creator-side invite). Enforces the member cap and keeps the creator's
     /// roster entry (fingerprint and signing key) pinned.
     @discardableResult
-    func updateRoster(groupID: Data, members: [GroupMember]) -> BitchatGroup? {
+    func updateRoster(groupID: Data, members: [GroupMember]) -> YarikGroup? {
         guard let index = groups.firstIndex(where: { $0.groupID == groupID }) else { return nil }
         var updated = groups[index]
         updated.members = members
@@ -111,9 +111,9 @@ final class GroupStore: ObservableObject {
 
     /// Rotates the group key (creator-side removal/rotation): new random key,
     /// epoch + 1, and the given roster. Returns the updated group and new key.
-    func rotateKey(groupID: Data, members: [GroupMember]) -> (group: BitchatGroup, key: Data)? {
+    func rotateKey(groupID: Data, members: [GroupMember]) -> (group: YarikGroup, key: Data)? {
         guard let existing = group(withID: groupID),
-              let newKey = Self.randomBytes(BitchatGroup.keyLength) else { return nil }
+              let newKey = Self.randomBytes(YarikGroup.keyLength) else { return nil }
         var rotated = existing
         rotated.epoch = existing.epoch &+ 1
         rotated.members = members
@@ -148,10 +148,10 @@ final class GroupStore: ObservableObject {
 
     /// Structural invariants every stored group satisfies: a well-sized ID,
     /// a non-empty roster within the cap, and the creator in that roster.
-    private static func isWellFormed(_ group: BitchatGroup) -> Bool {
-        group.groupID.count == BitchatGroup.groupIDLength
+    private static func isWellFormed(_ group: YarikGroup) -> Bool {
+        group.groupID.count == YarikGroup.groupIDLength
             && !group.members.isEmpty
-            && group.members.count <= BitchatGroup.maxMembers
+            && group.members.count <= YarikGroup.maxMembers
             && group.creator != nil
     }
 
@@ -189,7 +189,7 @@ final class GroupStore: ObservableObject {
     private func loadFromDisk() {
         guard let fileURL,
               let data = try? Data(contentsOf: fileURL),
-              let stored = try? JSONDecoder().decode([BitchatGroup].self, from: data) else {
+              let stored = try? JSONDecoder().decode([YarikGroup].self, from: data) else {
             return
         }
         // Only groups whose key survived in the keychain are usable. Loading

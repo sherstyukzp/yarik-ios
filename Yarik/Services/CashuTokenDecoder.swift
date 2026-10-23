@@ -1,6 +1,6 @@
 //
 // CashuTokenDecoder.swift
-// bitchat
+// yarik
 //
 // Decodes Cashu ecash tokens (V3 `cashuA` = base64url JSON, V4 `cashuB` =
 // base64url CBOR) just far enough to summarize them for the UI: total

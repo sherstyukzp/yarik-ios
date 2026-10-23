@@ -1,6 +1,6 @@
 //
 // KeychainManager.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -87,8 +87,8 @@ final class KeychainManager: KeychainManagerProtocol {
     #endif
 
     // Use consistent service name for all keychain items
-    private let service = BitchatApp.bundleID
-    private let appGroup = "group.\(BitchatApp.bundleID)"
+    private let service = YarikAppIdentity.bundleID
+    private let appGroup = "group.\(YarikAppIdentity.bundleID)"
     #if os(iOS)
     private let installAccessGate = KeychainInstallAccessGate()
     #endif
@@ -103,9 +103,9 @@ final class KeychainManager: KeychainManagerProtocol {
         "com.bitchat.deviceidentity",
         "com.bitchat.noise.identity",
         "chat.bitchat.passwords",
-        "bitchat.keychain",
-        "bitchat",
-        "com.bitchat"
+        "yarik.keychain",
+        "yarik",
+        "com.yarik"
     ]
     // AfterFirstUnlock, not WhenUnlocked: the mesh keeps running with the
     // device locked (identity-cache saves failed with -25308 throughout
@@ -415,7 +415,7 @@ final class KeychainManager: KeychainManagerProtocol {
             kSecValueData as String: data,
             kSecAttrService as String: service,
             kSecAttrAccessible as String: Self.itemAccessibility,
-            kSecAttrLabel as String: "bitchat-\(key)"
+            kSecAttrLabel as String: "yarik-\(key)"
         ]
         #if os(macOS)
         base[kSecAttrSynchronizable as String] = false
@@ -575,7 +575,7 @@ final class KeychainManager: KeychainManagerProtocol {
             kSecValueData as String: data,
             kSecAttrService as String: service,
             kSecAttrAccessible as String: Self.itemAccessibility,
-            kSecAttrLabel as String: "bitchat-\(key)"
+            kSecAttrLabel as String: "yarik-\(key)"
         ]
         #if os(macOS)
         base[kSecAttrSynchronizable as String] = false

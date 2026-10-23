@@ -222,8 +222,8 @@ struct BLEIngressPacketGuardTests {
         sender: PeerID,
         timestamp: UInt64,
         ttl: UInt8 = 3
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: type.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: nil,

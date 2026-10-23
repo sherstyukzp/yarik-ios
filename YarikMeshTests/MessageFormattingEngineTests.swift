@@ -1,6 +1,6 @@
 //
 // MessageFormattingEngineTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for MessageFormattingEngine regex patterns and utility functions.
 // This is free and unencumbered software released into the public domain.
@@ -22,7 +22,7 @@ struct MessageFormattingEngineTests {
             nickname: "carol",
             peerURLs: [senderPeerID: URL(string: "https://example.com/peers/alice")!]
         )
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "message-1",
             sender: "alice#a1b2",
             content: "hello #mesh https://example.com",
@@ -40,7 +40,7 @@ struct MessageFormattingEngineTests {
     @MainActor
     @Test func formatMessage_systemMessageUsesSystemLayout() {
         let context = MockMessageFormattingContext(nickname: "carol")
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "system-1",
             sender: "system",
             content: "connected",
@@ -61,7 +61,7 @@ struct MessageFormattingEngineTests {
             selfMessageIDs: ["self-1"]
         )
         let longContent = String(repeating: "a", count: 4_500)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "self-1",
             sender: "me#cafe",
             content: longContent,
@@ -78,7 +78,7 @@ struct MessageFormattingEngineTests {
     @MainActor
     @Test func formatMessage_mentionsAreRenderedThroughMentionFormatter() {
         let context = MockMessageFormattingContext(nickname: "carol")
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "message-mention",
             sender: "alice",
             content: "hi @bob#a1b2",
@@ -94,14 +94,14 @@ struct MessageFormattingEngineTests {
     @MainActor
     @Test func formatHeader_formatsNormalAndSystemSenders() {
         let context = MockMessageFormattingContext(nickname: "carol")
-        let normalMessage = BitchatMessage(
+        let normalMessage = YarikMessage(
             id: "header-1",
             sender: "alice#a1b2",
             content: "hello",
             timestamp: Date(timeIntervalSince1970: 1_700_001_000),
             isRelay: false
         )
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             id: "header-2",
             sender: "system",
             content: "notice",
@@ -337,7 +337,7 @@ struct MessageFormattingEngineTests {
         let context = MockMessageFormattingContext(nickname: "carol")
         let cashu = "cashuA" + String(repeating: "a", count: 40)
         let longContent = "hi @bob " + cashu + " " + String(repeating: "x", count: 4_100)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "long-cashu",
             sender: "alice",
             content: longContent,
@@ -367,11 +367,11 @@ private final class MockMessageFormattingContext: MessageFormattingContext {
         self.peerURLs = peerURLs
     }
 
-    func isSelfMessage(_ message: BitchatMessage) -> Bool {
+    func isSelfMessage(_ message: YarikMessage) -> Bool {
         selfMessageIDs.contains(message.id)
     }
 
-    func senderColor(for message: BitchatMessage, isDark: Bool) -> Color {
+    func senderColor(for message: YarikMessage, isDark: Bool) -> Color {
         .red
     }
 

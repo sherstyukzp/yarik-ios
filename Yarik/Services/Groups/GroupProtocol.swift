@@ -1,6 +1,6 @@
 //
 // GroupProtocol.swift
-// bitchat
+// yarik
 //
 // Wire formats and crypto for private groups: creator-signed group state
 // (invites and key updates over Noise) and ChaCha20-Poly1305 group messages
@@ -28,7 +28,7 @@ struct GroupMember: Codable, Equatable {
 
 /// Creator-managed encrypted group. Metadata only — the symmetric key lives
 /// in the keychain (see `GroupStore`).
-struct BitchatGroup: Codable, Equatable {
+struct YarikGroup: Codable, Equatable {
     static let maxMembers = 16
     static let groupIDLength = 16
     static let keyLength = 32
@@ -64,7 +64,7 @@ struct BitchatGroup: Codable, Equatable {
     /// as this group. A group keeps the creator it was created with: state
     /// for a known groupID naming anyone else is a takeover attempt, however
     /// validly it is self-signed.
-    func hasSameCreator(as other: BitchatGroup) -> Bool {
+    func hasSameCreator(as other: YarikGroup) -> Bool {
         guard let creator, let otherCreator = other.creator else { return false }
         return creator.fingerprint == otherCreator.fingerprint
             && creator.signingKey == otherCreator.signingKey
@@ -144,7 +144,7 @@ enum GroupRosterCoding {
     /// fingerprint, 32-byte signing key, and length-prefixed UTF-8 nickname.
     /// The creator signature covers the SHA-256 of these exact bytes.
     static func encode(_ members: [GroupMember]) -> Data? {
-        guard members.count <= BitchatGroup.maxMembers else { return nil }
+        guard members.count <= YarikGroup.maxMembers else { return nil }
         var out = Data([UInt8(members.count)])
         for member in members {
             guard let fingerprintData = Data(hexString: member.fingerprint),
@@ -163,7 +163,7 @@ enum GroupRosterCoding {
     }
 
     static func decode(_ data: Data) -> [GroupMember]? {
-        guard let count = data.first, count <= UInt8(BitchatGroup.maxMembers) else { return nil }
+        guard let count = data.first, count <= UInt8(YarikGroup.maxMembers) else { return nil }
         var members: [GroupMember] = []
         var offset = data.index(after: data.startIndex)
         for _ in 0..<count {
@@ -200,7 +200,7 @@ enum GroupRosterCoding {
 
 /// Creator-signed group state. The same wire form serves invites (0x06) and
 /// key updates (0x07); receivers verify the creator signature — computed over
-/// "bitchat-group-v1" | groupID | epoch | SHA256(key) | SHA256(roster) —
+/// "yarik-group-v1" | groupID | epoch | SHA256(key) | SHA256(roster) —
 /// against the creator's signing key pinned in the roster, and require the
 /// Noise session peer to BE the creator before accepting any state. Both
 /// checks are self-referential (the state names its own creator), so for a
@@ -226,7 +226,7 @@ struct GroupStatePayload: Equatable {
         case signature = 0x07
     }
 
-    static let signingDomain = Data("bitchat-group-v1".utf8)
+    static let signingDomain = Data("yarik-group-v1".utf8)
 
     /// The bytes the creator signs. Binding the key, roster, and name by hash
     /// keeps the signed content fixed-size. The name is covered so a relay
@@ -245,7 +245,7 @@ struct GroupStatePayload: Equatable {
     /// Builds a signed state payload. Returns nil when the roster cannot be
     /// encoded (over cap, malformed member) or signing fails.
     static func makeSigned(
-        group: BitchatGroup,
+        group: YarikGroup,
         key: Data,
         sign: (Data) -> Data?
     ) -> GroupStatePayload? {
@@ -295,11 +295,11 @@ struct GroupStatePayload: Equatable {
 
         for (type, value) in fields {
             switch FieldType(rawValue: type) {
-            case .groupID where value.count == BitchatGroup.groupIDLength:
+            case .groupID where value.count == YarikGroup.groupIDLength:
                 groupID = value
             case .name:
                 name = String(data: value, encoding: .utf8)
-            case .key where value.count == BitchatGroup.keyLength:
+            case .key where value.count == YarikGroup.keyLength:
                 key = value
             case .epoch:
                 epoch = GroupTLV.epoch(from: value)
@@ -332,15 +332,15 @@ struct GroupStatePayload: Equatable {
     /// Verifies the creator signature against the creator's signing key
     /// pinned in the roster, and that the creator is actually in the roster.
     func verifyCreatorSignature() -> Bool {
-        guard members.count <= BitchatGroup.maxMembers,
+        guard members.count <= YarikGroup.maxMembers,
               let creator = members.first(where: { $0.fingerprint == creatorFingerprint }),
               let rosterBlob = GroupRosterCoding.encode(members) else { return false }
         let content = GroupStatePayload.signingContent(groupID: groupID, epoch: epoch, key: key, rosterBlob: rosterBlob, name: name)
         return GroupCrypto.verify(signature: signature, for: content, publicKey: creator.signingKey)
     }
 
-    var asGroup: BitchatGroup {
-        BitchatGroup(
+    var asGroup: YarikGroup {
+        YarikGroup(
             groupID: groupID,
             name: name,
             epoch: epoch,
@@ -386,7 +386,7 @@ struct GroupMessageEnvelope: Equatable {
         var ciphertext: Data?
         for (type, value) in fields {
             switch FieldType(rawValue: type) {
-            case .groupID where value.count == BitchatGroup.groupIDLength:
+            case .groupID where value.count == YarikGroup.groupIDLength:
                 groupID = value
             case .epoch:
                 epoch = GroupTLV.epoch(from: value)
@@ -423,7 +423,7 @@ enum GroupCryptoError: Error, Equatable {
 }
 
 enum GroupCrypto {
-    static let messageSigningDomain = Data("bitchat-group-msg-v1".utf8)
+    static let messageSigningDomain = Data("yarik-group-msg-v1".utf8)
 
     private enum InnerField: UInt8 {
         case messageID = 0x01

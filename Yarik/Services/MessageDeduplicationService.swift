@@ -1,6 +1,6 @@
 //
 // MessageDeduplicationService.swift
-// bitchat
+// yarik
 //
 // Handles message deduplication using LRU caches.
 // This is free and unencumbered software released into the public domain.
@@ -170,7 +170,7 @@ final class MessageDeduplicationService {
     /// Cache for Nostr ACK deduplication (messageId:ackType:senderPubkey format)
     private let nostrAckCache: LRUDeduplicationCache<Bool>
 
-    /// Optional cross-launch persistence for the Nostr event cache. BitChat
+    /// Optional cross-launch persistence for the Nostr event cache. Yarik
     /// randomizes private-envelope timestamps, so DM subscriptions look back 24h and
     /// relays redeliver the same events on every launch; without this record
     /// each relaunch reprocesses old PMs and acks. Nil (tests, macOS callers

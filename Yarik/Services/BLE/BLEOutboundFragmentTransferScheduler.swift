@@ -2,7 +2,7 @@ import BitFoundation
 import Foundation
 
 struct BLEOutboundFragmentTransferRequest {
-    let packet: BitchatPacket
+    let packet: YarikPacket
     let pad: Bool
     let maxChunk: Int?
     let directedPeer: PeerID?
@@ -11,7 +11,7 @@ struct BLEOutboundFragmentTransferRequest {
     let requireNoiseAuthenticatedPeerLink: Bool
 
     init(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         pad: Bool,
         maxChunk: Int?,
         directedPeer: PeerID?,

@@ -6,7 +6,7 @@ import Foundation
 /// an English fallback (see PR #1391 review).
 struct LocalizationCoverageTests {
     private static let repoRoot = URL(fileURLWithPath: #filePath)
-        .deletingLastPathComponent()  // bitchatTests
+        .deletingLastPathComponent()  // YarikMeshTests
         .deletingLastPathComponent()  // repo root
 
     private struct Catalog {
@@ -45,7 +45,7 @@ struct LocalizationCoverageTests {
     }
 
     @Test func mainCatalogCoversAllLocalesForEveryKey() throws {
-        let catalog = try Self.loadCatalog("bitchat/Localizable.xcstrings")
+        let catalog = try Self.loadCatalog("yarik/Localizable.xcstrings")
         let expected = catalog.allLocales
         #expect(expected.count > 1, "catalog should declare more locales than the source language")
         for (key, locales) in catalog.coverage.sorted(by: { $0.key < $1.key }) {
@@ -55,7 +55,7 @@ struct LocalizationCoverageTests {
     }
 
     @Test func shareExtensionCatalogCoversAllLocalesForEveryKey() throws {
-        let catalog = try Self.loadCatalog("bitchatShareExtension/Localization/Localizable.xcstrings")
+        let catalog = try Self.loadCatalog("yarikShareExtension/Localization/Localizable.xcstrings")
         let expected = catalog.allLocales
         for (key, locales) in catalog.coverage.sorted(by: { $0.key < $1.key }) {
             let missing = expected.subtracting(locales).sorted()
@@ -64,8 +64,8 @@ struct LocalizationCoverageTests {
     }
 
     @Test func shareExtensionSupportsSameLocalesAsMainApp() throws {
-        let main = try Self.loadCatalog("bitchat/Localizable.xcstrings")
-        let shareExt = try Self.loadCatalog("bitchatShareExtension/Localization/Localizable.xcstrings")
+        let main = try Self.loadCatalog("yarik/Localizable.xcstrings")
+        let shareExt = try Self.loadCatalog("yarikShareExtension/Localization/Localizable.xcstrings")
         let missing = main.allLocales.subtracting(shareExt.allLocales).sorted()
         #expect(missing.isEmpty, "share extension is missing locales: \(missing.joined(separator: ", "))")
     }
@@ -89,13 +89,13 @@ struct LocalizationCoverageTests {
         let mainKeys = Set(main.coverage.keys)
         let shareKeys = Set(shareExt.coverage.keys)
 
-        // Files under `bitchat/` that the share extension also compiles have to
+        // Files under `yarik/` that the share extension also compiles have to
         // resolve in both catalogs, since each target bundles only its own.
         let sharedSources = try Self.shareExtensionMembershipExceptions()
 
         for (sourceRoot, ownKeys, otherKeys, ownCatalog, otherCatalog) in [
-            ("bitchat", mainKeys, shareKeys, Self.mainCatalogPath, Self.shareExtensionCatalogPath),
-            ("bitchatShareExtension", shareKeys, mainKeys,
+            ("yarik", mainKeys, shareKeys, Self.mainCatalogPath, Self.shareExtensionCatalogPath),
+            ("yarikShareExtension", shareKeys, mainKeys,
              Self.shareExtensionCatalogPath, Self.mainCatalogPath)
         ] {
             let references = try Self.localizedKeyReferences(in: sourceRoot)
@@ -118,7 +118,7 @@ struct LocalizationCoverageTests {
                 """
             )
 
-            guard sourceRoot == "bitchat" else { continue }
+            guard sourceRoot == "yarik" else { continue }
             let missingInBoth = references
                 .filter { sharedSources.contains($0.location.prefix(while: { $0 != ":" }).description) }
                 .filter { !shareKeys.contains($0.key) }
@@ -136,7 +136,7 @@ struct LocalizationCoverageTests {
         }
     }
 
-    /// The files under `bitchat/` that the share-extension target compiles, read
+    /// The files under `yarik/` that the share-extension target compiles, read
     /// from the project's membership exceptions so this cannot drift when the
     /// set changes.
     private static func shareExtensionMembershipExceptions() throws -> Set<String> {
@@ -144,7 +144,7 @@ struct LocalizationCoverageTests {
             contentsOf: repoRoot.appendingPathComponent("Yarik.xcodeproj/project.pbxproj"),
             encoding: .utf8
         )
-        let marker = #"Exceptions for "bitchat" folder in "bitchatShareExtension" target"#
+        let marker = #"Exceptions for "yarik" folder in "yarikShareExtension" target"#
         guard let markerRange = project.range(of: marker),
               let listStart = project.range(
                 of: "membershipExceptions = (", range: markerRange.upperBound..<project.endIndex
@@ -159,13 +159,13 @@ struct LocalizationCoverageTests {
                 .split(separator: ",")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { $0.hasSuffix(".swift") }
-                .map { "bitchat/\($0)" }
+                .map { "yarik/\($0)" }
         )
     }
 
-    private static let mainCatalogPath = "bitchat/Localizable.xcstrings"
+    private static let mainCatalogPath = "yarik/Localizable.xcstrings"
     private static let shareExtensionCatalogPath =
-        "bitchatShareExtension/Localization/Localizable.xcstrings"
+        "yarikShareExtension/Localization/Localizable.xcstrings"
 
     /// A literal `String(localized:)` key, with where it was written.
     private struct KeyReference {

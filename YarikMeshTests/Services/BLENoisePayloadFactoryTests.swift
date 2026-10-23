@@ -36,7 +36,7 @@ struct BLENoisePayloadFactoryTests {
     @Test
     func privateFilePayloadPrefixesCanonicalFilePacket() throws {
         let content = Data("%PDF-secret".utf8)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "secret.pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",
@@ -46,7 +46,7 @@ struct BLENoisePayloadFactoryTests {
         let payload = try #require(BLENoisePayloadFactory.privateFile(file))
 
         #expect(payload.first == 0x20, "Encrypted files must use Android's deployed wire value")
-        let decoded = try #require(BitchatFilePacket.decode(Data(payload.dropFirst())))
+        let decoded = try #require(YarikFilePacket.decode(Data(payload.dropFirst())))
         #expect(decoded.fileName == "secret.pdf")
         #expect(decoded.mimeType == "application/pdf")
         #expect(decoded.content == content)
@@ -55,14 +55,14 @@ struct BLENoisePayloadFactoryTests {
     @Test
     func androidB7f0b33PrivateFilePlaintextFixtureIsByteCompatible() throws {
         // Runtime-emitted by Android commit b7f0b33d from
-        // BitchatFilePacket("a.txt", 3, "text/plain", [01, 02, 03]) and
+        // YarikFilePacket("a.txt", 3, "text/plain", [01, 02, 03]) and
         // NoisePayload(type = FILE_TRANSFER, data = file.encode()).encode().
         let fixtureHex = "20010005612e7478740200040000000303000a746578742f706c61696e0400000003010203"
         let fixture = try #require(Data(hexString: fixtureHex))
 
         let typed = try #require(NoisePayload.decode(fixture))
         #expect(typed.type == .privateFile)
-        let file = try #require(BitchatFilePacket.decode(typed.data))
+        let file = try #require(YarikFilePacket.decode(typed.data))
         #expect(file.fileName == "a.txt")
         #expect(file.fileSize == 3)
         #expect(file.mimeType == "text/plain")

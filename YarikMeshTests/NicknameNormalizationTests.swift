@@ -1,6 +1,6 @@
 //
 // NicknameNormalizationTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Nicknames must compare equal regardless of how the user's keyboard
 // produced them: "café" as precomposed U+00E9 and as "e" + combining

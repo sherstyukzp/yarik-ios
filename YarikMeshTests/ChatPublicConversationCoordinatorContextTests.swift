@@ -1,6 +1,6 @@
 //
 // ChatPublicConversationCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatPublicConversationCoordinator` against a mock
 // `ChatPublicConversationContext` — proving the coordinator works without a
@@ -42,15 +42,15 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
     }
 
     // Public conversation store (single-writer intents)
-    var conversations: [ConversationID: [BitchatMessage]] = [:]
+    var conversations: [ConversationID: [YarikMessage]] = [:]
     private(set) var queuedGeohashSystemMessages: [String] = []
 
-    func publicMessages(in conversationID: ConversationID) -> [BitchatMessage] {
+    func publicMessages(in conversationID: ConversationID) -> [YarikMessage] {
         conversations[conversationID] ?? []
     }
 
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool {
         guard conversations[conversationID]?.contains(where: { $0.id == message.id }) != true else {
             return false
         }
@@ -63,7 +63,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
     }
 
     @discardableResult
-    func removePublicMessage(withID messageID: String) -> BitchatMessage? {
+    func removePublicMessage(withID messageID: String) -> YarikMessage? {
         for (conversationID, timeline) in conversations {
             guard let index = timeline.firstIndex(where: { $0.id == messageID }) else { continue }
             var updated = timeline
@@ -74,7 +74,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
         return nil
     }
 
-    func removePublicMessages(fromGeohash geohash: String, where predicate: (BitchatMessage) -> Bool) {
+    func removePublicMessages(fromGeohash geohash: String, where predicate: (YarikMessage) -> Bool) {
         conversations[.geohash(geohash.lowercased())]?.removeAll(where: predicate)
     }
 
@@ -95,7 +95,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
     }
 
     // Private chats
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
     var unreadPrivateMessages: Set<PeerID> = []
     private(set) var removedPrivateChats: [PeerID] = []
     private(set) var cleanedUpFileMessageIDs: [String] = []
@@ -107,8 +107,8 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
     }
 
     @discardableResult
-    func removePrivateMessage(withID messageID: String) -> BitchatMessage? {
-        var removed: BitchatMessage?
+    func removePrivateMessage(withID messageID: String) -> YarikMessage? {
+        var removed: YarikMessage?
         for (peerID, chat) in privateChats {
             guard let message = chat.first(where: { $0.id == messageID }) else { continue }
             removed = removed ?? message
@@ -122,7 +122,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
         return removed
     }
 
-    func cleanupLocalFile(forMessage message: BitchatMessage) {
+    func cleanupLocalFile(forMessage message: YarikMessage) {
         cleanedUpFileMessageIDs.append(message.id)
     }
 
@@ -191,11 +191,11 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
     var enqueuedMessageIDs: [String] { enqueuedMessages.map(\.messageID) }
     var stablePeerIDs: [PeerID: PeerID] = [:]
 
-    func processActionMessage(_ message: BitchatMessage) -> BitchatMessage {
+    func processActionMessage(_ message: YarikMessage) -> YarikMessage {
         message
     }
 
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool {
+    func isMessageBlocked(_ message: YarikMessage) -> Bool {
         blockedMessageIDs.contains(message.id)
     }
 
@@ -204,7 +204,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
         return rateLimitAllowed
     }
 
-    func enqueuePublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) {
+    func enqueuePublicMessage(_ message: YarikMessage, to conversationID: ConversationID) {
         enqueuedMessages.append((message.id, conversationID))
     }
 
@@ -229,7 +229,7 @@ private final class MockChatPublicConversationContext: ChatPublicConversationCon
         recordedContentKeys.append((key, timestamp))
     }
 
-    func prewarmMessageFormatting(_ message: BitchatMessage) {
+    func prewarmMessageFormatting(_ message: YarikMessage) {
         prewarmedMessageIDs.append(message.id)
     }
 
@@ -256,8 +256,8 @@ private func makePublicMessage(
     sender: String = "alice",
     content: String = "hello world",
     senderPeerID: PeerID? = PeerID(str: "aabbccddeeff0011")
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: sender,
         content: content,
@@ -364,7 +364,7 @@ struct ChatPublicConversationCoordinatorContextTests {
         // Launch-time echo seeding path.
         coordinator.registerArchivedEcho(senderPeerID: senderPeerID, timestamp: wireMax, content: "echoed")
         // Live path: a copy of the seeded echo is still recognized...
-        coordinator.handlePublicMessage(BitchatMessage(
+        coordinator.handlePublicMessage(YarikMessage(
             id: "live-copy",
             sender: "alice",
             content: "echoed",
@@ -375,7 +375,7 @@ struct ChatPublicConversationCoordinatorContextTests {
         #expect(context.enqueuedMessageIDs.isEmpty)
 
         // ...and a fresh message with the same timestamp is delivered.
-        coordinator.handlePublicMessage(BitchatMessage(
+        coordinator.handlePublicMessage(YarikMessage(
             id: "live-new",
             sender: "alice",
             content: "new",
@@ -580,7 +580,7 @@ struct ChatPublicConversationCoordinatorContextTests {
 
         // A mention of my nickname from someone else notifies.
         coordinator.checkForMentions(
-            BitchatMessage(
+            YarikMessage(
                 id: "mention-1",
                 sender: "alice",
                 content: "hey @me",
@@ -595,7 +595,7 @@ struct ChatPublicConversationCoordinatorContextTests {
 
         // Mentioning someone else does not notify.
         coordinator.checkForMentions(
-            BitchatMessage(
+            YarikMessage(
                 id: "mention-2",
                 sender: "alice",
                 content: "hey @bob",
@@ -608,7 +608,7 @@ struct ChatPublicConversationCoordinatorContextTests {
 
         // My own message mentioning myself does not notify.
         coordinator.checkForMentions(
-            BitchatMessage(
+            YarikMessage(
                 id: "mention-3",
                 sender: "me",
                 content: "talking about @me",

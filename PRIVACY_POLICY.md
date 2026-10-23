@@ -1,10 +1,10 @@
-# bitchat Privacy Policy
+# yarik Privacy Policy
 
 *Last updated: July 2026*
 
 ## Our Commitment
 
-bitchat is designed for private, account-free communication. This policy describes what the app keeps on your device, what it sends when you use mesh or optional internet features, and how long local data can remain.
+yarik is designed for private, account-free communication. This policy describes what the app keeps on your device, what it sends when you use mesh or optional internet features, and how long local data can remain.
 
 ## Summary
 
@@ -13,12 +13,12 @@ bitchat is designed for private, account-free communication. This policy describ
 - **No sale of data** — the project does not sell user data or build advertising profiles.
 - **Open source** — the storage, networking, and cryptography described here can be inspected in the source code.
 
-## What bitchat Stores on Your Device
+## What yarik Stores on Your Device
 
 1. **Identity and cryptographic keys**
    - Noise, signing, group, prekey, and optional Nostr identity material is generated locally.
    - Secret keys are stored in the system keychain as device-only items. Public keys are shared when required for messaging, verification, groups, or Nostr events.
-   - Keys remain until they are rotated, removed by the relevant feature, or erased with panic wipe. Because operating-system keychains can outlive an uninstall, bitchat records a non-secret install marker and deletes surviving app keys before use after a later reinstall.
+   - Keys remain until they are rotated, removed by the relevant feature, or erased with panic wipe. Because operating-system keychains can outlive an uninstall, yarik records a non-secret install marker and deletes surviving app keys before use after a later reinstall.
 
 2. **Nickname, preferences, and relationships**
    - Your nickname, settings, favorites, petnames, read-receipt identifiers, and bounded operational metadata are stored locally.
@@ -45,11 +45,11 @@ bitchat is designed for private, account-free communication. This policy describ
 7. **Optional location-channel state**
    - Your selected geohash channel, bookmarks, teleport flags, and bookmark display names are stored locally so the UI can restore them.
    - Per-geohash Nostr identities are derived locally from a device seed stored in the keychain.
-   - bitchat does not persist exact latitude or longitude and does not include exact coordinates in mesh or Nostr messages.
+   - yarik does not persist exact latitude or longitude and does not include exact coordinates in mesh or Nostr messages.
 
 ## Temporary Session Data
 
-While running, bitchat maintains active connections, routing state, deduplication state, and bounded in-memory conversation timelines. Closing the app clears the in-memory timelines and active connections, but it does not erase the persistent stores listed above.
+While running, yarik maintains active connections, routing state, deduplication state, and bounded in-memory conversation timelines. Closing the app clears the in-memory timelines and active connections, but it does not erase the persistent stores listed above.
 
 ## What Is Shared
 
@@ -73,7 +73,7 @@ Private group members receive the group's name, roster, key epoch, and encrypted
 
 Internet-backed features are optional. When enabled or used:
 
-- Private fallback messages use BitChat's app-specific encrypted envelopes. This format is not NIP-17, NIP-44, or NIP-59 compatible. Relays can observe the recipient public-key tag, event timing and size, and network metadata, but not the message plaintext or stable sender identity.
+- Private fallback messages use Yarik's app-specific encrypted envelopes. This format is not NIP-17, NIP-44, or NIP-59 compatible. Relays can observe the recipient public-key tag, event timing and size, and network metadata, but not the message plaintext or stable sender identity.
 - Public location-channel messages, notes, notices, and presence include a geohash tag, event kind, timestamp, and a public key. A geohash reveals an approximate area; finer precision reveals a smaller area.
 - The optional mesh bridge publishes bridge-enabled public mesh messages and presence to a neighborhood rendezvous cell. Those messages are public to participants and relays for that cell. A per-message “nearby only” choice prevents that message from crossing the bridge.
 - Bridge courier drops contain opaque end-to-end encrypted envelopes and a rotating recipient tag. Relays still observe timing and network metadata.
@@ -87,9 +87,9 @@ You can add relays yourself in settings, including `.onion` addresses. Added rel
 
 Location permission is optional and requested as when-in-use access. It is used to compute geohash channels, bridge rendezvous cells, and nearby place labels.
 
-- Exact coordinates are not included in bitchat mesh or Nostr payloads and are not persisted by bitchat.
+- Exact coordinates are not included in yarik mesh or Nostr payloads and are not persisted by yarik.
 - A selected geohash can still reveal an approximate area to peers and relays.
-- When bitchat asks the operating system for a friendly place name, Apple's `CLGeocoder` service may process the location under Apple's privacy terms.
+- When yarik asks the operating system for a friendly place name, Apple's `CLGeocoder` service may process the location under Apple's privacy terms.
 - Revoking location permission stops live location sampling. Saved bookmarks remain until you remove them, panic-wipe the app, or remove the app.
 
 ## Microphone, Camera, and Media Permissions
@@ -97,7 +97,7 @@ Location permission is optional and requested as when-in-use access. It is used 
 - Microphone access is used only while you record a voice note or actively hold live push-to-talk. The resulting audio is sent to the mesh conversation you selected; public-conversation audio is public to that mesh, while private-conversation audio uses the private transport protections described below.
 - Voice-note and live-audio files can remain in Application Support under the media retention rules above.
 - Camera access is used to scan peer-verification QR codes. Photo-library access is used when you choose an image to send.
-- These permissions can be revoked in system settings. bitchat does not record microphone or camera input while the related capture UI is inactive.
+- These permissions can be revoked in system settings. yarik does not record microphone or camera input while the related capture UI is inactive.
 
 ## Cryptography
 
@@ -105,7 +105,7 @@ Private and public features use different protections:
 
 - Mesh private sessions use Noise XX with X25519, ChaCha20-Poly1305, and SHA-256.
 - Private group messages use ChaCha20-Poly1305; group state and relevant mesh packets use Ed25519 signatures.
-- Nostr events use secp256k1 Schnorr signatures. BitChat private envelopes use secp256k1 key agreement, HKDF-SHA256, and XChaCha20-Poly1305. The envelope format is proprietary, only interoperates with BitChat clients, and does not provide forward secrecy against later compromise of the recipient's static Nostr private key.
+- Nostr events use secp256k1 Schnorr signatures. Yarik private envelopes use secp256k1 key agreement, HKDF-SHA256, and XChaCha20-Poly1305. The envelope format is proprietary, only interoperates with Yarik clients, and does not provide forward secrecy against later compromise of the recipient's static Nostr private key.
 - The persistent private-message outbox uses ChaCha20-Poly1305 with a key held in the keychain. Some other protected local identity state uses AES-GCM.
 - Public mesh, bridge, geohash, and board content is signed or authenticated as appropriate but is intentionally not confidential.
 
@@ -133,12 +133,12 @@ No cryptographic system can protect content after a recipient reads, copies, scr
 
 ## What the Project Does Not Do
 
-bitchat does not:
+yarik does not:
 
 - Operate an account database or project-owned messaging backend.
 - Include advertising, analytics, or tracking SDKs.
 - Sell user data or create advertising profiles.
-- Include exact GPS coordinates in bitchat mesh or Nostr message payloads.
+- Include exact GPS coordinates in yarik mesh or Nostr message payloads.
 
 ## Children's Privacy
 
@@ -150,7 +150,7 @@ Material behavior changes will be reflected in this document and its “Last upd
 
 ## Contact
 
-bitchat is an open source project. For privacy questions:
+yarik is an open source project. For privacy questions:
 
 - View the source: [https://github.com/permissionlesstech/bitchat](https://github.com/permissionlesstech/bitchat)
 - Open an issue on GitHub.

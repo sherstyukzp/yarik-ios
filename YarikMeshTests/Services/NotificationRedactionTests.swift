@@ -45,7 +45,7 @@ struct NotificationRedactionTests {
     }
 
     private func isolatedDefaults() -> UserDefaults {
-        UserDefaults(suiteName: "bitchat.tests.notifications.\(UUID().uuidString)")!
+        UserDefaults(suiteName: "yarik.tests.notifications.\(UUID().uuidString)")!
     }
 
     @Test func previewsAreHiddenByDefault() {
@@ -103,7 +103,7 @@ struct NotificationRedactionTests {
         #expect(!content.title.contains("u4pruyd"))
         #expect(!content.body.contains("someone said"))
         // The deep link still carries it: tapping must land in the channel.
-        #expect(content.userInfo["deeplink"] as? String == "bitchat://geohash/u4pruyd")
+        #expect(content.userInfo["deeplink"] as? String == "yarik://geohash/u4pruyd")
     }
 
     @Test func previewsShownWhenTheSettingIsOff() {

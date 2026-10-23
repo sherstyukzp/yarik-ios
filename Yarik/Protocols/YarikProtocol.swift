@@ -1,19 +1,19 @@
 //
-// BitchatProtocol.swift
-// bitchat
+// YarikProtocol.swift
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
 //
 
 ///
-/// # BitchatProtocol
+/// # YarikProtocol
 ///
-/// Defines the application-layer protocol for BitChat mesh networking, including
+/// Defines the application-layer protocol for Yarik mesh networking, including
 /// message types, packet structures, and encoding/decoding logic.
 ///
 /// ## Overview
-/// BitchatProtocol implements a binary protocol optimized for Bluetooth LE's
+/// YarikProtocol implements a binary protocol optimized for Bluetooth LE's
 /// constrained bandwidth and MTU limitations. It provides:
 /// - Efficient binary message encoding
 /// - Message fragmentation for large payloads
@@ -84,7 +84,7 @@ enum NoisePayloadType: UInt8 {
     // Live voice (push-to-talk)
     case voiceFrame = 0x08          // One live voice-burst packet (see VoiceBurstPacket)
     // Finalized private media. `0x20` is the value already deployed by the
-    // Android client. The complete BitchatFilePacket is encrypted inside
+    // Android client. The complete YarikFilePacket is encrypted inside
     // Noise before the outer noiseEncrypted packet is fragmented.
     case privateFile = 0x20
     // Versioned peer state authenticated by the surrounding Noise session.
@@ -142,8 +142,8 @@ enum LazyHandshakeState {
 
 // MARK: - Delegate Protocol
 
-protocol BitchatDelegate: AnyObject {
-    func didReceiveMessage(_ message: BitchatMessage)
+protocol YarikDelegate: AnyObject {
+    func didReceiveMessage(_ message: YarikMessage)
     func didConnectToPeer(_ peerID: PeerID)
     func didDisconnectFromPeer(_ peerID: PeerID)
     func didUpdatePeerList(_ peers: [PeerID])
@@ -168,7 +168,7 @@ protocol BitchatDelegate: AnyObject {
 }
 
 // Provide default implementation to make it effectively optional
-extension BitchatDelegate {
+extension YarikDelegate {
     func isFavorite(fingerprint: String) -> Bool {
         return false
     }

@@ -1,6 +1,6 @@
 //
 // PanicWipeBlockedBanner.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -27,9 +27,9 @@ struct PanicWipeBlockedBanner: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .bitchatFont(size: 11, weight: .semibold)
+                .yarikFont(size: 11, weight: .semibold)
             Text(message)
-                .bitchatFont(size: 11)
+                .yarikFont(size: 11)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .foregroundColor(palette.alertRed)

@@ -7,11 +7,11 @@ struct BLEFileTransferDeliveryPlan: Equatable {
 }
 
 enum BLEFileTransferPolicy {
-    static func isSelfEcho(packet: BitchatPacket, from peerID: PeerID, localPeerID: PeerID) -> Bool {
+    static func isSelfEcho(packet: YarikPacket, from peerID: PeerID, localPeerID: PeerID) -> Bool {
         peerID == localPeerID && packet.ttl != 0
     }
 
-    static func deliveryPlan(packet: BitchatPacket, localPeerID: PeerID) -> BLEFileTransferDeliveryPlan? {
+    static func deliveryPlan(packet: YarikPacket, localPeerID: PeerID) -> BLEFileTransferDeliveryPlan? {
         guard let recipientID = packet.recipientID else {
             return BLEFileTransferDeliveryPlan(isPrivateMessage: false, shouldTrackForSync: true)
         }
@@ -30,7 +30,7 @@ enum BLEFileTransferPolicy {
 }
 
 struct BLEIncomingFileAcceptance {
-    let filePacket: BitchatFilePacket
+    let filePacket: YarikFilePacket
     let mime: MimeType
 }
 
@@ -43,7 +43,7 @@ enum BLEIncomingFileRejection: Error, Equatable {
 
 enum BLEIncomingFileValidator {
     static func validate(payload: Data) -> Result<BLEIncomingFileAcceptance, BLEIncomingFileRejection> {
-        guard let filePacket = BitchatFilePacket.decode(payload) else {
+        guard let filePacket = YarikFilePacket.decode(payload) else {
             return .failure(.malformedPayload)
         }
 

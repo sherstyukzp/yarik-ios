@@ -47,7 +47,7 @@ struct PrivateMediaEndToEndTests {
         let cancellable = TransferProgressManager.shared.publisher.sink { rejections.record($0) }
         let content = Data("%PDF-1.7\ncapacity".utf8)
         service.sendFilePrivate(
-            BitchatFilePacket(
+            YarikFilePacket(
                 fileName: "capacity.pdf",
                 fileSize: UInt64(content.count),
                 mimeType: "application/pdf",
@@ -120,7 +120,7 @@ struct PrivateMediaEndToEndTests {
         let transferId = "panic-deferred-\(UUID().uuidString)"
         let content = Data("%PDF-1.7\npanic-deferred".utf8)
         service.sendFilePrivate(
-            BitchatFilePacket(
+            YarikFilePacket(
                 fileName: "panic-deferred.pdf",
                 fileSize: UInt64(content.count),
                 mimeType: "application/pdf",
@@ -154,7 +154,7 @@ struct PrivateMediaEndToEndTests {
 
         let transferId = "panic-broadcast-\(UUID().uuidString)"
         #expect(service._test_beginPrivateMediaAdmission(transferId, now: Date()))
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: service.myPeerID.id) ?? Data(),
             recipientID: Data(hexString: "1122334455667788"),
@@ -191,7 +191,7 @@ struct PrivateMediaEndToEndTests {
         alice._test_onOutboundPacket = tap.record
         bob.delegate = delegate
         let content = Data("%PDF-1.7\nprivate".utf8)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "private.pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",
@@ -235,7 +235,7 @@ struct PrivateMediaEndToEndTests {
         #expect(outbound.allSatisfy { $0.type != MessageType.noiseEncrypted.rawValue })
         #expect(raw.recipientID == Data(hexString: bob.myPeerID.toShort().id))
         #expect(raw.signature?.count == 64)
-        #expect(BitchatFilePacket.decode(raw.payload)?.content == content)
+        #expect(YarikFilePacket.decode(raw.payload)?.content == content)
 
         // Exercise the normal raw receive path with Alice's actual signing
         // key. The migration fallback is accepted because it is directed and
@@ -327,7 +327,7 @@ struct PrivateMediaEndToEndTests {
         let cancellable = TransferProgressManager.shared.publisher.sink { cancellations.record($0) }
         let content = Data("%PDF-1.7\nblocked".utf8)
         alice.sendFilePrivate(
-            BitchatFilePacket(
+            YarikFilePacket(
                 fileName: "blocked.pdf",
                 fileSize: UInt64(content.count),
                 mimeType: "application/pdf",
@@ -542,7 +542,7 @@ struct PrivateMediaEndToEndTests {
         )
         let content = Data("%PDF-1.7\nreceipt-proof-race".utf8)
         alice.sendFilePrivateReceiptRetry(
-            BitchatFilePacket(
+            YarikFilePacket(
                 fileName: "receipt-proof-race.pdf",
                 fileSize: UInt64(content.count),
                 mimeType: "application/pdf",
@@ -839,7 +839,7 @@ struct PrivateMediaEndToEndTests {
         let proofs = try await establishSessionCapturingPeerState(alice: alice, bob: bob)
 
         let content = Data("proof-gated-private-file".utf8)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "proof.txt",
             fileSize: UInt64(content.count),
             mimeType: "text/plain",
@@ -985,7 +985,7 @@ struct PrivateMediaEndToEndTests {
             return UInt8(truncatingIfNeeded: state >> 32)
         })
         let content = Data("%PDF-1.7\n".utf8) + body
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "too-many-fragments.pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",
@@ -1123,7 +1123,7 @@ struct PrivateMediaEndToEndTests {
         let content = Data("%PDF-1.7\n".utf8)
             + marker
             + Data(repeating: 0x50, count: 6 * 1024)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "private.pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",
@@ -1177,7 +1177,7 @@ struct PrivateMediaEndToEndTests {
         bob.delegate = delegate
         try await establishSession(alice: alice, bob: bob)
 
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "\(directoryLabel).pdf",
             fileSize: UInt64(content.count),
             mimeType: "application/pdf",
@@ -1188,7 +1188,7 @@ struct PrivateMediaEndToEndTests {
         typedPayload.append(encodedFile)
 
         let encrypted = try alice._test_makeEncryptedNoisePacket(typedPayload, to: bob.myPeerID)
-        let remoteShapedPacket = BitchatPacket(
+        let remoteShapedPacket = YarikPacket(
             type: encrypted.type,
             senderID: encrypted.senderID,
             recipientID: encrypted.recipientID,
@@ -1240,7 +1240,7 @@ struct PrivateMediaEndToEndTests {
 
         let content = Data("%PDF-1.7\ncancelled-before-admission".utf8)
         alice.sendFilePrivate(
-            BitchatFilePacket(
+            YarikFilePacket(
                 fileName: "cancelled.pdf",
                 fileSize: UInt64(content.count),
                 mimeType: "application/pdf",
@@ -1313,7 +1313,7 @@ struct PrivateMediaEndToEndTests {
         try await establishSession(alice: alice, bob: bob)
         alice._test_onOutboundPacket = tap.record
 
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: mimeType,
@@ -1411,7 +1411,7 @@ struct PrivateMediaEndToEndTests {
     private func establishSessionCapturingPeerState(
         alice: BLEService,
         bob: BLEService
-    ) async throws -> (alice: BitchatPacket, bob: BitchatPacket) {
+    ) async throws -> (alice: YarikPacket, bob: YarikPacket) {
         let aliceTap = PacketTap()
         let bobTap = PacketTap()
         alice._test_onOutboundPacket = aliceTap.record
@@ -1449,7 +1449,7 @@ struct PrivateMediaEndToEndTests {
         from sender: BLEService,
         to recipient: BLEService,
         capabilities: PeerCapabilities
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let state = AuthenticatedPeerStatePacket(
             capabilities: capabilities,
             signingPublicKey: sender.noiseSigningPublicKeyData()
@@ -1461,7 +1461,7 @@ struct PrivateMediaEndToEndTests {
     private func signedAnnounce(
         from service: BLEService,
         capabilities: PeerCapabilities?
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let announcement = AnnouncementPacket(
             nickname: "Bob",
             noisePublicKey: service.noiseStaticPublicKeyData(),
@@ -1470,7 +1470,7 @@ struct PrivateMediaEndToEndTests {
             capabilities: capabilities
         )
         let payload = try #require(announcement.encode())
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: service.myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -1486,7 +1486,7 @@ struct PrivateMediaEndToEndTests {
         claimedOwner: BLEService,
         signedBy signer: BLEService,
         capabilities: PeerCapabilities
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let announcement = AnnouncementPacket(
             nickname: "Mallory-as-Bob",
             noisePublicKey: claimedOwner.noiseStaticPublicKeyData(),
@@ -1495,7 +1495,7 @@ struct PrivateMediaEndToEndTests {
             capabilities: capabilities
         )
         let payload = try #require(announcement.encode())
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: claimedOwner.myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -1527,22 +1527,22 @@ struct PrivateMediaEndToEndTests {
     }
 }
 
-private func fragmentIndex(_ packet: BitchatPacket) -> Int {
+private func fragmentIndex(_ packet: YarikPacket) -> Int {
     guard packet.payload.count >= 10 else { return .max }
     return (Int(packet.payload[8]) << 8) | Int(packet.payload[9])
 }
 
 private final class PacketTap: @unchecked Sendable {
     private let lock = NSLock()
-    private var packets: [BitchatPacket] = []
+    private var packets: [YarikPacket] = []
 
-    func record(_ packet: BitchatPacket) {
+    func record(_ packet: YarikPacket) {
         lock.lock()
         packets.append(packet)
         lock.unlock()
     }
 
-    func snapshot() -> [BitchatPacket] {
+    func snapshot() -> [YarikPacket] {
         lock.lock()
         defer { lock.unlock() }
         return packets
@@ -1636,17 +1636,17 @@ private final class ReceiptCapabilityRecorder: @unchecked Sendable {
     }
 }
 
-private final class MessageCaptureDelegate: BitchatDelegate, @unchecked Sendable {
+private final class MessageCaptureDelegate: YarikDelegate, @unchecked Sendable {
     private let lock = NSLock()
-    private var messages: [BitchatMessage] = []
+    private var messages: [YarikMessage] = []
 
-    func didReceiveMessage(_ message: BitchatMessage) {
+    func didReceiveMessage(_ message: YarikMessage) {
         lock.lock()
         messages.append(message)
         lock.unlock()
     }
 
-    func snapshot() -> [BitchatMessage] {
+    func snapshot() -> [YarikMessage] {
         lock.lock()
         defer { lock.unlock() }
         return messages

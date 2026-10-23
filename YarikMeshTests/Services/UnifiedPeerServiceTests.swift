@@ -1,6 +1,6 @@
 //
 // UnifiedPeerServiceTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for UnifiedPeerService fingerprint and block resolution.
 //

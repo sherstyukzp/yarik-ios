@@ -37,7 +37,7 @@ struct ContentComposerView: View {
                         }) {
                             HStack {
                                 Text(suggestion)
-                                    .bitchatFont(size: 11)
+                                    .yarikFont(size: 11)
                                     .foregroundColor(palette.primary)
                                     .fontWeight(.medium)
                                 Spacer()
@@ -165,7 +165,7 @@ private extension ContentComposerView {
     var nearbyOnlyToggle: some View {
         Button(action: { bridgeService.nearbyOnly.toggle() }) {
             Image(systemName: bridgeService.nearbyOnly ? "antenna.radiowaves.left.and.right" : "network")
-                .font(.bitchatSystem(size: 16))
+                .font(.yarikSystem(size: 16))
                 .foregroundColor(bridgeService.nearbyOnly ? palette.secondary : Color.cyan.opacity(0.9))
                 .frame(width: 28, height: 28)
                 .contentShape(Rectangle())
@@ -214,7 +214,7 @@ private extension ContentComposerView {
         HStack(spacing: 12) {
             Image(systemName: voiceRecordingVM.isLiveStreaming ? "dot.radiowaves.left.and.right" : "waveform.circle.fill")
                 .foregroundColor(.red)
-                .font(.bitchatSystem(size: 20))
+                .font(.yarikSystem(size: 20))
                 .modifier(PulsingOpacityModifier(active: voiceRecordingVM.isLiveStreaming))
             TimelineView(.periodic(from: .now, by: 0.05)) { context in
                 // Live streaming means audio is heard as you speak — the HUD
@@ -224,14 +224,14 @@ private extension ContentComposerView {
                         "live \(voiceRecordingVM.formattedDuration(for: context.date))",
                         comment: "Recording HUD label while a voice message streams live to the recipient"
                     )
-                    .bitchatFont(size: 13, weight: .bold)
+                    .yarikFont(size: 13, weight: .bold)
                     .foregroundColor(.red)
                 } else {
                     Text(
                         "recording \(voiceRecordingVM.formattedDuration(for: context.date))",
                         comment: "Voice note recording duration indicator"
                     )
-                    .bitchatFont(size: 13)
+                    .yarikFont(size: 13)
                     .foregroundColor(.red)
                 }
             }
@@ -239,7 +239,7 @@ private extension ContentComposerView {
             Button(action: voiceRecordingVM.cancel) {
                 Label(String(localized: "common.cancel", comment: "Cancel action in the voice recording HUD"), systemImage: "xmark.circle")
                     .labelStyle(.iconOnly)
-                    .font(.bitchatSystem(size: 18))
+                    .font(.yarikSystem(size: 18))
                     .foregroundColor(.red)
             }
             .buttonStyle(.plain)
@@ -256,7 +256,7 @@ private extension ContentComposerView {
     var attachmentButton: some View {
         #if os(iOS)
         Image(systemName: "camera.circle.fill")
-            .font(.bitchatSystem(size: 24))
+            .font(.yarikSystem(size: 24))
             .foregroundColor(composerAccentColor)
             .frame(width: 36, height: 36)
             .contentShape(Circle())
@@ -284,7 +284,7 @@ private extension ContentComposerView {
         #else
         Button(action: { showMacImagePicker = true }) {
             Image(systemName: "photo.circle.fill")
-                .font(.bitchatSystem(size: 24))
+                .font(.yarikSystem(size: 24))
                 .foregroundColor(composerAccentColor)
                 .frame(width: 36, height: 36)
         }
@@ -333,7 +333,7 @@ private extension ContentComposerView {
 
     var micButtonView: some View {
         Image(systemName: "mic.circle.fill")
-            .font(.bitchatSystem(size: 24))
+            .font(.yarikSystem(size: 24))
             .foregroundColor(micColor)
             .modifier(PulsingOpacityModifier(active: busyTalker != nil && !voiceRecordingVM.state.isActive))
             .frame(width: 36, height: 36)
@@ -384,7 +384,7 @@ private extension ContentComposerView {
         let activeColor = composerAccentColor
         return Button(action: onSendMessage) {
             Image(systemName: "arrow.up.circle.fill")
-                .font(.bitchatSystem(size: 24))
+                .font(.yarikSystem(size: 24))
                 .foregroundColor(enabled ? activeColor : Color.gray)
                 .frame(width: 36, height: 36)
         }

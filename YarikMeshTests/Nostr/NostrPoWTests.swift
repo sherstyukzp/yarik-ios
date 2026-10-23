@@ -1,6 +1,6 @@
 //
 // NostrPoWTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for NIP-13 proof-of-work: leading-zero-bit counting, commitment
 // semantics, and nonce-tag mining for geohash (kind 20000) events.

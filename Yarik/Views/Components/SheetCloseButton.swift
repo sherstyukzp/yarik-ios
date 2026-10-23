@@ -1,6 +1,6 @@
 //
 // SheetCloseButton.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -19,7 +19,7 @@ struct SheetCloseButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "xmark")
-                .bitchatFont(size: 13, weight: .semibold)
+                .yarikFont(size: 13, weight: .semibold)
                 .frame(width: 32, height: 32)
                 .contentShape(Rectangle().inset(by: -6))
         }

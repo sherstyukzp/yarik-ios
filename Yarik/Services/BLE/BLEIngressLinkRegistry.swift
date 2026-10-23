@@ -33,20 +33,20 @@ struct BLEIngressLinkRegistry {
         ingressByMessageID.removeAll()
     }
 
-    func record(for packet: BitchatPacket) -> BLEIngressLinkRecord? {
+    func record(for packet: YarikPacket) -> BLEIngressLinkRecord? {
         ingressByMessageID[Self.messageID(for: packet)]
     }
 
-    func link(for packet: BitchatPacket) -> BLEIngressLinkID? {
+    func link(for packet: YarikPacket) -> BLEIngressLinkID? {
         record(for: packet)?.link
     }
 
-    func peerID(for packet: BitchatPacket) -> PeerID? {
+    func peerID(for packet: YarikPacket) -> PeerID? {
         record(for: packet)?.peerID
     }
 
     mutating func recordIfNew(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         link: BLEIngressLinkID,
         peerID: PeerID,
         now: Date = Date(),
@@ -67,7 +67,7 @@ struct BLEIngressLinkRegistry {
     }
 
     static func packetContext(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         claimedSenderID: PeerID,
         boundPeerID: PeerID?,
         localPeerID: PeerID,
@@ -103,24 +103,24 @@ struct BLEIngressLinkRegistry {
         ))
     }
 
-    static func messageID(for packet: BitchatPacket) -> String {
+    static func messageID(for packet: YarikPacket) -> String {
         let senderID = packet.senderID.hexEncodedString()
         let digestPrefix = packet.payload.sha256Hash().prefix(4).hexEncodedString()
         return "\(senderID)-\(packet.timestamp)-\(packet.type)-\(digestPrefix)"
     }
 
-    private static func requiresDirectSenderBinding(_ packet: BitchatPacket) -> Bool {
+    private static func requiresDirectSenderBinding(_ packet: YarikPacket) -> Bool {
         // REQUEST_SYNC is never relayed, so on a bound link the claimed sender
         // must be the link peer — it elicits a full store replay, and the
         // response is addressed to whoever the sender claims to be.
         packet.type == MessageType.requestSync.rawValue
     }
 
-    static func isDirectAnnounce(_ packet: BitchatPacket, directAnnounceTTL: UInt8) -> Bool {
+    static func isDirectAnnounce(_ packet: YarikPacket, directAnnounceTTL: UInt8) -> Bool {
         packet.type == MessageType.announce.rawValue && packet.ttl == directAnnounceTTL
     }
 
-    private static func isSelfAuthoredSyncResponse(_ packet: BitchatPacket) -> Bool {
+    private static func isSelfAuthoredSyncResponse(_ packet: YarikPacket) -> Bool {
         packet.isRSR && packet.ttl == 0
     }
 }
@@ -143,16 +143,16 @@ final class BLEIngressLinkStore: @unchecked Sendable {
         lock.withLock { registry.removeAll() }
     }
 
-    func record(for packet: BitchatPacket) -> BLEIngressLinkRecord? {
+    func record(for packet: YarikPacket) -> BLEIngressLinkRecord? {
         lock.withLock { registry.record(for: packet) }
     }
 
-    func link(for packet: BitchatPacket) -> BLEIngressLinkID? {
+    func link(for packet: YarikPacket) -> BLEIngressLinkID? {
         lock.withLock { registry.link(for: packet) }
     }
 
     func recordIfNew(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         link: BLEIngressLinkID,
         peerID: PeerID,
         lifetime: TimeInterval

@@ -1,7 +1,7 @@
-diff --git a/app/src/test/kotlin/com/bitchat/android/nostr/NostrProtocolTest.kt b/app/src/test/kotlin/com/bitchat/android/nostr/NostrProtocolTest.kt
+diff --git a/app/src/test/kotlin/com/yarik/android/nostr/NostrProtocolTest.kt b/app/src/test/kotlin/com/yarik/android/nostr/NostrProtocolTest.kt
 index a5bd956..544a29b 100644
---- a/app/src/test/kotlin/com/bitchat/android/nostr/NostrProtocolTest.kt
-+++ b/app/src/test/kotlin/com/bitchat/android/nostr/NostrProtocolTest.kt
+--- a/app/src/test/kotlin/com/yarik/android/nostr/NostrProtocolTest.kt
++++ b/app/src/test/kotlin/com/yarik/android/nostr/NostrProtocolTest.kt
 @@ -10,0 +11,21 @@ class NostrProtocolTest {
 +    @Test
 +    fun emitCrossPlatformFixtures() {

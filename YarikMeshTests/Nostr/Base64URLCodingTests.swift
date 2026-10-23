@@ -21,7 +21,7 @@ struct Base64URLCodingTests {
 
     @Test
     func roundTripsData() throws {
-        let original = Data("hello bitchat".utf8)
+        let original = Data("hello yarik".utf8)
 
         let decoded = try #require(Base64URLCoding.decode(Base64URLCoding.encode(original)))
 

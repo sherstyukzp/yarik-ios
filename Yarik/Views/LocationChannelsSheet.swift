@@ -53,7 +53,7 @@ struct LocationChannelsSheet: View {
         static let removeBookmark = String(localized: "location_channels.accessibility.remove_bookmark", comment: "Accessibility action name for removing a channel bookmark")
         static let shareChannel = String(localized: "channel.share.action", defaultValue: "share channel", comment: "Context-menu / accessibility action that shares a location-channel invite")
         static let sharePrecisionTitle = String(localized: "channel.share.precision_warning.title", defaultValue: "share a precise location channel?", comment: "Title of the confirmation before sharing a neighborhood-or-finer geohash invite")
-        static let sharePrecisionMessage = String(localized: "channel.share.precision_warning.message", defaultValue: "this channel covers a small area. an invite sent over sms or imessage is visible to the carrier and both handsets — it discloses interest in that place, not only that someone uses bitchat.", comment: "Body of the confirmation before sharing a fine-precision geohash invite")
+        static let sharePrecisionMessage = String(localized: "channel.share.precision_warning.message", defaultValue: "this channel covers a small area. an invite sent over sms or imessage is visible to the carrier and both handsets — it discloses interest in that place, not only that someone uses yarik.", comment: "Body of the confirmation before sharing a fine-precision geohash invite")
         static let shareAnyway = String(localized: "channel.share.precision_warning.confirm", defaultValue: "share anyway", comment: "Confirms sharing a fine-precision location channel after the OpSec warning")
 
         static func meshTitle(_ count: Int) -> String {
@@ -121,12 +121,12 @@ struct LocationChannelsSheet: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
                     Text(Strings.title)
-                        .bitchatFont(size: 18)
+                        .yarikFont(size: 18)
                     Spacer()
                     closeButton
                 }
                 Text(Strings.description)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.secondary)
 
                 // The description's tor claim is only true while tor is on;
@@ -134,7 +134,7 @@ struct LocationChannelsSheet: View {
                 // is about to join a channel, not just in settings.
                 if !locationChannelsModel.userTorEnabled {
                     Text(verbatim: Strings.torOffWarning)
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(palette.alertRed)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -144,7 +144,7 @@ struct LocationChannelsSheet: View {
                     case .notDetermined:
                         Button(action: { locationChannelsModel.enableLocationChannels() }) {
                             Text(Strings.requestPermissions)
-                                .bitchatFont(size: 12)
+                                .yarikFont(size: 12)
                                 .foregroundColor(standardGreen)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 6)
@@ -155,7 +155,7 @@ struct LocationChannelsSheet: View {
                     case .denied, .restricted:
                         VStack(alignment: .leading, spacing: 8) {
                             Text(Strings.permissionDenied)
-                                .bitchatFont(size: 12)
+                                .yarikFont(size: 12)
                                 .foregroundColor(palette.secondary)
                             Button(Strings.openSettings, action: SystemSettings.location.open)
                             .buttonStyle(.plain)
@@ -267,7 +267,7 @@ struct LocationChannelsSheet: View {
                             trailingAccessory: {
                                 Button(action: { locationChannelsModel.toggleBookmark(channel.geohash) }) {
                                     Image(systemName: locationChannelsModel.isBookmarked(channel.geohash) ? "bookmark.fill" : "bookmark")
-                                        .font(.bitchatSystem(size: 14))
+                                        .font(.yarikSystem(size: 14))
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.leading, 8)
@@ -296,7 +296,7 @@ struct LocationChannelsSheet: View {
                     HStack(spacing: 8) {
                         ProgressView()
                         Text(Strings.loadingNearby)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 10)
@@ -305,7 +305,7 @@ struct LocationChannelsSheet: View {
                     // beats a spinner that would never finish.
                     sectionDivider
                     Text(Strings.grantToFind)
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 10)
@@ -348,7 +348,7 @@ struct LocationChannelsSheet: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 2) {
                 Text(verbatim: "#")
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .foregroundColor(palette.secondary)
                 TextField("geohash", text: $customGeohash)
                     #if os(iOS)
@@ -356,7 +356,7 @@ struct LocationChannelsSheet: View {
                     .autocorrectionDisabled(true)
                     .keyboardType(.asciiCapable)
                     #endif
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .onChange(of: customGeohash) { newValue in
                         let allowed = Set("0123456789bcdefghjkmnpqrstuvwxyz")
                         let filtered = newValue
@@ -382,13 +382,13 @@ struct LocationChannelsSheet: View {
                 }) {
                     HStack(spacing: 6) {
                         Text(Strings.teleport)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                         Image(systemName: "face.dashed")
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                     }
                 }
                 .buttonStyle(.plain)
-                .bitchatFont(size: 14)
+                .yarikFont(size: 14)
                 .padding(.vertical, 6)
                 .padding(.horizontal, 10)
                 .background(palette.secondary.opacity(0.12))
@@ -398,7 +398,7 @@ struct LocationChannelsSheet: View {
             }
             if let err = customError {
                 Text(err)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(.red)
             }
         }
@@ -413,7 +413,7 @@ struct LocationChannelsSheet: View {
         if let suggestion = QuickJoinSuggestion.current() {
             VStack(alignment: .leading, spacing: 8) {
                 Text(Strings.quickJoinTitle)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.secondary)
 
                 Button(action: {
@@ -422,11 +422,11 @@ struct LocationChannelsSheet: View {
                 }) {
                     HStack {
                         Text(verbatim: "\(suggestion.flag) \(suggestion.localizedName)")
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(palette.primary)
                         Spacer()
                         Text(verbatim: "#\(suggestion.geohash)")
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.secondary)
                     }
                     .padding(.vertical, 6)
@@ -437,7 +437,7 @@ struct LocationChannelsSheet: View {
                 .accessibilityHint(Strings.switchChannelHint)
 
                 Text(Strings.quickJoinDescription(suggestion.localizedName))
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(palette.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -447,7 +447,7 @@ struct LocationChannelsSheet: View {
     private func bookmarkedSection(_ entries: [String]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(Strings.bookmarked)
-                .bitchatFont(size: 12)
+                .yarikFont(size: 12)
                 .foregroundColor(palette.secondary)
             LazyVStack(spacing: 0) {
                 ForEach(Array(entries.enumerated()), id: \.offset) { index, gh in
@@ -465,7 +465,7 @@ struct LocationChannelsSheet: View {
                         trailingAccessory: {
                             Button(action: { locationChannelsModel.toggleBookmark(gh) }) {
                                 Image(systemName: locationChannelsModel.isBookmarked(gh) ? "bookmark.fill" : "bookmark")
-                                    .font(.bitchatSystem(size: 14))
+                                    .font(.yarikSystem(size: 14))
                             }
                             .buttonStyle(.plain)
                             .padding(.leading, 8)
@@ -535,18 +535,18 @@ struct LocationChannelsSheet: View {
                 let parts = splitTitleAndCount(title)
                 HStack(spacing: 4) {
                     Text(parts.base)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .fontWeight(titleBold ? .bold : .regular)
                             .foregroundColor(titleColor ?? palette.primary)
                         if let count = parts.countSuffix, !count.isEmpty {
                             Text(count)
-                                .bitchatFont(size: 11)
+                                .yarikFont(size: 11)
                                 .foregroundColor(palette.secondary)
                         }
                     }
                 let subtitleFull = Strings.subtitle(prefix: subtitlePrefix, name: subtitleName)
                 Text(subtitleFull)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.secondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -554,7 +554,7 @@ struct LocationChannelsSheet: View {
                 Spacer()
                 if isSelected {
                     Text(verbatim: "✔︎")
-                        .bitchatFont(size: 16)
+                        .yarikFont(size: 16)
                         .foregroundColor(standardGreen)
                 }
                 trailingAccessory()

@@ -3,8 +3,8 @@ import SwiftUI
 /// Provides Dynamic Type aware font helpers that map existing fixed sizes onto
 /// preferred text styles so the UI scales with user accessibility settings.
 extension Font {
-    static func bitchatSystem(size: CGFloat, weight: Font.Weight = .regular, design: Font.Design = .default) -> Font {
-        let style = Font.TextStyle.bitchatPreferredStyle(for: size)
+    static func yarikSystem(size: CGFloat, weight: Font.Weight = .regular, design: Font.Design = .default) -> Font {
+        let style = Font.TextStyle.yarikPreferredStyle(for: size)
         var font = Font.system(style, design: design)
         if weight != .regular {
             font = font.weight(weight)
@@ -14,7 +14,7 @@ extension Font {
 }
 
 private extension Font.TextStyle {
-    static func bitchatPreferredStyle(for size: CGFloat) -> Font.TextStyle {
+    static func yarikPreferredStyle(for size: CGFloat) -> Font.TextStyle {
         switch size {
         case ..<11.5:
             return .caption2

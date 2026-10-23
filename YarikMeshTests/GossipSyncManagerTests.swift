@@ -23,7 +23,7 @@ struct GossipSyncManagerTests {
             let senderID = try #require(Data(hexString: "1122334455667788"))
             
             for i in 0..<iterations {
-                let packet = BitchatPacket(
+                let packet = YarikPacket(
                     type: MessageType.message.rawValue,
                     senderID: senderID,
                     recipientID: nil,
@@ -56,7 +56,7 @@ struct GossipSyncManagerTests {
         let senderData = try #require(Data(hexString: peerHex))
         let initialTimestampMs = UInt64(Date().timeIntervalSince1970 * 1000)
 
-        let announcePacket = BitchatPacket(
+        let announcePacket = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: senderData,
             recipientID: nil,
@@ -66,7 +66,7 @@ struct GossipSyncManagerTests {
             ttl: 1
         )
 
-        let messagePacket = BitchatPacket(
+        let messagePacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: senderData,
             recipientID: nil,
@@ -103,7 +103,7 @@ struct GossipSyncManagerTests {
         let otherData = try #require(Data(hexString: otherHex))
         let nowMs = UInt64(Date().timeIntervalSince1970 * 1000)
 
-        manager.onPublicPacketSeen(BitchatPacket(
+        manager.onPublicPacketSeen(YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: blockedData,
             recipientID: nil,
@@ -113,7 +113,7 @@ struct GossipSyncManagerTests {
             ttl: 1
         ))
         for (index, sender) in [blockedData, blockedData, otherData].enumerated() {
-            manager.onPublicPacketSeen(BitchatPacket(
+            manager.onPublicPacketSeen(YarikPacket(
                 type: MessageType.message.rawValue,
                 senderID: sender,
                 recipientID: nil,
@@ -143,7 +143,7 @@ struct GossipSyncManagerTests {
         let senderData = try #require(Data(hexString: peerHex))
         let staleTimestampMs = UInt64(Date().addingTimeInterval(-(config.stalePeerTimeoutSeconds + 1)).timeIntervalSince1970 * 1000)
 
-        let freshMessage = BitchatPacket(
+        let freshMessage = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: senderData,
             recipientID: nil,
@@ -154,7 +154,7 @@ struct GossipSyncManagerTests {
         )
         manager.onPublicPacketSeen(freshMessage)
 
-        let announcePacket = BitchatPacket(
+        let announcePacket = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: senderData,
             recipientID: nil,
@@ -191,7 +191,7 @@ struct GossipSyncManagerTests {
         let sender = try #require(Data(hexString: "1122334455667788"))
         let now = UInt64(Date().timeIntervalSince1970 * 1000)
 
-        let announcePacket = BitchatPacket(
+        let announcePacket = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -200,7 +200,7 @@ struct GossipSyncManagerTests {
             signature: nil,
             ttl: 1
         )
-        let messagePacket = BitchatPacket(
+        let messagePacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -209,7 +209,7 @@ struct GossipSyncManagerTests {
             signature: nil,
             ttl: 1
         )
-        let fragmentPacket = BitchatPacket(
+        let fragmentPacket = YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -218,7 +218,7 @@ struct GossipSyncManagerTests {
             signature: nil,
             ttl: 1
         )
-        let filePacket = BitchatPacket(
+        let filePacket = YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -276,7 +276,7 @@ struct GossipSyncManagerTests {
         let baseTimestamp = UInt64(Date().timeIntervalSince1970 * 1000)
         let totalMessages = 40
         for i in 0..<totalMessages {
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.message.rawValue,
                 senderID: sender,
                 recipientID: nil,
@@ -316,7 +316,7 @@ struct GossipSyncManagerTests {
         manager.delegate = delegate
 
         let sender = try #require(Data(hexString: "1122334455667788"))
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -352,7 +352,7 @@ struct GossipSyncManagerTests {
 
         // Announce older than the cursor: must still be sent (identity is
         // needed to verify everything else).
-        let announcePacket = BitchatPacket(
+        let announcePacket = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -361,7 +361,7 @@ struct GossipSyncManagerTests {
             signature: nil,
             ttl: 1
         )
-        let oldMessage = BitchatPacket(
+        let oldMessage = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -370,7 +370,7 @@ struct GossipSyncManagerTests {
             signature: nil,
             ttl: 1
         )
-        let newMessage = BitchatPacket(
+        let newMessage = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -419,7 +419,7 @@ struct GossipSyncManagerTests {
         manager.delegate = delegate
 
         let sender = try #require(Data(hexString: "aabbccddeeff0011"))
-        let announcePacket = BitchatPacket(
+        let announcePacket = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -461,7 +461,7 @@ struct GossipSyncManagerTests {
         manager.delegate = delegate
 
         let sender = try #require(Data(hexString: "aabbccddeeff0011"))
-        let messagePacket = BitchatPacket(
+        let messagePacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -526,7 +526,7 @@ struct GossipSyncManagerTests {
         let sender = try #require(Data(hexString: "aabbccddeeff0011"))
         let now = UInt64(Date().timeIntervalSince1970 * 1000)
 
-        let messagePacket = BitchatPacket(
+        let messagePacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -536,7 +536,7 @@ struct GossipSyncManagerTests {
             ttl: 1
         )
 
-        let fragmentPacket = BitchatPacket(
+        let fragmentPacket = YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -561,14 +561,14 @@ struct GossipSyncManagerTests {
 
     // MARK: - Fragment-ID filter (targeted resync)
 
-    private func makeFragmentPacket(sender: Data, fragmentID: Data, index: UInt16, timestamp: UInt64) -> BitchatPacket {
+    private func makeFragmentPacket(sender: Data, fragmentID: Data, index: UInt16, timestamp: UInt64) -> YarikPacket {
         // Fragment payload: 8-byte stream ID + index + total + original type.
         var payload = fragmentID
         payload.append(contentsOf: withUnsafeBytes(of: index.bigEndian) { Data($0) })
         payload.append(contentsOf: withUnsafeBytes(of: UInt16(4).bigEndian) { Data($0) })
         payload.append(MessageType.fileTransfer.rawValue)
         payload.append(Data([0xEE]))
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -675,7 +675,7 @@ struct GossipSyncManagerTests {
             generatedAt: UInt64(Date().timeIntervalSince1970 * 1000),
             signature: Data(count: PrekeyBundle.signatureLength)
         )
-        let bundlePacket = BitchatPacket(
+        let bundlePacket = YarikPacket(
             type: MessageType.prekeyBundle.rawValue,
             senderID: sender,
             recipientID: nil,
@@ -720,7 +720,7 @@ struct GossipSyncManagerTests {
 
         for i in 0..<5 {
             let fakeSender = Data((0..<8).map { j in UInt8(truncatingIfNeeded: i * 31 + j) })
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.prekeyBundle.rawValue,
                 senderID: fakeSender,
                 recipientID: nil,
@@ -760,7 +760,7 @@ struct GossipSyncManagerTests {
         let futureTypes: [MessageType] = [.announce, .message, .fragment, .fileTransfer, .groupMessage]
         for (index, type) in futureTypes.enumerated() {
             for timestamp in [beyondSkewMs, UInt64.max] {
-                manager.onPublicPacketSeen(BitchatPacket(
+                manager.onPublicPacketSeen(YarikPacket(
                     type: type.rawValue,
                     senderID: futureSender,
                     recipientID: nil,
@@ -771,7 +771,7 @@ struct GossipSyncManagerTests {
                 ))
             }
         }
-        let honest = BitchatPacket(
+        let honest = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: honestSender,
             recipientID: nil,
@@ -822,7 +822,7 @@ struct GossipSyncManagerTests {
         let nowMs = UInt64(Date().timeIntervalSince1970 * 1000)
         // Unsigned group ciphertext needs no key to mint.
         for i in 0..<40 {
-            manager.onPublicPacketSeen(BitchatPacket(
+            manager.onPublicPacketSeen(YarikPacket(
                 type: MessageType.groupMessage.rawValue,
                 senderID: junkSender,
                 recipientID: nil,
@@ -833,7 +833,7 @@ struct GossipSyncManagerTests {
             ))
         }
         for i in 0..<5 {
-            manager.onPublicPacketSeen(BitchatPacket(
+            manager.onPublicPacketSeen(YarikPacket(
                 type: MessageType.message.rawValue,
                 senderID: honestSender,
                 recipientID: nil,
@@ -861,7 +861,7 @@ struct GossipSyncManagerTests {
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
         let senderID = try #require(Data(hexString: "1122334455667788"))
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: senderID,
             recipientID: nil,
@@ -903,7 +903,7 @@ struct GossipSyncManagerTests {
         config.publicMessageMaxAgeSeconds = 60
 
         let senderID = try #require(Data(hexString: "1122334455667788"))
-        let stale = BitchatPacket(
+        let stale = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: senderID,
             recipientID: nil,
@@ -942,7 +942,7 @@ struct GossipSyncManagerTests {
         let honestSender = try #require(Data(hexString: "a0a1a2a3a4a5a6a7"))
         let nowMs = UInt64(Date().timeIntervalSince1970 * 1000)
         func archived(from sender: Data, at timestamp: UInt64) throws -> Data {
-            try #require(BitchatPacket(
+            try #require(YarikPacket(
                 type: MessageType.message.rawValue,
                 senderID: sender,
                 recipientID: nil,
@@ -968,7 +968,7 @@ struct GossipSyncManagerTests {
             manager.collectPublicMessagePackets { continuation.resume(returning: $0) }
         }
         #expect(echoes.map(\.senderID) == [honestSender])
-        #expect(mixedArchive.load().compactMap { BitchatPacket.from($0)?.senderID } == [honestSender])
+        #expect(mixedArchive.load().compactMap { YarikPacket.from($0)?.senderID } == [honestSender])
 
         // Poison-only archive: nothing restores, and the file is purged.
         let poisonOnlyArchive = GossipMessageArchive(fileURL: poisonOnlyURL)
@@ -982,10 +982,10 @@ struct GossipSyncManagerTests {
     // MARK: - Byte budgets
 
     /// Three 100-byte packets from distinct senders, oldest first.
-    private func makeBudgetPackets(type: MessageType) throws -> [BitchatPacket] {
+    private func makeBudgetPackets(type: MessageType) throws -> [YarikPacket] {
         let nowMs = UInt64(Date().timeIntervalSince1970 * 1000)
         return try ["00000000000000a1", "00000000000000a2", "00000000000000a3"].enumerated().map { index, hex in
-            BitchatPacket(
+            YarikPacket(
                 type: type.rawValue,
                 senderID: try #require(Data(hexString: hex)),
                 recipientID: nil,
@@ -1070,7 +1070,7 @@ struct GossipSyncManagerTests {
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
         let senderID = try #require(Data(hexString: "1122334455667788"))
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: senderID,
             recipientID: nil,
@@ -1106,11 +1106,11 @@ struct GossipSyncManagerTests {
 private final class RecordingDelegate: GossipSyncManager.Delegate {
     var onSend: (() -> Void)?
     var connectedPeers: [PeerID] = []
-    private(set) var lastPacket: BitchatPacket?
-    private(set) var packets: [BitchatPacket] = []
+    private(set) var lastPacket: YarikPacket?
+    private(set) var packets: [YarikPacket] = []
     private let lock = NSLock()
 
-    func sendPacket(_ packet: BitchatPacket) {
+    func sendPacket(_ packet: YarikPacket) {
         // Run the hook before recording: a waiter that sees `lastPacket`
         // then knows the hook already ran. Recording first let
         // concurrentPacketIntakeAndSyncRequest's waitFor win the race and
@@ -1122,11 +1122,11 @@ private final class RecordingDelegate: GossipSyncManager.Delegate {
         lock.unlock()
     }
 
-    func sendPacket(to peerID: PeerID, packet: BitchatPacket) {
+    func sendPacket(to peerID: PeerID, packet: YarikPacket) {
         sendPacket(packet)
     }
 
-    func signPacketForBroadcast(_ packet: BitchatPacket) -> BitchatPacket {
+    func signPacketForBroadcast(_ packet: YarikPacket) -> YarikPacket {
         packet
     }
     

@@ -1,7 +1,7 @@
 import Foundation
 import BitLogger
 
-/// Comprehensive input validation for BitChat protocol
+/// Comprehensive input validation for Yarik protocol
 /// Prevents injection attacks, buffer overflows, and malformed data
 struct InputValidator {
     

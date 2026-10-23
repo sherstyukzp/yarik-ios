@@ -100,7 +100,7 @@ struct SimulatedMeshTests {
         let capture = TransportEventCapture()
         b.service.eventDelegate = capture
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: a.service.myPeerID.id) ?? Data(),
             recipientID: nil,

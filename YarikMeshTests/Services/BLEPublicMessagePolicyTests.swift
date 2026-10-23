@@ -113,8 +113,8 @@ struct BLEPublicMessagePolicyTests {
         timestamp: UInt64 = 900_000,
         ttl: UInt8 = 3,
         recipientID: Data? = nil
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: type.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipientID,

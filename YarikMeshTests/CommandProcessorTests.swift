@@ -575,8 +575,8 @@ struct CommandProcessorTests {
         }
     }
 
-    private func makeMessage(sender: String, content: String) -> BitchatMessage {
-        BitchatMessage(
+    private func makeMessage(sender: String, content: String) -> YarikMessage {
+        YarikMessage(
             sender: sender,
             content: content,
             timestamp: Date(timeIntervalSince1970: 1_700_000_000),
@@ -591,7 +591,7 @@ private final class MockCommandContextProvider: CommandContextProvider {
     var activeChannel: ChannelID = .mesh
     var selectedPrivateChatPeer: PeerID?
     var blockedUsers: Set<String> = []
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
     let idBridge: NostrIdentityBridge
 
     var nicknameToPeerID: [String: PeerID] = [:]

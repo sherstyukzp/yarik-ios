@@ -1,7 +1,7 @@
 # Peer ID Rotation Specification
 
 **Status:** Draft for cross-platform review. The derivations and the wire format **are implemented and tested**; nothing is wired into the shipping mesh.
-**Audience:** bitchat iOS and bitchat Android maintainers.
+**Audience:** yarik iOS and yarik Android maintainers.
 **Requires agreement before going further.** This changes the wire protocol, so neither platform can ship it alone.
 
 **Where the code is:**
@@ -27,7 +27,7 @@ Three policy decisions were forced by the compiler when the new message type was
 
 Today a passive listener with a BLE dongle, standing in a crowd, can do the following with no cryptographic attack and no active participation:
 
-1. **Detect that a phone is running bitchat.** The service UUID is a fixed constant.
+1. **Detect that a phone is running yarik.** The service UUID is a fixed constant.
 2. **Assign that phone a permanent identifier.** The 8-byte sender ID in every packet header is `SHA-256(noiseStaticPublicKey)[0..8]`, and the Noise static key is generated once and kept in the keychain. It does not rotate. Same phone, same bytes, next week, next city.
 3. **Learn the phone's long-term public keys and its self-chosen nickname.** The announce carries the 32-byte Noise static key, the 32-byte Ed25519 signing key, and the nickname, all in cleartext, re-broadcast every 4–30 seconds and on demand to anything that connects and subscribes.
 4. **Reconstruct who was standing near whom.** The announce also carries up to ten neighbour IDs, so one receiver gets the local adjacency graph without needing several receivers or signal-strength trilateration.
@@ -51,7 +51,7 @@ iOS BLE address randomization does not help. It randomizes the link-layer addres
 
 **Non-goals, explicitly out of scope here**
 
-- Hiding *that* bitchat is in use. The service UUID is a separate problem; BLE requires something discoverable. Tracked separately.
+- Hiding *that* yarik is in use. The service UUID is a separate problem; BLE requires something discoverable. Tracked separately.
 - Traffic-analysis resistance in general: padding coverage, send-time jitter, TTL randomization, and the neighbour-list leak each need their own change. Rotation does not fix them and they do not fix rotation.
 - Resistance to an active attacker who connects and completes a handshake. Anyone you handshake with learns your identity; that is what a handshake is for.
 
@@ -83,7 +83,7 @@ Failure throws `NoiseSessionError.peerIdentityMismatch`.
 
 If the peer ID becomes independent of the key, **both checks fail for every peer** and there is nothing left proving that a sender ID belongs to the sender. Any rotation design must therefore ship a *replacement* binding in the same change. This is why the work is a protocol revision and not a patch.
 
-Note also what the existing announce signature does and does not prove. The packet signature covers the sender ID (`BitchatPacket.toBinaryDataForSigning()` zeroes only TTL and the RSR flag), but it is verified against the Ed25519 key carried *inside the same announce* — a self-signature. The code says so plainly (`BLEAnnounceHandlingPolicy.swift:94-103`): an attacker can replay a victim's peer ID and Noise key with their own signing key and a valid self-signature, and only trust-on-first-use pinning of the signing key stops it. So today's binding is "derived ID + TOFU", and a replacement must be at least that strong.
+Note also what the existing announce signature does and does not prove. The packet signature covers the sender ID (`YarikPacket.toBinaryDataForSigning()` zeroes only TTL and the RSR flag), but it is verified against the Ed25519 key carried *inside the same announce* — a self-signature. The code says so plainly (`BLEAnnounceHandlingPolicy.swift:94-103`): an attacker can replay a victim's peer ID and Noise key with their own signing key and a valid self-signature, and only trust-on-first-use pinning of the signing key stops it. So today's binding is "derived ID + TOFU", and a replacement must be at least that strong.
 
 ## 4. Design
 
@@ -103,11 +103,11 @@ ROTATION_PERIOD = 3600   (1 hour, proposed — see open question O1)
 ```
 K_rot   = HKDF-SHA256(ikm: noiseStaticPrivateKey,
                       salt: "",
-                      info: "bitchat-peer-rotation-v1",
+                      info: "yarik-peer-rotation-v1",
                       length: 32)
 
 peerID_e = HMAC-SHA256(key: K_rot,
-                       message: "bitchat-peer-id-v2" || uint32be(epoch))[0..8]
+                       message: "yarik-peer-id-v2" || uint32be(epoch))[0..8]
 ```
 
 Properties:
@@ -124,7 +124,7 @@ With the static keys off the air, mutual favourites need another way to spot eac
 
 ```
 S_AB    = X25519(A_noiseStaticPrivate, B_noiseStaticPublic)      // == X25519(B_priv, A_pub)
-K_AB    = HKDF-SHA256(ikm: S_AB, salt: "", info: "bitchat-recognition-v1", length: 32)
+K_AB    = HKDF-SHA256(ikm: S_AB, salt: "", info: "yarik-recognition-v1", length: 32)
 
 tag_A→B = HMAC-SHA256(key: K_AB,
                       message: uint32be(epoch)
@@ -167,7 +167,7 @@ Inside the completed handshake, each side proves that the rotating ID it was usi
 
 ```
 proof = Ed25519-Sign(signingPrivateKey,
-                     "bitchat-peerid-binding-v1"
+                     "yarik-peerid-binding-v1"
                      || uint32be(epoch)
                      || peerID_e (8 bytes)
                      || noiseStaticPublicKey (32 bytes))
@@ -185,7 +185,7 @@ An earlier draft of this list omitted the first check, which left a hole worth s
 
 This replaces `authenticatedRemoteKey`'s derivation check with an explicit signed statement. With the static-key check present it is strictly stronger than today's self-signed announce, because the signing key is checked against a pin rather than taken from the same message. Without it, it is weaker — a reminder that "signed" and "bound to this conversation" are different properties.
 
-Note the canonical-bytes helper for this already half-exists: `NoiseEncryptionService.buildAnnounceSignature` / `verifyAnnounceSignature` / `canonicalAnnounceBytes`, with context `"bitchat-announce-v1"`, are present but unreferenced in production (only tests call them). They sign `context‖peerID(8)‖noiseKey(32)‖ed25519Key(32)‖nickname‖timestampMs`. The binding above is deliberately a **different context string** and a different field set, so the two can never be confused; the dead code should be deleted or repurposed explicitly rather than silently reused.
+Note the canonical-bytes helper for this already half-exists: `NoiseEncryptionService.buildAnnounceSignature` / `verifyAnnounceSignature` / `canonicalAnnounceBytes`, with context `"yarik-announce-v1"`, are present but unreferenced in production (only tests call them). They sign `context‖peerID(8)‖noiseKey(32)‖ed25519Key(32)‖nickname‖timestampMs`. The binding above is deliberately a **different context string** and a different field set, so the two can never be confused; the dead code should be deleted or repurposed explicitly rather than silently reused.
 
 ### 4.6 The announce, before and after
 
@@ -259,7 +259,7 @@ This is what an implementer must handle. Every item below was verified against t
 | **Handshake identity check** | `authenticatedRemoteKey` re-derives the ID from the static key and fails for every peer once IDs are independent. Replace with §4.5. | `NoiseSessionManager.swift:1106-1122`, enforced `:714-718` |
 | **Announce preflight** | Same derivation check rejects any announce whose ID is not the key's hash. | `BLEAnnounceHandlingPolicy.swift:32-35` |
 | **Sealed message outbox** | Queued DM plaintext is keyed by peer ID on disk and survives app kill. A recipient's rotation orphans their queue. Needs re-keying by **fingerprint** (stable) with the peer ID as a lookup hint. This is the single worst offender. | `MessageOutboxStore.swift:66`, `:704-707`, `:746` |
-| **Private-media durable IDs** | `stableID` hashes sender and recipient short IDs, and the durable receipt ledger keys accept/tombstone records on it. Rotation silently breaks dedup **and user deletion tombstones**, so deleted media could be re-accepted. | `BitchatFilePacket.swift:183-231`, `BLEPrivateMediaReceiptStore.swift` |
+| **Private-media durable IDs** | `stableID` hashes sender and recipient short IDs, and the durable receipt ledger keys accept/tombstone records on it. Rotation silently breaks dedup **and user deletion tombstones**, so deleted media could be re-accepted. | `YarikFilePacket.swift:183-231`, `BLEPrivateMediaReceiptStore.swift` |
 | **Initiator tie-break** | Crossed-initiation resolution compares `localPeerID < peerID`. Both sides must reach the same verdict; a rotation mid-negotiation flips it asymmetrically. Needs a rotation-stable comparison key (fingerprint). | `NoiseSessionManager.swift:83`, `:569`, `:582`, `:603` |
 | **Fingerprint-prefix lookups** | Several paths recover a peer from `fingerprint.hasPrefix(peerID)`. These silently return empty, and one of them is what lets a public message from a not-yet-registered peer be accepted at all. | `SecureIdentityStateManager.swift:437-444`; `ChatGroupCoordinator.swift:98-102`, `:432`; `FavoritesPersistenceService.swift:188-195`; `BLEService.swift:2552`, `:2823` |
 | **`PeerID.routingData`** | Falls back to `toShort()`, i.e. fingerprint-derived routing bytes. | `PeerID.swift:190-202` |
@@ -289,11 +289,11 @@ With `noiseStaticPrivateKey = 0102…20` (bytes 1 through 32):
 
 ```
 rotationSecret = HKDF-SHA256(ikm: 0102…20, salt: <empty>,
-                             info: "bitchat-peer-rotation-v1", len: 32)
+                             info: "yarik-peer-rotation-v1", len: 32)
                = fb82dfec0c0a2a4677beca44e2f72c80e7c5de773dd5fce6ee47af83d3c25f09
 
 peerID(epoch=100) = HMAC-SHA256(rotationSecret,
-                                "bitchat-peer-id-v2" || uint32be(100))[0..8]
+                                "yarik-peer-id-v2" || uint32be(100))[0..8]
                   = f7c08c528506a374
 ```
 
@@ -302,7 +302,7 @@ With a recognition key derived from a shared secret of 32 × `0x42`, sender key
 
 ```
 recognitionKey = HKDF-SHA256(ikm: 42×32, salt: <empty>,
-                             info: "bitchat-recognition-v1", len: 32)
+                             info: "yarik-recognition-v1", len: 32)
 
 tag_A→B(epoch=100) = HMAC-SHA256(recognitionKey,
                                  uint32be(100) || 0A×32 || 0B×32 || A1×8)[0..8]
@@ -328,7 +328,7 @@ Still to be written jointly: a full `announceV2` packet as a hex blob, and the �
 - **O4 — Unsigned v2 announces.** Binding tags to the announced peer ID removes impersonation-as-any-ID, but a recorded announce can still be rebroadcast verbatim within the epoch window, so a peer can be made to look present when absent. Is "presence is a hint; nothing consequential until a handshake whose static key matches the favourite that produced the match" acceptable? The alternatives are an ephemeral per-epoch signing key with a proof-of-continuity, or a freshness nonce echoed by the recipient — both more machinery and more bytes.
 - **O5 — Rotation while a session is live.** Defer rotation until sessions are idle, or rotate and migrate? Deferring is simpler and safer, but a long-lived session pins the ID for its lifetime, which weakens G1 for exactly the people who talk most.
 - **O6 — Nickname timing.** Moving the nickname into the session means a stranger's name appears only after a handshake. Is that acceptable UX on both platforms, or does the peer list need a "someone nearby" placeholder state?
-- **O7 — Padding is a coordinated change, not a local one.** This started as a question about decoder tolerance and turned into something firmer. `BitchatPacket.toBinaryDataForSigning()` encodes with padding enabled, so **the padding bytes are inside the signed material for every signed packet**. Changing the padding algorithm therefore changes the signed byte stream, and signatures stop verifying against any peer that has not made the identical change. Both outstanding padding fixes are affected: extending coverage beyond `noiseEncrypted`/`noiseHandshake`, and closing the gap where a frame needing more than 255 bytes of padding is emitted unpadded (encoded *frames* of 241–256, 497–768 and 1009–1792 bytes ship at exact length today — the arithmetic is over the whole encoded packet that `pad` receives, not the payload alone). Two things to settle: whether Android's decoder also tolerates trailing bytes the way iOS's does (`guard offset <= buf.count`, plus an unpad retry), and whether padding changes ride this protocol revision or get their own capability-gated one.
+- **O7 — Padding is a coordinated change, not a local one.** This started as a question about decoder tolerance and turned into something firmer. `YarikPacket.toBinaryDataForSigning()` encodes with padding enabled, so **the padding bytes are inside the signed material for every signed packet**. Changing the padding algorithm therefore changes the signed byte stream, and signatures stop verifying against any peer that has not made the identical change. Both outstanding padding fixes are affected: extending coverage beyond `noiseEncrypted`/`noiseHandshake`, and closing the gap where a frame needing more than 255 bytes of padding is emitted unpadded (encoded *frames* of 241–256, 497–768 and 1009–1792 bytes ship at exact length today — the arithmetic is over the whole encoded packet that `pad` receives, not the payload alone). Two things to settle: whether Android's decoder also tolerates trailing bytes the way iOS's does (`guard offset <= buf.count`, plus an unpad retry), and whether padding changes ride this protocol revision or get their own capability-gated one.
 
 - **O9 — A seized device recomputes every past peer ID.** `K_rot` is a long-lived secret, so `peerID_e = HMAC(K_rot, epoch)` is computable for *any* epoch by whoever holds it. Someone who seizes a phone, or extracts the Noise static key from a backup, can therefore take historical radio captures and identify which of them were this device — retroactively defeating the unlinkability for every past epoch. Rotation protects against the passive observer, not against later key compromise. A hash ratchet (`K_{e+1} = HKDF(K_e)`, discarding `K_e`) would give forward secrecy for the ID stream, at the cost of state that must survive restarts, tolerate clock jumps, and resynchronise after a gap — none of which is free, and all of which interacts with the ±1 window. Worth deciding deliberately rather than inheriting.
 

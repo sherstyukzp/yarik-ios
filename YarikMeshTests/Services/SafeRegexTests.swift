@@ -1,6 +1,6 @@
 //
 // SafeRegexTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // SafeRegex must never trap: valid patterns compile normally, invalid ones
 // degrade to a regex that matches nothing. The production-pattern test keeps
@@ -23,7 +23,7 @@ struct SafeRegexTests {
     @Test
     func validPatternCompilesAndMatches() {
         let regex = SafeRegex.compile("#([a-zA-Z0-9_]+)")
-        #expect(matchCount(regex, "tag #bitchat here") == 1)
+        #expect(matchCount(regex, "tag #yarik here") == 1)
     }
 
     @Test

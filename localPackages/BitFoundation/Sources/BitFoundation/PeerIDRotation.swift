@@ -55,14 +55,14 @@ public enum PeerIDRotation {
     // MARK: - Context strings
     //
     // Distinct per use so a value derived for one purpose can never be
-    // substituted for another. `bitchat-announce-v1` is deliberately NOT reused:
+    // substituted for another. `yarik-announce-v1` is deliberately NOT reused:
     // it belongs to the production-dead announce-signature helpers in
     // NoiseEncryptionService, and confusing the two would be a real bug.
 
-    private static let rotationInfo = Data("bitchat-peer-rotation-v1".utf8)
-    private static let peerIDContext = Data("bitchat-peer-id-v2".utf8)
-    private static let recognitionInfo = Data("bitchat-recognition-v1".utf8)
-    private static let bindingContext = Data("bitchat-peerid-binding-v1".utf8)
+    private static let rotationInfo = Data("yarik-peer-rotation-v1".utf8)
+    private static let peerIDContext = Data("yarik-peer-id-v2".utf8)
+    private static let recognitionInfo = Data("yarik-recognition-v1".utf8)
+    private static let bindingContext = Data("yarik-peerid-binding-v1".utf8)
 
     // MARK: - Epochs
 

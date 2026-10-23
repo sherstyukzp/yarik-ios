@@ -248,7 +248,7 @@ private extension SecureLogger {
                     file: String, line: Int, function: String) {
         // All public wrappers are compiled out of release builds; this core
         // is gated too so no future call path can reintroduce production
-        // logging. bitchat is privacy-first: release builds emit nothing.
+        // logging. yarik is privacy-first: release builds emit nothing.
         #if DEBUG
         guard shouldLog(level) else { return }
         let location = formatLocation(file: file, line: line, function: function)

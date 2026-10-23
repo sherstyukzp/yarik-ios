@@ -2,8 +2,8 @@ import Foundation
 import CoreBluetooth
 import BitFoundation
 
-/// Represents a peer in the BitChat network with all associated metadata
-struct BitchatPeer: Equatable {
+/// Represents a peer in the Yarik network with all associated metadata
+struct YarikPeer: Equatable {
     let peerID: PeerID // Hex-encoded peer ID
     let noisePublicKey: Data
     let nickname: String
@@ -109,7 +109,7 @@ struct BitchatPeer: Equatable {
         self.nostrPublicKey = nil
     }
     
-    static func == (lhs: BitchatPeer, rhs: BitchatPeer) -> Bool {
+    static func == (lhs: YarikPeer, rhs: YarikPeer) -> Bool {
         lhs.peerID == rhs.peerID
     }
 }

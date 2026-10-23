@@ -165,12 +165,12 @@ struct BLEDirectedRelaySpoolTests {
         #expect(spool.count >= 1)
     }
 
-    private func makePacket(payload: [UInt8]) -> BitchatPacket {
+    private func makePacket(payload: [UInt8]) -> YarikPacket {
         makePacket(payload: Data(payload))
     }
 
-    private func makePacket(payload: Data) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(payload: Data) -> YarikPacket {
+        YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: Data(hexString: "8877665544332211") ?? Data(),
             recipientID: Data(hexString: "1122334455667788"),

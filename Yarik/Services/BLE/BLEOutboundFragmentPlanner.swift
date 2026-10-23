@@ -2,7 +2,7 @@ import BitFoundation
 import Foundation
 
 struct BLEOutboundFragmentPlan {
-    let fragmentPackets: [BitchatPacket]
+    let fragmentPackets: [YarikPacket]
     let fragmentVersion: UInt8
     let chunkSize: Int
     let spacingMs: Int
@@ -79,7 +79,7 @@ enum BLEOutboundFragmentPlanner {
     }
 
     private static func sizingPolicy(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         requestedMaxChunk: Int?,
         defaultChunkSize: Int,
         bleMaxMTU: Int
@@ -101,14 +101,14 @@ enum BLEOutboundFragmentPlanner {
     }
 
     private static func makeFragmentPacket(
-        original packet: BitchatPacket,
+        original packet: YarikPacket,
         fragmentID: Data,
         index: Int,
         total: Int,
         fragmentData: Data,
         fragmentRecipient: Data?,
         fragmentVersion: UInt8
-    ) -> BitchatPacket {
+    ) -> YarikPacket {
         var payload = Data()
         payload.append(fragmentID)
         payload.append(contentsOf: withUnsafeBytes(of: UInt16(index).bigEndian) { Data($0) })
@@ -116,7 +116,7 @@ enum BLEOutboundFragmentPlanner {
         payload.append(packet.type)
         payload.append(fragmentData)
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.fragment.rawValue,
             senderID: packet.senderID,
             recipientID: fragmentRecipient,

@@ -1,6 +1,6 @@
 //
 // MessageRouterTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for MessageRouter transport selection and outbox behavior.
 //

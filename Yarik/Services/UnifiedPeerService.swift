@@ -1,6 +1,6 @@
 //
 //  UnifiedPeerService.swift
-//  bitchat
+//  yarik
 //
 //  Unified peer state management combining mesh connectivity and favorites
 //  This is free and unencumbered software released into the public domain.
@@ -18,14 +18,14 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
     
     // MARK: - Published Properties
     
-    @Published private(set) var peers: [BitchatPeer] = []
+    @Published private(set) var peers: [YarikPeer] = []
     @Published private(set) var connectedPeerIDs: Set<PeerID> = []
-    @Published private(set) var favorites: [BitchatPeer] = []
-    @Published private(set) var mutualFavorites: [BitchatPeer] = []
+    @Published private(set) var favorites: [YarikPeer] = []
+    @Published private(set) var mutualFavorites: [YarikPeer] = []
     
     // MARK: - Private Properties
     
-    private var peerIndex: [PeerID: BitchatPeer] = [:]
+    private var peerIndex: [PeerID: YarikPeer] = [:]
     private var fingerprintCache: [PeerID: String] = [:]
     private let meshService: Transport
     private let idBridge: NostrIdentityBridge
@@ -83,7 +83,7 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
         let hasAnyConnected = meshPeers.contains { $0.isConnected }
         let favorites = favoritesService.favorites
         
-        var enrichedPeers: [BitchatPeer] = []
+        var enrichedPeers: [YarikPeer] = []
         var connected: Set<PeerID> = []
         var addedPeerIDs: Set<PeerID> = []
         var meshNoiseKeys: Set<Data> = []
@@ -131,7 +131,7 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
         // Phase 3: Sort peers
         enrichedPeers.sort { lhs, rhs in
             // Connectivity rank: connected > reachable > others
-            func rank(_ p: BitchatPeer) -> Int { p.isConnected ? 2 : (p.isReachable ? 1 : 0) }
+            func rank(_ p: YarikPeer) -> Int { p.isConnected ? 2 : (p.isReachable ? 1 : 0) }
             let lr = rank(lhs), rr = rank(rhs)
             if lr != rr { return lr > rr }
             // Then favorites inside same rank
@@ -141,9 +141,9 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
         }
         
         // Phase 4: Build subsets and indices
-        var favoritesList: [BitchatPeer] = []
-        var mutualsList: [BitchatPeer] = []
-        var newIndex: [PeerID: BitchatPeer] = [:]
+        var favoritesList: [YarikPeer] = []
+        var mutualsList: [YarikPeer] = []
+        var newIndex: [PeerID: YarikPeer] = [:]
         
         for peer in enrichedPeers {
             newIndex[peer.peerID] = peer
@@ -178,7 +178,7 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
         peerInfo: TransportPeerSnapshot,
         favorites: [Data: FavoritesPersistenceService.FavoriteRelationship],
         meshAttached: Bool
-    ) -> BitchatPeer {
+    ) -> YarikPeer {
         // Determine reachability based on lastSeen and identity trust
         let now = Date()
         let fingerprint = peerInfo.noisePublicKey?.sha256Fingerprint()
@@ -189,7 +189,7 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
         let withinRetention = now.timeIntervalSince(peerInfo.lastSeen) <= retention
         let isReachable = peerInfo.isConnected ? true : (withinRetention && meshAttached)
 
-        var peer = BitchatPeer(
+        var peer = YarikPeer(
             peerID: peerInfo.peerID,
             noisePublicKey: peerInfo.noisePublicKey ?? Data(),
             nickname: peerInfo.nickname,
@@ -212,8 +212,8 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
     private func buildPeerFromFavorite(
         favorite: FavoritesPersistenceService.FavoriteRelationship,
         peerID: PeerID
-    ) -> BitchatPeer {
-        var peer = BitchatPeer(
+    ) -> YarikPeer {
+        var peer = YarikPeer(
             peerID: peerID,
             noisePublicKey: favorite.peerNoisePublicKey,
             nickname: favorite.peerNickname,
@@ -247,7 +247,7 @@ final class UnifiedPeerService: ObservableObject, TransportPeerEventsDelegate {
     // MARK: - Public Methods
     
     /// Get peer by ID
-    func getPeer(by peerID: PeerID) -> BitchatPeer? {
+    func getPeer(by peerID: PeerID) -> YarikPeer? {
         return peerIndex[peerID]
     }
     

@@ -1,6 +1,6 @@
 //
 // DeliveryStatusView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -13,7 +13,7 @@ extension DeliveryStatus {
     /// Localized, user-facing description of the status. Used for macOS
     /// tooltips, the tap-to-reveal caption under a message, and VoiceOver —
     /// the glyphs alone are unexplained 10pt icons.
-    var bitchatDescription: String {
+    var yarikDescription: String {
         switch self {
         case .notSentYet:
             return String(localized: "content.delivery.not_sent_yet", defaultValue: "Not sent yet", comment: "Delivery status description for a message that has not entered any send pipeline")
@@ -66,9 +66,9 @@ struct DeliveryStatusView: View {
 
     var body: some View {
         statusGlyph
-            .help(status.bitchatDescription)
+            .help(status.yarikDescription)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(status.bitchatDescription)
+            .accessibilityLabel(status.yarikDescription)
     }
 
     @ViewBuilder
@@ -78,30 +78,30 @@ struct DeliveryStatusView: View {
             // Normally hidden by callers; shown as a hollow dotted circle if
             // it ever surfaces so the state is visible rather than invisible.
             Image(systemName: "circle.dotted")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(secondaryTextColor.opacity(0.6))
 
         case .sending:
             Image(systemName: "circle")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(secondaryTextColor.opacity(0.6))
 
         case .sent:
             Image(systemName: "checkmark")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(secondaryTextColor.opacity(0.6))
 
         case .carried:
             Image(systemName: "figure.walk")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(secondaryTextColor.opacity(0.8))
 
         case .delivered:
             HStack(spacing: -2) {
                 Image(systemName: "checkmark")
-                    .font(.bitchatSystem(size: 10))
+                    .font(.yarikSystem(size: 10))
                 Image(systemName: "checkmark")
-                    .font(.bitchatSystem(size: 10))
+                    .font(.yarikSystem(size: 10))
             }
             .foregroundColor(textColor.opacity(0.8))
 
@@ -109,23 +109,23 @@ struct DeliveryStatusView: View {
             // Filled variant so read vs delivered is legible without color.
             HStack(spacing: 0) {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.bitchatSystem(size: 9, weight: .bold))
+                    .font(.yarikSystem(size: 9, weight: .bold))
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.bitchatSystem(size: 9, weight: .bold))
+                    .font(.yarikSystem(size: 9, weight: .bold))
             }
             .foregroundColor(palette.accentBlue)
 
         case .failed:
             Image(systemName: "exclamationmark.triangle")
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(Color.red.opacity(0.8))
 
         case .partiallyDelivered(let reached, let total):
             HStack(spacing: 1) {
                 Image(systemName: "checkmark")
-                    .font(.bitchatSystem(size: 10))
+                    .font(.yarikSystem(size: 10))
                 Text(verbatim: "\(reached)/\(total)")
-                    .bitchatFont(size: 10)
+                    .yarikFont(size: 10)
             }
             .foregroundColor(secondaryTextColor.opacity(0.6))
         }

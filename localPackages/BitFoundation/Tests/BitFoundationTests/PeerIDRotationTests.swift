@@ -58,7 +58,7 @@ struct PeerIDRotationTests {
         let second = PeerIDRotation.rotationSecret(noiseStaticPrivateKey: staticPrivateA)
         #expect(first == second)
         #expect(first.count == 32)
-        // VECTOR: HKDF-SHA256(ikm: 01..20, salt: empty, info: "bitchat-peer-rotation-v1", 32)
+        // VECTOR: HKDF-SHA256(ikm: 01..20, salt: empty, info: "yarik-peer-rotation-v1", 32)
         #expect(hex(first) == "fb82dfec0c0a2a4677beca44e2f72c80e7c5de773dd5fce6ee47af83d3c25f09")
     }
 
@@ -69,7 +69,7 @@ struct PeerIDRotationTests {
 
         #expect(a.count == PeerIDRotation.idLength)
         #expect(b.count == PeerIDRotation.idLength)
-        // VECTOR: HMAC-SHA256(rotationSecret, "bitchat-peer-id-v2" || uint32be(100))[0..8]
+        // VECTOR: HMAC-SHA256(rotationSecret, "yarik-peer-id-v2" || uint32be(100))[0..8]
         #expect(hex(a) == "f7c08c528506a374")
         // The whole point: consecutive epochs are unrelated to an observer.
         #expect(a != b)
@@ -190,7 +190,7 @@ struct PeerIDRotationTests {
             senderStaticPublicKey: pubA, recipientStaticPublicKey: pubB, peerID: idA
         )
         #expect(now != next)
-        // VECTOR: HMAC-SHA256(HKDF(ikm: 0x42*32, info: "bitchat-recognition-v1"),
+        // VECTOR: HMAC-SHA256(HKDF(ikm: 0x42*32, info: "yarik-recognition-v1"),
         //         uint32be(100) || 0x0A*32 || 0x0B*32 || 0xA1*8)[0..8]
         #expect(hex(now) == "4568f61d61d6cbfb")
     }
@@ -339,12 +339,12 @@ struct PeerIDRotationTests {
             peerID: Data(repeating: 0xAB, count: 8),
             noiseStaticPublicKey: Data(repeating: 0xCD, count: 32)
         )
-        let context = Data("bitchat-peerid-binding-v1".utf8)
+        let context = Data("yarik-peerid-binding-v1".utf8)
         #expect(message.count == context.count + 4 + 8 + 32)
         #expect(message.starts(with: context))
         // Must not collide with the production-dead announce-signature helpers,
-        // which use "bitchat-announce-v1".
-        #expect(!message.starts(with: Data("bitchat-announce-v1".utf8)))
+        // which use "yarik-announce-v1".
+        #expect(!message.starts(with: Data("yarik-announce-v1".utf8)))
     }
 
     @Test func bindingMessagePadsShortInputsRatherThanShifting() {

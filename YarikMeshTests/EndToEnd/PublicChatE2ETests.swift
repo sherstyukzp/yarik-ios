@@ -1,6 +1,6 @@
 //
 // PublicChatE2ETests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -88,11 +88,11 @@ struct PublicChatE2ETests {
             // Set up relay in Bob
             bob.packetDeliveryHandler = { packet in
                 // Bob should relay to Charlie
-                if let message = BitchatMessage(packet.payload),
+                if let message = YarikMessage(packet.payload),
                    message.sender == TestConstants.testNickname1 {
 
                     // Create relay message
-                    let relayMessage = BitchatMessage(
+                    let relayMessage = YarikMessage(
                         id: message.id,
                         sender: message.sender,
                         content: message.content,
@@ -106,7 +106,7 @@ struct PublicChatE2ETests {
                     )
 
                     if let relayPayload = relayMessage.toBinaryPayload() {
-                        let relayPacket = BitchatPacket(
+                        let relayPacket = YarikPacket(
                             type: packet.type,
                             senderID: packet.senderID,
                             recipientID: packet.recipientID,
@@ -385,12 +385,12 @@ struct PublicChatE2ETests {
             // Check if should relay
             guard packet.ttl > 1 else { return }
 
-            if let message = BitchatMessage(packet.payload) {
+            if let message = YarikMessage(packet.payload) {
                 // Don't relay own messages
                 guard message.senderPeerID != node.peerID else { return }
                 
                 // Create relay message
-                let relayMessage = BitchatMessage(
+                let relayMessage = YarikMessage(
                     id: message.id,
                     sender: message.sender,
                     content: message.content,
@@ -404,7 +404,7 @@ struct PublicChatE2ETests {
                 )
                 
                 if let relayPayload = relayMessage.toBinaryPayload() {
-                    let relayPacket = BitchatPacket(
+                    let relayPacket = YarikPacket(
                         type: packet.type,
                         senderID: node.peerID.id.data(using: .utf8)!,
                         recipientID: packet.recipientID,

@@ -30,7 +30,7 @@ struct BLEAnnounceHandlingPolicyTests {
     func preflightRejectsMalformedPayload() {
         let now = Date(timeIntervalSince1970: 1_000)
         let peerID = PeerID(str: "1122334455667788")
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: peerID.id) ?? Data(),
             recipientID: nil,
@@ -268,7 +268,7 @@ struct BLEAnnounceHandlingPolicyTests {
         noisePublicKey: Data,
         peerID: PeerID,
         timestamp: UInt64
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let announcement = AnnouncementPacket(
             nickname: "Alice",
             noisePublicKey: noisePublicKey,
@@ -277,7 +277,7 @@ struct BLEAnnounceHandlingPolicyTests {
         )
         let payload = try #require(announcement.encode())
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: peerID.id) ?? Data(),
             recipientID: nil,

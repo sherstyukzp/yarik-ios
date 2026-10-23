@@ -1,6 +1,6 @@
 //
 // ChatMediaTransferCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatMediaTransferCoordinator` against a mock
 // `ChatMediaTransferContext` — proving the coordinator works without a
@@ -45,10 +45,10 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
     }
 
     // Message state
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
 
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool {
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool {
         var chat = privateChats[peerID] ?? []
         guard !chat.contains(where: { $0.id == message.id }) else { return false }
         chat.append(message)
@@ -56,7 +56,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
         return true
     }
 
-    private(set) var appendedPublicMessages: [(message: BitchatMessage, conversationID: ConversationID)] = []
+    private(set) var appendedPublicMessages: [(message: YarikMessage, conversationID: ConversationID)] = []
     private(set) var removedMessages: [(messageID: String, cleanupFile: Bool)] = []
     private(set) var untombstonedMediaRemovals: [String] = []
     private(set) var outgoingMediaRemovals: [String] = []
@@ -64,7 +64,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
     private(set) var notifyUIChangedCount = 0
 
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool {
         appendedPublicMessages.append((message, conversationID))
         return true
     }
@@ -106,7 +106,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
 
     // Mesh file transfer
     private(set) var privateFileSends: [(
-        packet: BitchatFilePacket,
+        packet: YarikFilePacket,
         peerID: PeerID,
         transferId: String
     )] = []
@@ -215,7 +215,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
     }
 
     func sendFilePrivate(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
@@ -225,7 +225,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
     }
 
     func sendFilePrivateReceiptRetry(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     ) {
@@ -234,7 +234,7 @@ private final class MockChatMediaTransferContext: ChatMediaTransferContext {
         privateFileReceiptRetryTransferIDs.append(transferId)
     }
 
-    func sendFileBroadcast(_ packet: BitchatFilePacket, transferId: String) {
+    func sendFileBroadcast(_ packet: YarikFilePacket, transferId: String) {
         broadcastFileSends.append(transferId)
     }
 
@@ -271,7 +271,7 @@ private final class PausedVoiceNotePreparer: @unchecked Sendable {
     private var released = false
     private var finished = false
 
-    func prepare(_ url: URL) throws -> BitchatFilePacket {
+    func prepare(_ url: URL) throws -> YarikFilePacket {
         condition.lock()
         started = true
         condition.broadcast()
@@ -282,7 +282,7 @@ private final class PausedVoiceNotePreparer: @unchecked Sendable {
         condition.broadcast()
         condition.unlock()
         let content = Data("voice".utf8)
-        return BitchatFilePacket(
+        return YarikFilePacket(
             fileName: url.lastPathComponent,
             fileSize: UInt64(content.count),
             mimeType: "audio/mp4",
@@ -311,10 +311,10 @@ private final class PausedVoiceNotePreparer: @unchecked Sendable {
 }
 
 private final class StaticVoiceNotePreparer: @unchecked Sendable {
-    private let packet: BitchatFilePacket
+    private let packet: YarikFilePacket
 
     init(fileName: String, content: Data = Data("voice".utf8)) {
-        packet = BitchatFilePacket(
+        packet = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: "audio/mp4",
@@ -322,7 +322,7 @@ private final class StaticVoiceNotePreparer: @unchecked Sendable {
         )
     }
 
-    func prepare(_ _: URL) throws -> BitchatFilePacket {
+    func prepare(_ _: URL) throws -> YarikFilePacket {
         packet
     }
 }
@@ -729,7 +729,7 @@ struct ChatMediaTransferCoordinatorContextTests {
         let child = directory.appendingPathComponent("child.jpg")
         try Data([0x01]).write(to: child)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: UUID().uuidString,
             sender: "Peer",
             content:
@@ -1594,7 +1594,7 @@ struct ChatMediaTransferCoordinatorContextTests {
             context: context,
             prepareVoiceNotePacket: { url in
                 let content = Data("voice".utf8)
-                return BitchatFilePacket(
+                return YarikFilePacket(
                     fileName: url.lastPathComponent,
                     fileSize: UInt64(content.count),
                     mimeType: "audio/mp4",
@@ -1747,7 +1747,7 @@ private final class PausedImagePreparer: @unchecked Sendable {
 
         let data = Data("prepared image".utf8)
         try data.write(to: outputURL, options: .atomic)
-        let packet = BitchatFilePacket(
+        let packet = YarikFilePacket(
             fileName: outputURL.lastPathComponent,
             fileSize: UInt64(data.count),
             mimeType: "image/jpeg",

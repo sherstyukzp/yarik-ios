@@ -1,6 +1,6 @@
 //
 // HexStringTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for Data(hexString:) hex parsing
 //

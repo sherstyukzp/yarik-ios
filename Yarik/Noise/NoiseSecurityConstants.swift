@@ -1,6 +1,6 @@
 //
 // NoiseSecurityConstants.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -17,7 +17,7 @@ enum NoiseSecurityConstants {
     /// added by `NoiseCipherState` around every transport plaintext.
     static let transportCiphertextOverhead = 20
 
-    /// Private files are an explicit BitChat extension to the ordinary Noise
+    /// Private files are an explicit Yarik extension to the ordinary Noise
     /// message-size ceiling. They remain bounded by the same framed-file cap
     /// used by the binary and fragment decoders. Only the `.privateFile`
     /// typed-payload path is allowed to use this larger budget.

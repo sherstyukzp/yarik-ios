@@ -177,13 +177,13 @@ private final class BLEPrivateMediaTransferAdmissionRegistry {
 }
 
 /// BLEService — Bluetooth Mesh Transport
-/// - Emits events exclusively via `BitchatDelegate` for UI.
+/// - Emits events exclusively via `YarikDelegate` for UI.
 /// - ChatViewModel must consume delegate callbacks (`didReceivePublicMessage`, `didReceiveNoisePayload`).
 final class BLEService: NSObject {
     
     // MARK: - Constants
     
-    // Mainnet matches Yarik Android and release bitchat iOS. Define MESH_TESTNET
+    // Mainnet matches Yarik Android and release yarik iOS. Define MESH_TESTNET
     // at compile time for an isolated testnet (upstream used #if DEBUG).
     #if MESH_TESTNET
     static let serviceUUID = CBUUID(string: "F47B5E2D-4A9E-4C5A-9B3F-8E1D2C3A4B5A") // testnet
@@ -278,7 +278,7 @@ final class BLEService: NSObject {
     // announce it depends on; we retain the latest such bundle per owner
     // (bounded) and re-attempt attribution when the announce lands.
     // Engine-confined.
-    private var pendingPrekeyBundles: [PeerID: BitchatPacket] = [:]
+    private var pendingPrekeyBundles: [PeerID: YarikPacket] = [:]
     private static let pendingPrekeyBundleCap = 64
     // Gateway mode: sink for received nostrCarrier packets (set by app
     // wiring, called on the main actor after transport-level checks) and the
@@ -293,7 +293,7 @@ final class BLEService: NSObject {
     #if DEBUG
     // Test-only tap on the outbound pipeline so multi-node tests can ferry
     // packets between in-process service instances.
-    var _test_onOutboundPacket: ((BitchatPacket) -> Void)?
+    var _test_onOutboundPacket: ((YarikPacket) -> Void)?
     /// May block a synthetic CoreBluetooth receive callback immediately
     /// before it hands a packet to `messageQueue`.
     var _test_beforeReceivePacketHandoff: (() -> Void)?
@@ -869,7 +869,7 @@ final class BLEService: NSObject {
         // Create packet with explicit fields so we can sign it
         let sendDate = timestamp ?? Date()
         let sendTimestampMs = UInt64(sendDate.timeIntervalSince1970 * 1000)
-        let basePacket = BitchatPacket(
+        let basePacket = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -898,7 +898,7 @@ final class BLEService: NSObject {
 
     // MARK: Delegates
 
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     weak var eventDelegate: TransportEventDelegate?
     weak var peerEventsDelegate: TransportPeerEventsDelegate?
 
@@ -978,7 +978,7 @@ final class BLEService: NSObject {
     func stopServices() {
         let localIdentity = localIdentityState.snapshot()
         // Send leave message synchronously to ensure delivery
-        var leavePacket = BitchatPacket(
+        var leavePacket = YarikPacket(
             type: MessageType.leave.rawValue,
             senderID: localIdentity.peerIDData,
             recipientID: nil,
@@ -1502,7 +1502,7 @@ final class BLEService: NSObject {
         sendPrivateMessage(content, to: peerID, messageID: messageID)
     }
 
-    func sendFileBroadcast(_ filePacket: BitchatFilePacket, transferId: String) {
+    func sendFileBroadcast(_ filePacket: YarikFilePacket, transferId: String) {
         messageQueue.async { [weak self] in
             guard let self = self else { return }
             guard !self.isPanicSuspended else { return }
@@ -1511,7 +1511,7 @@ final class BLEService: NSObject {
                 return
             }
 
-            var packet = BitchatPacket(
+            var packet = YarikPacket(
                 type: MessageType.fileTransfer.rawValue,
                 senderID: self.myPeerIDData,
                 recipientID: nil,
@@ -1540,7 +1540,7 @@ final class BLEService: NSObject {
     }
 
     func sendFilePrivate(
-        _ filePacket: BitchatFilePacket,
+        _ filePacket: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
@@ -1555,7 +1555,7 @@ final class BLEService: NSObject {
     }
 
     func sendFilePrivateReceiptRetry(
-        _ filePacket: BitchatFilePacket,
+        _ filePacket: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     ) {
@@ -1569,7 +1569,7 @@ final class BLEService: NSObject {
     }
 
     private func sendFilePrivate(
-        _ filePacket: BitchatFilePacket,
+        _ filePacket: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool,
@@ -1792,7 +1792,7 @@ final class BLEService: NSObject {
     /// encrypted private media. The payload is authenticated but visible to
     /// relays, matching the pre-migration behavior until those clients upgrade.
     private func sendSignedLegacyPrivateFile(
-        _ filePacket: BitchatFilePacket,
+        _ filePacket: YarikFilePacket,
         to targetID: PeerID,
         transferId: String
     ) {
@@ -1811,7 +1811,7 @@ final class BLEService: NSObject {
             return
         }
 
-        let unsigned = BitchatPacket(
+        let unsigned = YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: myPeerIDData,
             recipientID: recipientData,
@@ -1884,7 +1884,7 @@ final class BLEService: NSObject {
     }
     
     private func acceptedIngressContext(
-        for packet: BitchatPacket,
+        for packet: YarikPacket,
         claimedSenderID: PeerID,
         boundPeerID: PeerID?,
         linkDescription: String
@@ -1919,7 +1919,7 @@ final class BLEService: NSObject {
         }
     }
 
-    private func isAcceptedIngressPayload(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    private func isAcceptedIngressPayload(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         switch BLEIngressPacketGuard.validatePayload(
             packet,
             from: peerID,
@@ -1956,7 +1956,7 @@ final class BLEService: NSObject {
         SecureLogger.debug("↩️ Dropping BLE self-loopback packet type \(packetType) from \(linkDescription)", category: .session)
     }
 
-    private func recordIngressIfNew(_ packet: BitchatPacket, link: BLEIngressLinkID, peerID: PeerID) -> Bool {
+    private func recordIngressIfNew(_ packet: YarikPacket, link: BLEIngressLinkID, peerID: PeerID) -> Bool {
         ingressLinks.recordIfNew(
             packet,
             link: link,
@@ -1968,7 +1968,7 @@ final class BLEService: NSObject {
     // MARK: - Packet Broadcasting
     
     private func broadcastPacket(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         transferId: String? = nil,
         requiresPrivateMediaAdmission: Bool = false
     ) {
@@ -1988,7 +1988,7 @@ final class BLEService: NSObject {
             }
         }
         // Apply route if recipient exists (centralized route application)
-        let packetToSend: BitchatPacket
+        let packetToSend: YarikPacket
         if let recipientPeerID = PeerID(hexData: packet.recipientID) {
             packetToSend = applyRouteIfAvailable(packet, to: recipientPeerID)
         } else {
@@ -2114,7 +2114,7 @@ final class BLEService: NSObject {
         sendGenericBroadcast(packetToSend, data: data, pad: padForBLE)
     }
 
-    private func sendEncrypted(_ packet: BitchatPacket, data: Data, pad: Bool) {
+    private func sendEncrypted(_ packet: YarikPacket, data: Data, pad: Bool) {
         guard let recipientPeerID = PeerID(hexData: packet.recipientID) else { return }
         var sentEncrypted = false
 
@@ -2161,7 +2161,7 @@ final class BLEService: NSObject {
         }
     }
 
-    private func sendGenericBroadcast(_ packet: BitchatPacket, data: Data, pad: Bool) {
+    private func sendGenericBroadcast(_ packet: YarikPacket, data: Data, pad: Bool) {
         sendOnAllLinks(packet: packet, data: data, pad: pad, directedOnlyPeer: nil)
     }
 
@@ -2262,7 +2262,7 @@ final class BLEService: NSObject {
     /// that own a durable upstream copy must keep it retryable.
     @discardableResult
     private func sendOnAllLinks(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         data: Data,
         pad: Bool,
         directedOnlyPeer: PeerID?,
@@ -2382,7 +2382,7 @@ final class BLEService: NSObject {
     // Directed send helper (unicast to a specific peerID) without altering packet contents
     @discardableResult
     private func sendPacketDirected(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         to peerID: PeerID,
         requireDirectPeerLink: Bool = false,
         requireNoiseAuthenticatedPeerLink: Bool = false
@@ -2402,7 +2402,7 @@ final class BLEService: NSObject {
     }
 
     // MARK: - Directed store-and-forward
-    private func spoolDirectedPacket(_ packet: BitchatPacket, recipientPeerID: PeerID) {
+    private func spoolDirectedPacket(_ packet: YarikPacket, recipientPeerID: PeerID) {
         let msgID = BLEOutboundPacketPolicy.messageID(for: packet)
         messageQueue.async { [weak self] in
             guard let self = self else { return }
@@ -2434,7 +2434,7 @@ final class BLEService: NSObject {
         }
     }
 
-    private func signedSenderDisplayName(for packet: BitchatPacket, from peerID: PeerID) -> String? {
+    private func signedSenderDisplayName(for packet: YarikPacket, from peerID: PeerID) -> String? {
         guard let signature = packet.signature,
               let packetData = packet.toBinaryDataForSigning() else {
             return nil
@@ -2508,7 +2508,7 @@ final class BLEService: NSObject {
         }
     }
 
-    private func decodeArchivedPublicMessage(_ packet: BitchatPacket) -> ArchivedPublicMessage? {
+    private func decodeArchivedPublicMessage(_ packet: YarikPacket) -> ArchivedPublicMessage? {
         guard packet.type == MessageType.message.rawValue,
               let content = String(data: packet.payload, encoding: .utf8)?.trimmedOrNilIfEmpty
         else { return nil }
@@ -2535,7 +2535,7 @@ final class BLEService: NSObject {
         )
     }
 
-    private func handleFileTransfer(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    private func handleFileTransfer(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         fileTransferHandler.handle(packet, from: peerID)
     }
 
@@ -2700,7 +2700,7 @@ final class BLEService: NSObject {
     /// signing key bound by a verified announce. The persisted identity cache
     /// keeps delayed/relayed leaves verifiable after the live registry entry
     /// has aged out.
-    private func handleLeave(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    private func handleLeave(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         let registrySigningKey = onEngine {
             peerRegistry.info(for: peerID)?.signingPublicKey
         }
@@ -2788,7 +2788,7 @@ final class BLEService: NSObject {
         }
         
         // Create packet with signature using the noise private key
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: localIdentity.peerIDData,
             recipientID: nil,
@@ -2838,7 +2838,7 @@ final class BLEService: NSObject {
         guard !envelope.isEmpty else { return }
         messageQueue.async { [weak self] in
             guard let self else { return }
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.groupMessage.rawValue,
                 senderID: Data(hexString: self.myPeerID.id) ?? Data(),
                 recipientID: nil,
@@ -2901,7 +2901,7 @@ final class BLEService: NSObject {
         guard !burstContent.isEmpty else { return }
         messageQueue.async { [weak self] in
             guard let self else { return }
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.voiceFrame.rawValue,
                 senderID: self.myPeerIDData,
                 recipientID: nil,
@@ -2937,19 +2937,19 @@ extension BLEService: GossipSyncManager.Delegate {
     // production engine code only ever queue.async's into the manager
     // (the queue.sync helpers are DEBUG test entry points that run on
     // test threads), so no reverse edge exists.
-    func sendPacket(_ packet: BitchatPacket) {
+    func sendPacket(_ packet: YarikPacket) {
         onEngine {
             broadcastPacket(packet)
         }
     }
 
-    func sendPacket(to peerID: PeerID, packet: BitchatPacket) {
+    func sendPacket(to peerID: PeerID, packet: YarikPacket) {
         onEngine {
             _ = sendPacketDirected(packet, to: peerID)
         }
     }
 
-    func signPacketForBroadcast(_ packet: BitchatPacket) -> BitchatPacket {
+    func signPacketForBroadcast(_ packet: YarikPacket) -> YarikPacket {
         return noiseService.signPacket(packet) ?? packet
     }
     
@@ -3076,7 +3076,7 @@ extension BLEService {
     /// peripheral. The callback itself runs on `bleQueue`, exactly where the
     /// panic radio-stop barrier must linearize it.
     func _test_handlePacketFromBLEQueue(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         fromPeerID: PeerID
     ) {
         bleQueue.async { [weak self] in
@@ -3089,7 +3089,7 @@ extension BLEService {
     /// recording — for a frame arriving on a synthetic link. The
     /// SimulatedMesh harness feeds every node through this, so multi-node
     /// tests exercise the same engine code as CoreBluetooth ingress.
-    func _test_ingestFrame(_ packet: BitchatPacket, link: BLEIngressLinkID) {
+    func _test_ingestFrame(_ packet: YarikPacket, link: BLEIngressLinkID) {
         emitLinkEvent(.frameDecoded(packet, link: link, linkDescription: "Simulated \(link)"))
     }
 
@@ -3127,7 +3127,7 @@ extension BLEService {
         )
     }
 
-    func _test_handlePacket(_ packet: BitchatPacket, fromPeerID: PeerID, preseedPeer: Bool = true, signingPublicKey: Data? = nil) {
+    func _test_handlePacket(_ packet: YarikPacket, fromPeerID: PeerID, preseedPeer: Bool = true, signingPublicKey: Data? = nil) {
         if preseedPeer {
             // Ensure the synthetic peer is known and marked verified for public-message tests
             let normalizedID = PeerID(hexData: packet.senderID)
@@ -3175,7 +3175,7 @@ extension BLEService {
         gossipSyncManager?._hasPrekeyBundle(for: peerID) ?? false
     }
 
-    func _test_acceptsIngress(packet: BitchatPacket, boundPeerID: PeerID?) -> Bool {
+    func _test_acceptsIngress(packet: YarikPacket, boundPeerID: PeerID?) -> Bool {
         let claimedSenderID = PeerID(hexData: packet.senderID)
         guard case .success = BLEIngressLinkRegistry.packetContext(
             for: packet,
@@ -3189,7 +3189,7 @@ extension BLEService {
         return true
     }
 
-    func _test_recordIngressIfNew(packet: BitchatPacket, linkID: String) -> Bool {
+    func _test_recordIngressIfNew(packet: YarikPacket, linkID: String) -> Bool {
         recordIngressIfNew(packet, link: .central(linkID), peerID: PeerID(hexData: packet.senderID))
     }
 
@@ -3351,7 +3351,7 @@ extension BLEService {
     }
 
     func _test_broadcastPrivateMediaPacket(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         transferId: String
     ) {
         broadcastPacket(
@@ -3398,15 +3398,15 @@ extension BLEService {
     /// Compatibility tests use this to model Android's deployed 0x20 file
     /// payload and the short-lived 0x09 prerelease payload without exposing a
     /// production API that can emit the old value.
-    func _test_makeEncryptedNoisePacket(_ typedPayload: Data, to peerID: PeerID) throws -> BitchatPacket {
+    func _test_makeEncryptedNoisePacket(_ typedPayload: Data, to peerID: PeerID) throws -> YarikPacket {
         try makeEncryptedNoisePacket(typedPayload, to: peerID)
     }
 
-    static func _test_shouldRediscoverBitChatService(
+    static func _test_shouldRediscoverYarikService(
         invalidatedServiceUUIDs: [CBUUID],
         cachedServiceUUIDs: [CBUUID]?
     ) -> Bool {
-        shouldRediscoverBitChatService(
+        shouldRediscoverYarikService(
             invalidatedServiceUUIDs: invalidatedServiceUUIDs,
             cachedServiceUUIDs: cachedServiceUUIDs
         )
@@ -3710,7 +3710,7 @@ extension BLEService {
         )
     }
 
-    private func applyRouteIfAvailable(_ packet: BitchatPacket, to recipient: PeerID) -> BitchatPacket {
+    private func applyRouteIfAvailable(_ packet: YarikPacket, to recipient: PeerID) -> YarikPacket {
         let now = Date()
         let route = BLESourceRouteOriginationPolicy.route(
             for: packet,
@@ -3726,7 +3726,7 @@ extension BLEService {
         )
         guard let route else { return packet }
         // Create new packet with route applied and version upgraded to 2
-        let routedPacket = BitchatPacket(
+        let routedPacket = YarikPacket(
             type: packet.type,
             senderID: packet.senderID,
             recipientID: packet.recipientID,
@@ -3779,7 +3779,7 @@ extension BLEService {
                 return
             }
             let nonce = payload.nonce
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.ping.rawValue,
                 senderID: self.myPeerIDData,
                 recipientID: recipientData,
@@ -3833,7 +3833,7 @@ extension BLEService {
     /// response budget on it would let one connected peer rotate forged
     /// sender IDs to emit unbounded pongs. The budget is per physical link;
     /// the pong still goes to the claimed sender (that's the protocol).
-    private func handleMeshPing(_ packet: BitchatPacket, fromLink linkPeerID: PeerID) {
+    private func handleMeshPing(_ packet: YarikPacket, fromLink linkPeerID: PeerID) {
         guard packet.recipientID == myPeerIDData else { return }
         guard let ping = MeshPingPayload.decode(packet.payload) else {
             SecureLogger.debug("⚠️ Malformed ping via \(linkPeerID.id.prefix(8))…", category: .session)
@@ -3849,7 +3849,7 @@ extension BLEService {
             return
         }
         guard let pong = MeshPingPayload(nonce: ping.nonce, originTTL: messageTTL) else { return }
-        let reply = BitchatPacket(
+        let reply = YarikPacket(
             type: MessageType.pong.rawValue,
             senderID: myPeerIDData,
             recipientID: packet.senderID,
@@ -3864,7 +3864,7 @@ extension BLEService {
     /// Resolves a pong against its outstanding probe. The unguessable echoed
     /// nonce plus the sender check bind the reply to the probed peer; hops
     /// come from the pong's TTL decrements on the return path.
-    private func handleMeshPong(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleMeshPong(_ packet: YarikPacket, from peerID: PeerID) {
         guard packet.recipientID == myPeerIDData else { return }
         guard let pong = MeshPingPayload.decode(packet.payload) else { return }
         let pending = onEngine {
@@ -3925,7 +3925,7 @@ extension BLEService {
         )
     }
 
-    private func forwardAlongRouteIfNeeded(_ packet: BitchatPacket) -> Bool {
+    private func forwardAlongRouteIfNeeded(_ packet: YarikPacket) -> Bool {
         let myRoutingData = routingData(for: myPeerID) ?? (myPeerIDData.isEmpty ? nil : myPeerIDData)
         let plan = BLERouteForwardingPolicy.plan(
             for: packet,
@@ -3959,13 +3959,13 @@ extension BLEService {
     /// handshake. An old session keyed only by peer ID is insufficient: a
     /// replayed announce can rebind an attacker's link to that ID.
     /// Engine-confined.
-    private func markNoiseAuthenticatedIngressLink(for packet: BitchatPacket, peerID: PeerID) {
+    private func markNoiseAuthenticatedIngressLink(for packet: YarikPacket, peerID: PeerID) {
         guard let link = ingressLinks.link(for: packet) else { return }
         guard linkBindings.boundPeer(for: link) == peerID else { return }
         linkAuth.markAuthenticated(link, owner: peerID)
     }
 
-    private func isNoiseAuthenticatedIngressLink(for packet: BitchatPacket, peerID: PeerID) -> Bool {
+    private func isNoiseAuthenticatedIngressLink(for packet: YarikPacket, peerID: PeerID) -> Bool {
         guard let link = ingressLinks.link(for: packet) else { return false }
         return linkAuth.isAuthenticated(link, for: peerID) && linkBindings.boundPeer(for: link) == peerID
     }
@@ -4395,7 +4395,7 @@ extension BLEService {
         _ typedPayload: Data,
         to peerID: PeerID,
         requiresAuthenticatedPrivateMediaReceipts: Bool = false
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let encrypted: Data
         let isPrivateFile = NoisePayloadType.isPrivateFile(rawValue: typedPayload.first)
         if isPrivateFile {
@@ -4414,7 +4414,7 @@ extension BLEService {
         } else {
             encrypted = try noiseService.encrypt(typedPayload, for: peerID)
         }
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: myPeerIDData,
             recipientID: Data(hexString: peerID.id),
@@ -4592,8 +4592,8 @@ extension BLEService {
         return prekeyBundleStore.assignPrekey(messageID: messageID, recipientNoiseKey: recipientNoiseKey)
     }
 
-    private func makeCourierPacket(_ payload: Data, to peerID: PeerID) -> BitchatPacket {
-        let packet = BitchatPacket(
+    private func makeCourierPacket(_ payload: Data, to peerID: PeerID) -> YarikPacket {
+        let packet = YarikPacket(
             type: MessageType.courierEnvelope.rawValue,
             senderID: myPeerIDData,
             recipientID: Data(hexString: peerID.id),
@@ -4611,7 +4611,7 @@ extension BLEService {
     /// Handles both courier roles for an incoming envelope addressed to us:
     /// recipient (the rotating tag matches our static key → open and deliver)
     /// or courier (a trusted peer is depositing mail for someone else → store).
-    private func handleCourierEnvelope(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleCourierEnvelope(_ packet: YarikPacket, from peerID: PeerID) {
         // Directed packets only; envelopes addressed elsewhere ride the
         // generic relay path untouched.
         guard packet.recipientID == myPeerIDData else { return }
@@ -4703,7 +4703,7 @@ extension BLEService {
         }
     }
 
-    private func acceptCourierDeposit(_ envelope: CourierEnvelope, from peerID: PeerID, packet: BitchatPacket) {
+    private func acceptCourierDeposit(_ envelope: CourierEnvelope, from peerID: PeerID, packet: YarikPacket) {
         // A deposit must come from its depositor over the direct link: the
         // claimed sender has to be the ingress peer, and the packet signature
         // has to verify against that peer's announced signing key. Otherwise
@@ -4838,7 +4838,7 @@ extension BLEService {
             SecureLogger.error("❌ Failed to build prekey bundle", category: .security)
             return
         }
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.prekeyBundle.rawValue,
             senderID: myPeerIDData,
             recipientID: nil,
@@ -4871,7 +4871,7 @@ extension BLEService {
     /// freshness or poison attribution. Only after that does the packet enter
     /// our own gossip store, so we never help spread a bundle we couldn't
     /// attribute.
-    private func handlePrekeyBundle(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handlePrekeyBundle(_ packet: YarikPacket, from peerID: PeerID) {
         guard let bundle = PrekeyBundle.decode(packet.payload) else {
             SecureLogger.debug("🔑 Ignoring malformed prekey bundle from \(peerID.id.prefix(8))…", category: .security)
             return
@@ -4919,7 +4919,7 @@ extension BLEService {
 
     /// Verify a bundle's inner + outer signatures against the owner's bound
     /// signing key and, on success, cache it and let it enter our gossip store.
-    private func ingestVerifiedPrekeyBundle(_ bundle: PrekeyBundle, packet: BitchatPacket, owner: PeerID, signingKey: Data) {
+    private func ingestVerifiedPrekeyBundle(_ bundle: PrekeyBundle, packet: YarikPacket, owner: PeerID, signingKey: Data) {
         guard noiseService.verifyPrekeyBundleSignature(bundle, signingPublicKey: signingKey),
               noiseService.verifyPacketSignature(packet, publicKey: signingKey) else {
             SecureLogger.debug("🔑 Ignoring prekey bundle without verifiable signature (owner \(owner.id.prefix(8))…)", category: .security)
@@ -4936,7 +4936,7 @@ extension BLEService {
     /// announce, in a barrier ordered after the registry write, so a bundle
     /// stashed before the write is always observed here.
     private func drainPendingPrekeyBundles(for owner: PeerID) {
-        let pending: BitchatPacket? = onEngine {
+        let pending: YarikPacket? = onEngine {
             pendingPrekeyBundles.removeValue(forKey: owner)
         }
         guard let packet = pending,
@@ -4973,7 +4973,7 @@ extension BLEService {
     /// the gateway is not reachable or signing fails.
     func sendNostrCarrier(_ payload: Data, to gatewayPeer: PeerID) -> Bool {
         guard isPeerReachable(gatewayPeer) else { return false }
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.nostrCarrier.rawValue,
             senderID: myPeerIDData,
             recipientID: Data(hexString: gatewayPeer.id),
@@ -4996,7 +4996,7 @@ extension BLEService {
     /// the default TTL. Unsigned at the packet layer — receivers verify the
     /// carried event's own Schnorr signature.
     func broadcastNostrCarrier(_ payload: Data) {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.nostrCarrier.rawValue,
             senderID: myPeerIDData,
             recipientID: nil,
@@ -5013,7 +5013,7 @@ extension BLEService {
     /// Transport-level handling for a received nostrCarrier packet; policy
     /// (verification of the carried event, quotas, loop prevention) lives in
     /// `GatewayService` behind `onNostrCarrierPacket`.
-    private func handleNostrCarrier(_ packet: BitchatPacket, from _: PeerID) {
+    private func handleNostrCarrier(_ packet: YarikPacket, from _: PeerID) {
         let senderID = PeerID(hexData: packet.senderID)
         let directedToUs: Bool
         if let recipientID = packet.recipientID {
@@ -5310,7 +5310,7 @@ extension BLEService {
     }
 
     private func broadcastNoiseHandshake(_ handshakeData: Data, to peerID: PeerID) {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.noiseHandshake.rawValue,
             senderID: myPeerIDData,
             recipientID: Data(hexString: peerID.id),
@@ -5416,7 +5416,7 @@ extension BLEService {
     
     @discardableResult
     private func sendFragmentedPacket(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         pad: Bool,
         maxChunk: Int? = nil,
         directedOnlyPeer: PeerID? = nil,
@@ -5557,7 +5557,7 @@ extension BLEService {
             transferIdentifier = nil
         }
 
-        let sendFragment: (BitchatPacket) -> Bool = { [weak self] fragmentPacket in
+        let sendFragment: (YarikPacket) -> Bool = { [weak self] fragmentPacket in
             guard let self else { return false }
             if request.requireDirectPeerLink, let directedPeer = request.directedPeer {
                 return self.sendPacketDirected(
@@ -5662,7 +5662,7 @@ extension BLEService {
         }
     }
     
-    private func handleFragment(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleFragment(_ packet: YarikPacket, from peerID: PeerID) {
         if DispatchQueue.getSpecific(key: messageQueueKey) != nil {
             fragmentHandler.handle(packet, from: peerID)
         } else {
@@ -5819,7 +5819,7 @@ extension BLEService {
     /// same-batch spoof protection the old bleQueue-side attribution
     /// enforced with a batch-local binding.
     private func ingestDecodedPacket(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         link: BLEIngressLinkID,
         linkDescription: String
     ) {
@@ -5839,7 +5839,7 @@ extension BLEService {
     /// announce — `rebindLinkAfterVerifiedDirectAnnounce`), records
     /// ingress, and hands the packet to the handler pipeline.
     private func attributeAndHandlePacket(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         link: BLEIngressLinkID,
         linkDescription: String
     ) {
@@ -5880,7 +5880,7 @@ extension BLEService {
         handleReceivedPacket(packet, from: context.receivedFromPeerID)
     }
 
-    private func handleReceivedPacket(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleReceivedPacket(_ packet: YarikPacket, from peerID: PeerID) {
         let isNoisePacket = packet.type == MessageType.noiseHandshake.rawValue
             || packet.type == MessageType.noiseEncrypted.rawValue
 
@@ -5931,7 +5931,7 @@ extension BLEService {
     }
 
     private func handleReceivedPacketOnQueue(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         from peerID: PeerID
     ) {
         let context = BLEReceivePipeline.context(for: packet, localPeerID: myPeerID)
@@ -6075,7 +6075,7 @@ extension BLEService {
         return true
     }
 
-    private func scheduleRelayIfNeeded(_ packet: BitchatPacket, senderID: PeerID, messageID: String) {
+    private func scheduleRelayIfNeeded(_ packet: YarikPacket, senderID: PeerID, messageID: String) {
         let degree = peerRegistry.connectedCount
         let decision = BLEReceivePipeline.relayDecision(
             for: packet,
@@ -6102,7 +6102,7 @@ extension BLEService {
         engineScheduler.schedule(after: Double(decision.delayMs) / 1_000, execute: work)
     }
     
-    private func handleAnnounce(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleAnnounce(_ packet: YarikPacket, from peerID: PeerID) {
         let result = announceHandler.handle(packet, from: peerID)
 
         // A capability bit in the public announce is only a discovery hint.
@@ -6184,7 +6184,7 @@ extension BLEService {
     /// retirement — is one engine slot, so no observer can see a
     /// half-applied rotation. Only the physical connection cancels hop to
     /// bleQueue.
-    private func rebindLinkAfterVerifiedDirectAnnounce(_ packet: BitchatPacket, to peerID: PeerID) {
+    private func rebindLinkAfterVerifiedDirectAnnounce(_ packet: YarikPacket, to peerID: PeerID) {
         guard let link = ingressLinks.link(for: packet) else { return }
         let linkUUID: String
         let previousPeerID: PeerID?
@@ -6325,7 +6325,7 @@ extension BLEService {
     /// retired (announce-evidenced, never pre-announce links), at most one
     /// retirement per peer per cooldown window, and the peer keeps a live
     /// link either way.
-    private func retireRedundantPeripheralLinks(_ packet: BitchatPacket, to peerID: PeerID) {
+    private func retireRedundantPeripheralLinks(_ packet: YarikPacket, to peerID: PeerID) {
         let ingressLink = ingressLinks.link(for: packet)
         let now = Date()
         var ingressPeripheralUUID: String?
@@ -6568,7 +6568,7 @@ extension BLEService {
 
     /// Validates and stores an incoming board post or tombstone. Returns
     /// whether the packet is worth relaying onward.
-    private func handleBoardPost(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    private func handleBoardPost(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         guard let wire = BoardWire.decode(from: packet.payload) else {
             SecureLogger.warning("⚠️ Malformed board packet from \(peerID.id.prefix(8))…", category: .session)
             return false
@@ -6600,7 +6600,7 @@ extension BLEService {
         }
         messageQueue.async { [weak self] in
             guard let self = self else { return }
-            let basePacket = BitchatPacket(
+            let basePacket = YarikPacket(
                 type: MessageType.boardPost.rawValue,
                 senderID: Data(hexString: self.myPeerID.id) ?? Data(),
                 recipientID: nil,
@@ -6622,7 +6622,7 @@ extension BLEService {
     }
 
     // Handle REQUEST_SYNC: decode payload and respond with missing packets via sync manager
-    private func handleRequestSync(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleRequestSync(_ packet: YarikPacket, from peerID: PeerID) {
         // REQUEST_SYNC is link-local by design (always sent with ttl 0): a
         // nonzero TTL means a crafted or relayed request, and answering one
         // would let a single small packet fan a full store replay out of
@@ -6652,7 +6652,7 @@ extension BLEService {
     
     // Mention parsing moved to ChatViewModel
     
-    private func handleMessage(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleMessage(_ packet: YarikPacket, from peerID: PeerID) {
         publicMessageHandler.handle(packet, from: peerID)
     }
 
@@ -6709,7 +6709,7 @@ extension BLEService {
     /// gossip backfill and hand the payload to the UI layer, where the group
     /// coordinator decrypts and authenticates against the roster. Non-members
     /// still relay (generic broadcast relay path) but never decode.
-    private func handleGroupMessage(_ packet: BitchatPacket, from _: PeerID) {
+    private func handleGroupMessage(_ packet: YarikPacket, from _: PeerID) {
         let isBroadcastRecipient: Bool = {
             guard let recipient = packet.recipientID else { return true }
             return recipient.count == 8 && recipient.allSatisfy { $0 == 0xFF }
@@ -6731,7 +6731,7 @@ extension BLEService {
     /// valid packet signature is required before any audio reaches the UI).
     /// Returns whether the packet was accepted; rejected packets must not be
     /// relayed either, or spoofed 0x29 floods would still amplify.
-    private func handleVoiceFrame(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    private func handleVoiceFrame(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         guard peerID != myPeerID else { return false }
         guard BLEPacketFreshnessPolicy.isBroadcastRecipient(packet.recipientID) else { return false }
         guard !BLEPacketFreshnessPolicy.isStale(
@@ -6771,7 +6771,7 @@ extension BLEService {
         return true
     }
 
-    private func handleNoiseHandshake(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleNoiseHandshake(_ packet: YarikPacket, from peerID: PeerID) {
         let result = noisePacketHandler.handleHandshakeWithResult(
             packet,
             from: peerID
@@ -6787,7 +6787,7 @@ extension BLEService {
         }
     }
 
-    private func handleNoiseEncrypted(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func handleNoiseEncrypted(_ packet: YarikPacket, from peerID: PeerID) {
         noisePacketHandler.handleEncrypted(packet, from: peerID)
     }
 

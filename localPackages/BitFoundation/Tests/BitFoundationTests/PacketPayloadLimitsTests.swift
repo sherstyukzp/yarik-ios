@@ -75,7 +75,7 @@ struct PacketPayloadLimitsTests {
         // before fragmenting. Reassembly must never cut off such a frame.
         for type in Self.cappedTypes + [MessageType.fileTransfer.rawValue] {
             let cap = PacketPayloadLimits.maxPayloadBytes(forType: type)
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: type,
                 senderID: Data(repeating: 0x11, count: BinaryProtocol.senderIDSize),
                 recipientID: Data(repeating: 0x22, count: BinaryProtocol.recipientIDSize),
@@ -104,7 +104,7 @@ struct PacketPayloadLimitsTests {
         ).encode())
         #expect(payload.count * 2 <= PacketPayloadLimits.maxPayloadBytes(forType: MessageType.announceV2.rawValue))
 
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announceV2.rawValue,
             senderID: Data(repeating: 0x11, count: BinaryProtocol.senderIDSize),
             recipientID: nil,
@@ -128,7 +128,7 @@ struct PacketPayloadLimitsTests {
     }
 
     private func encodeUncompressed(type: UInt8, payloadSize: Int, version: UInt8) throws -> Data {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: type,
             senderID: Data(repeating: 0x11, count: BinaryProtocol.senderIDSize),
             recipientID: nil,
@@ -146,7 +146,7 @@ struct PacketPayloadLimitsTests {
     /// Encodes a maximally compressible payload and checks that the frame
     /// really went out compressed, so decode exercises the inflate path.
     private func encodeCompressed(type: UInt8, payloadSize: Int, version: UInt8) throws -> Data {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: type,
             senderID: Data(repeating: 0x11, count: BinaryProtocol.senderIDSize),
             recipientID: nil,

@@ -10,7 +10,7 @@ struct BLEOutboundLinkPlan: Equatable {
 
 enum BLEOutboundLinkPlanner {
     static func plan(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         dataCount: Int,
         peripheralIDs: [String],
         peripheralWriteLimits: [Int],
@@ -79,7 +79,7 @@ enum BLEOutboundLinkPlanner {
         )
     }
 
-    static func directedPeerHint(for packet: BitchatPacket, explicitPeer: PeerID?) -> PeerID? {
+    static func directedPeerHint(for packet: YarikPacket, explicitPeer: PeerID?) -> PeerID? {
         if let explicitPeer { return explicitPeer }
         if let recipient = PeerID(str: packet.recipientID?.hexEncodedString()), !recipient.isEmpty {
             return recipient

@@ -4,7 +4,7 @@ import Foundation
 enum BLEOutboundPacketPolicy {
     private static let fragmentFrameOverhead = 13 + 8 + 8 + 13
 
-    static func messageID(for packet: BitchatPacket) -> String {
+    static func messageID(for packet: YarikPacket) -> String {
         BLEIngressLinkRegistry.messageID(for: packet)
     }
 
@@ -28,7 +28,7 @@ enum BLEOutboundPacketPolicy {
         }
     }
 
-    static func priority(for packet: BitchatPacket, data _: Data) -> BLEOutboundWritePriority {
+    static func priority(for packet: YarikPacket, data _: Data) -> BLEOutboundWritePriority {
         guard let messageType = MessageType(rawValue: packet.type) else { return .low }
         switch messageType {
         case .fragment:

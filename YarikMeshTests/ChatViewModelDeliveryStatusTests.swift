@@ -1,6 +1,6 @@
 //
 // ChatViewModelDeliveryStatusTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for ChatViewModel delivery status state machine.
 //
@@ -47,7 +47,7 @@ struct ChatViewModelDeliveryStatusTests {
         let messageID = "test-msg-1"
 
         // Setup: create a message with .read status
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -81,7 +81,7 @@ struct ChatViewModelDeliveryStatusTests {
         let peerID = PeerID(str: "0102030405060708")
         let messageID = "test-msg-carried"
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -111,7 +111,7 @@ struct ChatViewModelDeliveryStatusTests {
         let peerID = PeerID(str: "0102030405060708")
         let messageID = "test-msg-carried-sending"
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -160,7 +160,7 @@ struct ChatViewModelDeliveryStatusTests {
         let peerID = PeerID(str: "0102030405060708")
         let messageID = "test-msg-carried-delivered"
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -189,7 +189,7 @@ struct ChatViewModelDeliveryStatusTests {
         let messageID = "test-msg-2"
 
         // Setup: create a message with .sent status
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -218,7 +218,7 @@ struct ChatViewModelDeliveryStatusTests {
         let (viewModel, transport) = makeTestableViewModel()
         let peerID = PeerID(str: "0102030405060708")
         let messageID = "test-msg-identical"
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -244,7 +244,7 @@ struct ChatViewModelDeliveryStatusTests {
         let messageID = "test-msg-3"
 
         // Setup: create a message with .delivered status
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -277,7 +277,7 @@ struct ChatViewModelDeliveryStatusTests {
         let messageID = "test-msg-4"
 
         // Setup: create a message with .sent status
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Test message",
@@ -315,7 +315,7 @@ struct ChatViewModelDeliveryStatusTests {
 
         viewModel.seedPrivateChat(
             [
-                BitchatMessage(
+                YarikMessage(
                     id: messageID,
                     sender: viewModel.nickname,
                     content: "Keep retrying",
@@ -379,7 +379,7 @@ struct ChatViewModelDeliveryStatusTests {
         let coordinator = ChatMediaTransferCoordinator(
             context: viewModel,
             prepareVoiceNotePacket: { _ in
-                BitchatFilePacket(
+                YarikFilePacket(
                     fileName: fileName,
                     fileSize: UInt64(content.count),
                     mimeType: "audio/mp4",
@@ -442,7 +442,7 @@ struct ChatViewModelDeliveryStatusTests {
         let (viewModel, transport) = makeTestableViewModel()
         let peerID = PeerID(str: "0102030405060709")
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "keep-receipt",
             sender: viewModel.nickname,
             content: "Keep me",
@@ -529,7 +529,7 @@ struct ChatViewModelDeliveryStatusTests {
         let messageID = "public-msg-1"
 
         // Setup: add a message to public timeline with .sending status
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Public message",
@@ -559,7 +559,7 @@ struct ChatViewModelDeliveryStatusTests {
         let secondPeerID = PeerID(str: "1112131415161718")
 
         viewModel.seedPublicMessages([
-            BitchatMessage(
+            YarikMessage(
                 id: messageID,
                 sender: viewModel.nickname,
                 content: "Public copy",
@@ -571,7 +571,7 @@ struct ChatViewModelDeliveryStatusTests {
             )
         ])
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: messageID,
                 sender: viewModel.nickname,
                 content: "Private copy A",
@@ -584,7 +584,7 @@ struct ChatViewModelDeliveryStatusTests {
             )
         ], for: firstPeerID)
         viewModel.seedPrivateChat([
-            BitchatMessage(
+            YarikMessage(
                 id: messageID,
                 sender: viewModel.nickname,
                 content: "Private copy B",
@@ -613,7 +613,7 @@ struct ChatViewModelDeliveryStatusTests {
         let (viewModel, transport) = makeTestableViewModel()
         let peerID = PeerID(str: "0102030405060708")
         let messageID = "reordered-msg-1"
-        let olderMessage = BitchatMessage(
+        let olderMessage = YarikMessage(
             id: "older-msg",
             sender: viewModel.nickname,
             content: "Older message",
@@ -624,7 +624,7 @@ struct ChatViewModelDeliveryStatusTests {
             senderPeerID: transport.myPeerID,
             deliveryStatus: .sent
         )
-        let targetMessage = BitchatMessage(
+        let targetMessage = YarikMessage(
             id: messageID,
             sender: viewModel.nickname,
             content: "Target message",
@@ -665,7 +665,7 @@ struct ChatViewModelDeliveryStatusTests {
         let peerID = PeerID(str: "0102030405060708")
         let droppedID = "router-drop-0"
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: droppedID,
             sender: viewModel.nickname,
             content: "Will be dropped",
@@ -701,7 +701,7 @@ struct ChatViewModelDeliveryStatusTests {
         let peerID = PeerID(str: "0102030405060708")
         let droppedID = "router-drop-delivered"
 
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: droppedID,
             sender: viewModel.nickname,
             content: "Already delivered",
@@ -838,7 +838,7 @@ private final class MockChatDeliveryContext: ChatDeliveryContext {
 
     private let localPeerID = PeerID(str: "aabbccddeeff0011")
 
-    private func contextMessages(for peerID: PeerID) -> [BitchatMessage] {
+    private func contextMessages(for peerID: PeerID) -> [YarikMessage] {
         store.conversationsByID[.directPeer(peerID)]?.messages ?? []
     }
 }
@@ -848,8 +848,8 @@ private func makePrivateMessage(
     id: String,
     status: DeliveryStatus,
     timestamp: Date = Date()
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "me",
         content: "Test message",
@@ -867,8 +867,8 @@ private func makePublicMessage(
     id: String,
     status: DeliveryStatus,
     timestamp: Date = Date()
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "me",
         content: "Public message",

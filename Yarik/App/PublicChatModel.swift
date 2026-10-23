@@ -14,7 +14,7 @@ final class PublicChatModel: ObservableObject {
     @Published private(set) var activeChannel: ChannelID
 
     /// The active public conversation's timeline.
-    var messages: [BitchatMessage] { activeConversation.messages }
+    var messages: [YarikMessage] { activeConversation.messages }
 
     private let conversations: ConversationStore
     private var activeConversation: Conversation

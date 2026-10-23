@@ -17,7 +17,7 @@ struct BLEAnnounceHandlerTests {
         var dedupSeenIDs: Set<String> = []
         var shouldEmitReconnectLogResult = true
 
-        var verifySignatureCalls: [(packet: BitchatPacket, signingPublicKey: Data)] = []
+        var verifySignatureCalls: [(packet: YarikPacket, signingPublicKey: Data)] = []
         var barrierCount = 0
         var upsertCalls: [(peerID: PeerID, announcement: AnnouncementPacket, isConnected: Bool, now: Date)] = []
         var reconnectLogQueries: [PeerID] = []
@@ -26,7 +26,7 @@ struct BLEAnnounceHandlerTests {
         var dedupContainsQueries: [String] = []
         var dedupMarkedIDs: [String] = []
         var uiEventDeliveries: [(peerID: PeerID, notifyPeerConnected: Bool, scheduleInitialSync: Bool)] = []
-        var trackedPackets: [BitchatPacket] = []
+        var trackedPackets: [YarikPacket] = []
         var announceBacks = 0
         var afterglowDelays: [TimeInterval] = []
     }
@@ -231,7 +231,7 @@ struct BLEAnnounceHandlerTests {
     func malformedAnnounceIsNoOp() {
         let now = Date(timeIntervalSince1970: 1_000)
         let peerID = PeerID(str: "1122334455667788")
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: peerID.id) ?? Data(),
             recipientID: nil,
@@ -741,7 +741,7 @@ struct BLEAnnounceHandlerTests {
         )
         let handler = BLEAnnounceHandler(environment: environment)
 
-        func makeSignedAnnounce(nickname: String, signer: NoiseEncryptionService) throws -> BitchatPacket {
+        func makeSignedAnnounce(nickname: String, signer: NoiseEncryptionService) throws -> YarikPacket {
             let announcement = AnnouncementPacket(
                 nickname: nickname,
                 noisePublicKey: victimNoiseKey,
@@ -749,7 +749,7 @@ struct BLEAnnounceHandlerTests {
                 directNeighbors: nil
             )
             let payload = try #require(announcement.encode())
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.announce.rawValue,
                 senderID: Data(hexString: peerID.id) ?? Data(),
                 recipientID: nil,
@@ -862,7 +862,7 @@ struct BLEAnnounceHandlerTests {
         }
         let handler = BLEAnnounceHandler(environment: makeEnvironment(identityManager: identityManager))
 
-        func makeSignedAnnounce(nickname: String, signer: NoiseEncryptionService) throws -> BitchatPacket {
+        func makeSignedAnnounce(nickname: String, signer: NoiseEncryptionService) throws -> YarikPacket {
             let announcement = AnnouncementPacket(
                 nickname: nickname,
                 noisePublicKey: victimNoiseKey,
@@ -870,7 +870,7 @@ struct BLEAnnounceHandlerTests {
                 directNeighbors: nil
             )
             let payload = try #require(announcement.encode())
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.announce.rawValue,
                 senderID: Data(hexString: peerID.id) ?? Data(),
                 recipientID: nil,
@@ -950,7 +950,7 @@ struct BLEAnnounceHandlerTests {
         signature: Data?,
         ttl: UInt8 = TransportConfig.messageTTLDefault,
         directNeighbors: [Data]? = nil
-    ) throws -> BitchatPacket {
+    ) throws -> YarikPacket {
         let announcement = AnnouncementPacket(
             nickname: "Alice",
             noisePublicKey: noisePublicKey,
@@ -959,7 +959,7 @@ struct BLEAnnounceHandlerTests {
         )
         let payload = try #require(announcement.encode())
 
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.announce.rawValue,
             senderID: Data(hexString: peerID.id) ?? Data(),
             recipientID: nil,

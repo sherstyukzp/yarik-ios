@@ -1,6 +1,6 @@
 //
 // ChatPeerIdentityCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatPeerIdentityCoordinator` against a mock
 // `ChatPeerIdentityContext` — proving the coordinator works without a
@@ -25,7 +25,7 @@ import BitFoundation
 @MainActor
 private final class MockChatPeerIdentityContext: ChatPeerIdentityContext {
     // Conversation state
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
     var unreadPrivateMessages: Set<PeerID> = []
     var selectedPrivateChatPeer: PeerID?
     var selectedPrivateChatFingerprint: String?
@@ -85,14 +85,14 @@ private final class MockChatPeerIdentityContext: ChatPeerIdentityContext {
 
     // Unified peer service
     var connectedPeers: Set<PeerID> = []
-    var peersByID: [PeerID: BitchatPeer] = [:]
+    var peersByID: [PeerID: YarikPeer] = [:]
     var blockedPeers: Set<PeerID> = []
     var fingerprintsByPeerID: [PeerID: String] = [:]
     var peerIDsByNickname: [String: PeerID] = [:]
     var ephemeralPeerIDsByNoiseKey: [Data: PeerID] = [:]
     private(set) var toggledFavoritePeers: [PeerID] = []
 
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer? { peersByID[peerID] }
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer? { peersByID[peerID] }
     func unifiedIsBlocked(_ peerID: PeerID) -> Bool { blockedPeers.contains(peerID) }
     func unifiedToggleFavorite(_ peerID: PeerID) { toggledFavoritePeers.append(peerID) }
     func unifiedFingerprint(for peerID: PeerID) -> String? { fingerprintsByPeerID[peerID] }
@@ -239,8 +239,8 @@ private func makePrivateMessage(
     sender: String = "alice",
     timestamp: Date = Date(),
     senderPeerID: PeerID? = nil
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: sender,
         content: "hello",

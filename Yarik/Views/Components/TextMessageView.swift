@@ -1,6 +1,6 @@
 //
 // TextMessageView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -15,9 +15,9 @@ struct TextMessageView: View {
     @ThemedPalette private var palette
     @EnvironmentObject private var conversationUIModel: ConversationUIModel
 
-    let message: BitchatMessage
+    let message: YarikMessage
     /// Value snapshot of the message's mutable delivery status, captured at
-    /// construction. `BitchatMessage` is a reference type mutated in place by
+    /// construction. `YarikMessage` is a reference type mutated in place by
     /// `ConversationStore`, and SwiftUI compares reference-typed view fields
     /// by identity — so a status-only change (e.g. delivered → read) on the
     /// SAME instance would otherwise compare "unchanged" and this row's body
@@ -27,7 +27,7 @@ struct TextMessageView: View {
     @State private var expandedMessageIDs: Set<String> = []
     @State private var showDeliveryDetail = false
 
-    init(message: BitchatMessage) {
+    init(message: YarikMessage) {
         self.message = message
         self.deliveryStatus = message.deliveryStatus
     }
@@ -45,14 +45,14 @@ struct TextMessageView: View {
                 let isExpanded = expandedMessageIDs.contains(message.id)
                 if message.isPrivate {
                     Image(systemName: "lock.fill")
-                        .font(.bitchatSystem(size: 8))
+                        .font(.yarikSystem(size: 8))
                         .foregroundColor(Color.orange.opacity(0.75))
                         .padding(.trailing, 4)
                         .accessibilityHidden(true)
                 }
                 if conversationUIModel.showsVerifiedSeal(for: message) {
                     Image(systemName: "checkmark.seal.fill")
-                        .font(.bitchatSystem(size: 8))
+                        .font(.yarikSystem(size: 8))
                         .foregroundColor(Color.green.opacity(0.85))
                         .padding(.trailing, 4)
                         .accessibilityLabel(
@@ -61,7 +61,7 @@ struct TextMessageView: View {
                 }
                 if message.isBridged {
                     Image(systemName: "network")
-                        .font(.bitchatSystem(size: 8))
+                        .font(.yarikSystem(size: 8))
                         .foregroundColor(Color.cyan.opacity(0.75))
                         .padding(.trailing, 4)
                         .accessibilityLabel(
@@ -97,14 +97,14 @@ struct TextMessageView: View {
             if message.isPrivate && conversationUIModel.isSentByCurrentUser(message),
                deliveryStatus != .notSentYet {
                 if case .failed = deliveryStatus {
-                    Text(verbatim: deliveryStatus.bitchatDescription)
-                        .bitchatFont(size: 11)
+                    Text(verbatim: deliveryStatus.yarikDescription)
+                        .yarikFont(size: 11)
                         .foregroundColor(Color.red.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, 2)
                 } else if showDeliveryDetail {
-                    Text(verbatim: deliveryStatus.bitchatDescription)
-                        .bitchatFont(size: 11)
+                    Text(verbatim: deliveryStatus.yarikDescription)
+                        .yarikFont(size: 11)
                         .foregroundColor(palette.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, 2)
@@ -119,7 +119,7 @@ struct TextMessageView: View {
                     if isExpanded { expandedMessageIDs.remove(message.id) }
                     else { expandedMessageIDs.insert(message.id) }
                 }
-                .bitchatFont(size: 11, weight: .medium)
+                .yarikFont(size: 11, weight: .medium)
                 .foregroundColor(palette.accentBlue)
                 .padding(.top, 4)
             }
@@ -153,7 +153,7 @@ struct TextMessageView: View {
 }
 
 // Wrapped in #if DEBUG because the preview depends on _PreviewHelpers
-// (PreviewKeychainManager, BitchatMessage.preview), a development asset
+// (PreviewKeychainManager, YarikMessage.preview), a development asset
 // excluded from archive builds.
 #if DEBUG
 #Preview {

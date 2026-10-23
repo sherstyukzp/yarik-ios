@@ -1,6 +1,6 @@
 //
 // MockTransport.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Mock Transport implementation for unit testing ChatViewModel.
 // This is free and unencumbered software released into the public domain.
@@ -21,7 +21,7 @@ final class MockTransport: Transport, PrivateMediaDeletionPersisting,
 
     // MARK: - Protocol Properties
 
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     weak var eventDelegate: TransportEventDelegate?
     weak var peerEventsDelegate: TransportPeerEventsDelegate?
 
@@ -37,8 +37,8 @@ final class MockTransport: Transport, PrivateMediaDeletionPersisting,
     private(set) var sentReadReceipts: [(receipt: ReadReceipt, peerID: PeerID)] = []
     private(set) var sentDeliveryAcks: [(messageID: String, peerID: PeerID)] = []
     private(set) var sentFavoriteNotifications: [(peerID: PeerID, isFavorite: Bool)] = []
-    private(set) var sentBroadcastFiles: [(packet: BitchatFilePacket, transferID: String)] = []
-    private(set) var sentPrivateFiles: [(packet: BitchatFilePacket, peerID: PeerID, transferID: String)] = []
+    private(set) var sentBroadcastFiles: [(packet: YarikFilePacket, transferID: String)] = []
+    private(set) var sentPrivateFiles: [(packet: YarikFilePacket, peerID: PeerID, transferID: String)] = []
     private(set) var sentPrivateFileLegacyAllowances: [Bool] = []
     private(set) var cancelledTransfers: [String] = []
     private(set) var deletedPrivateMediaMessageIDBatches: [[String]] = []
@@ -204,12 +204,12 @@ final class MockTransport: Transport, PrivateMediaDeletionPersisting,
         sentDeliveryAcks.append((messageID, peerID))
     }
 
-    func sendFileBroadcast(_ packet: BitchatFilePacket, transferId: String) {
+    func sendFileBroadcast(_ packet: YarikFilePacket, transferId: String) {
         sentBroadcastFiles.append((packet, transferId))
     }
 
     func sendFilePrivate(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
@@ -240,9 +240,9 @@ final class MockTransport: Transport, PrivateMediaDeletionPersisting,
         cancelledTransfers.append(transferId)
     }
 
-    private(set) var sentFileReceiptRetries: [(BitchatFilePacket, PeerID, String)] = []
+    private(set) var sentFileReceiptRetries: [(YarikFilePacket, PeerID, String)] = []
     func sendFilePrivateReceiptRetry(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     ) {
@@ -413,7 +413,7 @@ final class MockTransport: Transport, PrivateMediaDeletionPersisting,
     }
 
     /// Simulates receiving a message
-    func simulateIncomingMessage(_ message: BitchatMessage) {
+    func simulateIncomingMessage(_ message: YarikMessage) {
         delegate?.didReceiveMessage(message)
     }
 

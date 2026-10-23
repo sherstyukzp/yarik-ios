@@ -30,7 +30,7 @@ struct PrivateMediaReconnectRetryLimits: Equatable {
 private struct PrivateMediaReconnectRetryRecord {
     let messageID: String
     let peerID: PeerID
-    let packet: BitchatFilePacket
+    let packet: YarikFilePacket
     var receiptSessionGeneration: UUID
     var createdAt: Date
     var retryCount: Int
@@ -80,11 +80,11 @@ protocol ChatMediaTransferContext: AnyObject {
     // MARK: Message state
     /// Appends a private message via the single-writer store intent.
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool
     /// Appends a public message via the single-writer store intent
     /// (immediate: outgoing media placeholders must render without batching).
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool
     func removeMessage(withID messageID: String, cleanupFile: Bool)
     /// Removes a media bubble with direction-scoped cleanup instead of the
     /// broad compatibility cleanup path.
@@ -117,17 +117,17 @@ protocol ChatMediaTransferContext: AnyObject {
     )
     func cancelLegacyPrivateMediaConsent(transferId: String, messageID: String)
     func sendFilePrivate(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
     )
     func sendFilePrivateReceiptRetry(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     )
-    func sendFileBroadcast(_ packet: BitchatFilePacket, transferId: String)
+    func sendFileBroadcast(_ packet: YarikFilePacket, transferId: String)
     func cancelTransfer(_ transferId: String)
     /// Receiver-side stable-ID deletion commit. Implementations must invoke
     /// completion only after the entire batch is durably tombstoned.
@@ -201,7 +201,7 @@ extension ChatViewModel: ChatMediaTransferContext {
     }
 
     func sendFilePrivate(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         allowLegacyFallback: Bool
@@ -215,7 +215,7 @@ extension ChatViewModel: ChatMediaTransferContext {
     }
 
     func sendFilePrivateReceiptRetry(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String
     ) {
@@ -226,7 +226,7 @@ extension ChatViewModel: ChatMediaTransferContext {
         )
     }
 
-    func sendFileBroadcast(_ packet: BitchatFilePacket, transferId: String) {
+    func sendFileBroadcast(_ packet: YarikFilePacket, transferId: String) {
         fileTransport?.sendFileBroadcast(packet, transferId: transferId)
     }
 
@@ -255,7 +255,7 @@ extension ChatViewModel: ChatMediaTransferContext {
     /// reserved by a receipt/deletion transaction stays on disk for bounded
     /// quota cleanup instead. Must run after the bubbles were removed; a
     /// surviving reference in any conversation keeps the payload.
-    func cleanupLegacyIncomingMediaPayloads(for messages: [BitchatMessage]) {
+    func cleanupLegacyIncomingMediaPayloads(for messages: [YarikMessage]) {
         guard let cleanup =
                 meshService as? any PrivateMediaDeletionPersisting else {
             return
@@ -385,7 +385,7 @@ extension ChatViewModel: ChatMediaTransferContext {
     }
 
     private func isIncomingPrivateMessage(
-        _ message: BitchatMessage
+        _ message: YarikMessage
     ) -> Bool {
         if let senderPeerID = message.senderPeerID {
             return senderPeerID.toShort() != meshService.myPeerID.toShort()
@@ -395,7 +395,7 @@ extension ChatViewModel: ChatMediaTransferContext {
     }
 
     private func incomingMediaRelativePath(
-        for message: BitchatMessage
+        for message: YarikMessage
     ) -> String? {
         let categories: [MimeType.Category] = [.audio, .image, .file]
         guard let category = categories.first(where: {
@@ -494,7 +494,7 @@ final class ChatMediaTransferCoordinator {
     private unowned let context: any ChatMediaTransferContext
     private let prepareImagePacket: @Sendable (URL) throws -> ChatPreparedImage
     private let imagePreparationBarrier = ImagePreparationBarrier()
-    private let prepareVoiceNotePacket: @Sendable (URL) throws -> BitchatFilePacket
+    private let prepareVoiceNotePacket: @Sendable (URL) throws -> YarikFilePacket
     private let reconnectRetryLimits: PrivateMediaReconnectRetryLimits
     private let now: () -> Date
     private let transferIDFactory: (String) -> String
@@ -529,7 +529,7 @@ final class ChatMediaTransferCoordinator {
         prepareImagePacket: @escaping @Sendable (URL) throws -> ChatPreparedImage = {
             try ChatMediaPreparation.prepareImagePacket(from: $0)
         },
-        prepareVoiceNotePacket: @escaping @Sendable (URL) throws -> BitchatFilePacket = {
+        prepareVoiceNotePacket: @escaping @Sendable (URL) throws -> YarikFilePacket = {
             try ChatMediaPreparation.prepareVoiceNotePacket(at: $0)
         },
         reconnectRetryLimits: PrivateMediaReconnectRetryLimits =
@@ -783,12 +783,12 @@ final class ChatMediaTransferCoordinator {
         content: String,
         targetPeer: PeerID?,
         messageID: String? = nil
-    ) -> BitchatMessage {
+    ) -> YarikMessage {
         let timestamp = Date()
-        let message: BitchatMessage
+        let message: YarikMessage
 
         if let peerID = targetPeer {
-            message = BitchatMessage(
+            message = YarikMessage(
                 id: messageID,
                 sender: context.nickname,
                 content: content,
@@ -803,7 +803,7 @@ final class ChatMediaTransferCoordinator {
             context.appendPrivateMessage(message, to: peerID)
         } else {
             let (displayName, senderPeerID) = context.currentPublicSender()
-            message = BitchatMessage(
+            message = YarikMessage(
                 sender: displayName,
                 content: content,
                 timestamp: timestamp,
@@ -824,7 +824,7 @@ final class ChatMediaTransferCoordinator {
     }
 
     private func beginPrivateMediaSend(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         messageID: String
@@ -839,7 +839,7 @@ final class ChatMediaTransferCoordinator {
     }
 
     private func continuePrivateMediaSend(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         to peerID: PeerID,
         transferId: String,
         messageID: String,
@@ -1094,7 +1094,7 @@ final class ChatMediaTransferCoordinator {
         }
     }
 
-    func cleanupLocalFile(forMessage message: BitchatMessage) {
+    func cleanupLocalFile(forMessage message: YarikMessage) {
         cleanupLocalFile(
             forMessage: message,
             directions: ["outgoing", "incoming"],
@@ -1105,7 +1105,7 @@ final class ChatMediaTransferCoordinator {
     /// `/clear` may cancel an outgoing message before receiver tombstones are
     /// committed. Restrict cleanup to that message's outgoing directory so a
     /// same-name incoming payload cannot be removed prematurely.
-    func cleanupOutgoingLocalFile(forMessage message: BitchatMessage) {
+    func cleanupOutgoingLocalFile(forMessage message: YarikMessage) {
         cleanupLocalFile(
             forMessage: message,
             directions: ["outgoing"],
@@ -1116,7 +1116,7 @@ final class ChatMediaTransferCoordinator {
     /// Receiver cleanup runs only after any required tombstone commit. Keep it
     /// scoped to the parsed media category and incoming directory so unrelated
     /// outgoing or cross-category payloads with the same basename survive.
-    func cleanupIncomingLocalFile(forMessage message: BitchatMessage) {
+    func cleanupIncomingLocalFile(forMessage message: YarikMessage) {
         cleanupLocalFile(
             forMessage: message,
             directions: ["incoming"],
@@ -1125,7 +1125,7 @@ final class ChatMediaTransferCoordinator {
     }
 
     private func cleanupLocalFile(
-        forMessage message: BitchatMessage,
+        forMessage message: YarikMessage,
         directions: [String],
         searchAllCategories: Bool
     ) {
@@ -1424,7 +1424,7 @@ private extension ChatMediaTransferCoordinator {
     }
 
     func retainForReconnectRetryIfEligible(
-        _ packet: BitchatFilePacket,
+        _ packet: YarikFilePacket,
         peerID: PeerID,
         messageID: String,
         activeTransferID: String

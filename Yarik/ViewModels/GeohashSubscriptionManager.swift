@@ -26,7 +26,7 @@ protocol GeohashSubscriptionContext: AnyObject {
     var nostrRelayManager: NostrRelayManager? { get }
 
     // MARK: Public timeline & pipeline
-    var messages: [BitchatMessage] { get }
+    var messages: [YarikMessage] { get }
     /// Commits any batched-but-unflushed public messages to the store so a
     /// channel switch never strands them in the pipeline buffer.
     func flushPublicMessagePipeline()

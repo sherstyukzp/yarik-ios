@@ -1,6 +1,6 @@
 //
 // BridgePeopleList.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -19,10 +19,10 @@ struct PeopleSectionHeader: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.bitchatSystem(size: 10))
+                .font(.yarikSystem(size: 10))
                 .foregroundColor(iconColor)
             Text(verbatim: title)
-                .bitchatFont(size: 11, weight: .semibold)
+                .yarikFont(size: 11, weight: .semibold)
                 .foregroundColor(palette.secondary)
         }
         .padding(.horizontal)
@@ -61,7 +61,7 @@ struct BridgePeopleList: View {
                 ForEach(bridgeService.bridgedParticipants) { person in
                     HStack(spacing: 4) {
                         Text(person.displayName)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(palette.primary)
                         Spacer()
                     }

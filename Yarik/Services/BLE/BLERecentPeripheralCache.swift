@@ -1,6 +1,6 @@
 import Foundation
 
-/// Remembers recently seen bitchat peripherals (fresh discoveries and dropped
+/// Remembers recently seen yarik peripherals (fresh discoveries and dropped
 /// links) so the service can arm pending background connections against them
 /// when the app leaves the foreground. Generic over the peripheral type so
 /// the eviction/expiry logic is testable without CoreBluetooth.

@@ -1,6 +1,6 @@
 //
 // PublicMessagePipelineTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for PublicMessagePipeline batching, content dedup, and per-message
 // conversation routing. Ordering and ID dedup live in the ConversationStore
@@ -17,13 +17,13 @@ import BitFoundation
 private final class TestPipelineDelegate: PublicMessagePipelineDelegate {
     private let dedupService = MessageDeduplicationService()
     /// Commits in arrival-at-commit order, per conversation.
-    private(set) var committed: [(message: BitchatMessage, conversationID: ConversationID)] = []
+    private(set) var committed: [(message: YarikMessage, conversationID: ConversationID)] = []
     /// Message IDs the commit rejects (simulates the store's ID dedup).
     var rejectedMessageIDs: Set<String> = []
     private(set) var recordedContentKeys: [String] = []
     private(set) var batchingStates: [Bool] = []
 
-    func messages(in conversationID: ConversationID) -> [BitchatMessage] {
+    func messages(in conversationID: ConversationID) -> [YarikMessage] {
         committed.filter { $0.conversationID == conversationID }.map(\.message)
     }
 
@@ -40,13 +40,13 @@ private final class TestPipelineDelegate: PublicMessagePipelineDelegate {
         recordedContentKeys.append(key)
     }
 
-    func pipeline(_: PublicMessagePipeline, commit message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func pipeline(_: PublicMessagePipeline, commit message: YarikMessage, to conversationID: ConversationID) -> Bool {
         guard !rejectedMessageIDs.contains(message.id) else { return false }
         committed.append((message, conversationID))
         return true
     }
 
-    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: BitchatMessage) {}
+    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: YarikMessage) {}
 
     func pipelineSetBatchingState(_: PublicMessagePipeline, isBatching: Bool) {
         batchingStates.append(isBatching)
@@ -54,8 +54,8 @@ private final class TestPipelineDelegate: PublicMessagePipelineDelegate {
 }
 
 @MainActor
-private func makeMessage(id: String, content: String, timestamp: Date) -> BitchatMessage {
-    BitchatMessage(
+private func makeMessage(id: String, content: String, timestamp: Date) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "A",
         content: content,

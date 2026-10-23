@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The sheet behind the "bitchat/" logo: a segmented Settings/Info surface.
+/// The sheet behind the "yarik/" logo: a segmented Settings/Info surface.
 /// Settings gathers every user preference (appearance, voice, connectivity
 /// toggles, panic wipe); Info keeps the about content (how-to, features,
 /// privacy, symbols legend).
@@ -66,7 +66,7 @@ struct AppInfoView: View {
             static let languageTitle = String(localized: "app_info.settings.language.title", defaultValue: "LANGUAGE", comment: "Section header (uppercase) for the app language picker in settings")
             static let languagePickerLabel = String(localized: "app_info.settings.language.picker_label", defaultValue: "app language", comment: "Label of the app language picker row in settings")
             static let languageSystem = String(localized: "app_info.settings.language.system", defaultValue: "system default", comment: "Menu option that clears the in-app language override so the app follows the device language")
-            static let languageRestartNote = String(localized: "app_info.settings.language.restart_note", defaultValue: "restart bitchat to apply the new language", comment: "Caption shown after the user picks a different app language; the change takes effect on next launch")
+            static let languageRestartNote = String(localized: "app_info.settings.language.restart_note", defaultValue: "restart yarik to apply the new language", comment: "Caption shown after the user picks a different app language; the change takes effect on next launch")
 
             static let bridgeTitle = String(localized: "app_info.settings.bridge.title", defaultValue: "mesh bridge", comment: "Title of the mesh bridge toggle in settings")
             static let bridgeSubtitle = String(localized: "app_info.settings.bridge.subtitle", defaultValue: "joins nearby mesh islands over the internet: what you say in the mesh channel also reaches people in your area beyond radio range, and their messages appear here marked with the network glyph. while you have internet, your device also carries bridge and location-channel traffic for phones around you that have none.", comment: "Subtitle explaining what the mesh bridge toggle does")
@@ -120,7 +120,7 @@ struct AppInfoView: View {
 
             static let dangerTitle = String(localized: "app_info.settings.danger.title", defaultValue: "DANGER ZONE", comment: "Section header (uppercase) for destructive actions in settings")
             static let panicButton = String(localized: "app_info.settings.danger.panic_button", defaultValue: "panic wipe", comment: "Button in the settings danger zone that erases all local data after confirmation")
-            static let panicNote = String(localized: "app_info.settings.danger.panic_note", defaultValue: "erases all messages, keys, and identity. triple-tapping the bitchat/ logo does the same, instantly.", comment: "Caption under the panic wipe button explaining what it does and the triple-tap shortcut")
+            static let panicNote = String(localized: "app_info.settings.danger.panic_note", defaultValue: "erases all messages, keys, and identity. triple-tapping the yarik/ logo does the same, instantly.", comment: "Caption under the panic wipe button explaining what it does and the triple-tap shortcut")
             static let panicConfirmTitle = String(localized: "app_info.settings.danger.panic_confirm_title", defaultValue: "wipe all data?", comment: "Title of the confirmation dialog before a panic wipe")
             static let panicConfirmAction = String(localized: "app_info.settings.danger.panic_confirm_action", defaultValue: "wipe everything", comment: "Destructive confirmation button that performs the panic wipe")
         }
@@ -342,7 +342,7 @@ struct AppInfoView: View {
                         appThemeRawValue = theme.rawValue
                     } label: {
                         Text(theme.displayNameKey)
-                            .bitchatFont(size: 13, weight: selectedTheme == theme ? .semibold : .regular)
+                            .yarikFont(size: 13, weight: selectedTheme == theme ? .semibold : .regular)
                             .foregroundColor(selectedTheme == theme ? palette.accent : secondaryTextColor)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
@@ -380,11 +380,11 @@ struct AppInfoView: View {
                     } label: {
                         HStack {
                             Text(Strings.Settings.languagePickerLabel)
-                                .bitchatFont(size: 12, weight: .semibold)
+                                .yarikFont(size: 12, weight: .semibold)
                                 .foregroundColor(textColor)
                             Spacer()
                             Text(languageOverride.isEmpty ? Strings.Settings.languageSystem : AppLanguageSettings.endonym(for: languageOverride))
-                                .bitchatFont(size: 12)
+                                .yarikFont(size: 12)
                                 .foregroundColor(palette.accent)
                             Image(systemName: "chevron.up.chevron.down")
                                 .font(.system(size: 10))
@@ -396,7 +396,7 @@ struct AppInfoView: View {
 
                     if showLanguageRestartNote {
                         Text(Strings.Settings.languageRestartNote)
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(secondaryTextColor)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -437,7 +437,7 @@ struct AppInfoView: View {
                     // bridge peer advertising a cell).
                     if bridgeService.isEnabled {
                         Text(bridgeService.activeCell.map(Strings.Settings.bridgeCell) ?? Strings.Settings.bridgeNoCell)
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(secondaryTextColor)
                     }
                 }
@@ -453,7 +453,7 @@ struct AppInfoView: View {
                     // subtitle everyone skims.
                     if !locationChannelsModel.userTorEnabled {
                         Text(verbatim: Strings.Settings.torOffWarning)
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(palette.alertRed)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -491,7 +491,7 @@ struct AppInfoView: View {
                 case .authorized:
                     Button(action: SystemSettings.location.open) {
                         Text("location_channels.action.remove_access")
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.alertRed)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
@@ -502,7 +502,7 @@ struct AppInfoView: View {
                 case .notDetermined:
                     Button(action: { locationChannelsModel.enableLocationChannels() }) {
                         Text("location_channels.action.request_permissions")
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.accent)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
@@ -513,11 +513,11 @@ struct AppInfoView: View {
                 case .denied, .restricted:
                     settingsCard {
                         Text("location_channels.permission_denied")
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(secondaryTextColor)
                         Button("location_channels.action.open_settings", action: SystemSettings.location.open)
                             .buttonStyle(.plain)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.accent)
                     }
                 }
@@ -550,7 +550,7 @@ struct AppInfoView: View {
 
                     Button(action: { showPanicConfirmation = true }) {
                         Text(Strings.Settings.panicButton)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.alertRed)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
@@ -570,7 +570,7 @@ struct AppInfoView: View {
                     }
 
                     Text(Strings.Settings.panicNote)
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(secondaryTextColor)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -612,10 +612,10 @@ struct AppInfoView: View {
         settingsCard {
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: Strings.Settings.relaysTitle)
-                    .bitchatFont(size: 12, weight: .semibold)
+                    .yarikFont(size: 12, weight: .semibold)
                     .foregroundColor(textColor)
                 Text(verbatim: Strings.Settings.relaysSubtitle)
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(secondaryTextColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -623,13 +623,13 @@ struct AppInfoView: View {
             ForEach(NostrRelayManager.builtInRelayURLs.sorted(), id: \.self) { relay in
                 HStack(spacing: 6) {
                     Text(verbatim: relay)
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(secondaryTextColor)
                         .lineLimit(1)
                         .truncationMode(.middle)
                     Spacer(minLength: 4)
                     Text(verbatim: Strings.Settings.relayBuiltIn)
-                        .bitchatFont(size: 10)
+                        .yarikFont(size: 10)
                         .foregroundColor(secondaryTextColor)
                 }
             }
@@ -637,7 +637,7 @@ struct AppInfoView: View {
             ForEach(customRelays, id: \.self) { relay in
                 HStack(spacing: 6) {
                     Text(verbatim: relay)
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(textColor)
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -658,7 +658,7 @@ struct AppInfoView: View {
                 HStack(spacing: 6) {
                     TextField(Strings.Settings.relayPlaceholder, text: $relayInput)
                         .textFieldStyle(.plain)
-                        .bitchatFont(size: 11)
+                        .yarikFont(size: 11)
                         .foregroundColor(textColor)
                         .autocorrectionDisabled(true)
                         #if os(iOS)
@@ -668,7 +668,7 @@ struct AppInfoView: View {
                         .onSubmit(addRelay)
                     Button(action: addRelay) {
                         Text(verbatim: Strings.Settings.relayAdd)
-                            .bitchatFont(size: 11, weight: .semibold)
+                            .yarikFont(size: 11, weight: .semibold)
                             .foregroundColor(palette.accent)
                     }
                     .buttonStyle(.plain)
@@ -678,7 +678,7 @@ struct AppInfoView: View {
 
             if let relayError {
                 Text(verbatim: relayError)
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(palette.alertRed)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -728,10 +728,10 @@ struct AppInfoView: View {
         Toggle(isOn: isOn) {
             VStack(alignment: .leading, spacing: 2) {
                 title
-                    .bitchatFont(size: 12, weight: .semibold)
+                    .yarikFont(size: 12, weight: .semibold)
                     .foregroundColor(textColor)
                 subtitle
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .foregroundColor(secondaryTextColor)
             }
         }
@@ -746,11 +746,11 @@ struct AppInfoView: View {
             // Header
             VStack(alignment: .center, spacing: 8) {
                 Text(Strings.appName)
-                    .bitchatFont(size: 32, weight: .bold)
+                    .yarikFont(size: 32, weight: .bold)
                     .foregroundColor(textColor)
 
                 Text(Strings.tagline)
-                    .bitchatFont(size: 16)
+                    .yarikFont(size: 16)
                     .foregroundColor(secondaryTextColor)
             }
             .frame(maxWidth: .infinity)
@@ -761,7 +761,7 @@ struct AppInfoView: View {
                 SectionHeader(Strings.HowToUse.title)
 
                 Text(verbatim: Strings.HowToUse.paragraph)
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .foregroundColor(textColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -777,7 +777,7 @@ struct AppInfoView: View {
                         HStack(spacing: 0) {
                             FeatureRow(info: Strings.Network.topology)
                             Image(systemName: "chevron.right")
-                                .font(.bitchatSystem(size: 12))
+                                .font(.yarikSystem(size: 12))
                                 .foregroundColor(secondaryTextColor)
                         }
                         .contentShape(Rectangle())
@@ -824,12 +824,12 @@ struct AppInfoView: View {
                 ForEach(Strings.Legend.items, id: \.icon) { item in
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: item.icon)
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                             .foregroundColor(item.color ?? textColor)
                             .frame(width: 30)
 
                         Text(item.text)
-                            .bitchatFont(size: 13)
+                            .yarikFont(size: 13)
                             .foregroundColor(secondaryTextColor)
                             .fixedSize(horizontal: false, vertical: true)
 
@@ -881,7 +881,7 @@ struct SectionHeader: View {
 
     var body: some View {
         title
-            .bitchatFont(size: 16, weight: .bold)
+            .yarikFont(size: 16, weight: .bold)
             .foregroundColor(textColor)
             .padding(.top, 8)
     }
@@ -898,17 +898,17 @@ struct FeatureRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: info.icon)
-                .font(.bitchatSystem(size: 20))
+                .font(.yarikSystem(size: 20))
                 .foregroundColor(textColor)
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 4) {
                 info.title
-                    .bitchatFont(size: 14, weight: .semibold)
+                    .yarikFont(size: 14, weight: .semibold)
                     .foregroundColor(textColor)
 
                 info.description
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(secondaryTextColor)
                     .fixedSize(horizontal: false, vertical: true)
             }

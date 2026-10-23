@@ -37,10 +37,10 @@ protocol ChatVerificationContext: AnyObject {
     func notifyUIChanged()
 
     // MARK: Peers
-    var unifiedPeers: [BitchatPeer] { get }
-    var unifiedFavorites: [BitchatPeer] { get }
+    var unifiedPeers: [YarikPeer] { get }
+    var unifiedFavorites: [YarikPeer] { get }
     /// The peer's current entry in the unified peer service, if known.
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer?
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer?
     func unifiedFingerprint(for peerID: PeerID) -> String?
     func resolveNickname(for peerID: PeerID) -> String
     func cachedStablePeerID(for shortPeerID: PeerID) -> PeerID?
@@ -99,11 +99,11 @@ extension ChatViewModel: ChatVerificationContext {
         vouchCoordinator.vouchToConnectedVerifiedPeers()
     }
 
-    var unifiedPeers: [BitchatPeer] {
+    var unifiedPeers: [YarikPeer] {
         unifiedPeerService.peers
     }
 
-    var unifiedFavorites: [BitchatPeer] {
+    var unifiedFavorites: [YarikPeer] {
         unifiedPeerService.favorites
     }
 

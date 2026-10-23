@@ -14,7 +14,7 @@ struct BLEFileTransferHandlerTests {
         var signatureVerifyCount = 0
         var signedNameQueries: [PeerID] = []
         var blockedPeers: Set<PeerID> = []
-        var trackedPackets: [BitchatPacket] = []
+        var trackedPackets: [YarikPacket] = []
         var quotaReservations: [Int] = []
         var saveCalls: [(data: Data, preferredName: String?, subdirectory: String, fallbackExtension: String?, defaultPrefix: String)] = []
         var receiptStates: [String: BLEPrivateMediaReceiptState] = [:]
@@ -24,7 +24,7 @@ struct BLEFileTransferHandlerTests {
         var finishedIncomingFileDeliveries: [URL] = []
         var lastSeenUpdates: [PeerID] = []
         var deliveryAcks: [(messageID: String, peerID: PeerID)] = []
-        var deliveredMessages: [BitchatMessage] = []
+        var deliveredMessages: [YarikMessage] = []
         var shouldAcceptDelivery = true
         var deliveryOutcome = TransportEventDeliveryOutcome.accepted
         var saveOverride: ((
@@ -420,7 +420,7 @@ struct BLEFileTransferHandlerTests {
         #expect(recorder.deliveredMessages.count == 1)
         #expect(recorder.deliveredMessages.first?.isPrivate == true)
         #expect(recorder.deliveredMessages.first?.id.hasPrefix("media-") == false)
-        // Must be explicit: BitchatMessage defaults private messages to
+        // Must be explicit: YarikMessage defaults private messages to
         // .sending, which the media views render as an in-flight send
         // (empty reveal mask, disabled reveal tap).
         #expect(recorder.deliveredMessages.first?.deliveryStatus == .delivered(to: "Me", at: Date(timeIntervalSince1970: 900)))
@@ -433,7 +433,7 @@ struct BLEFileTransferHandlerTests {
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF]) + Data(repeating: 0x41, count: 128)
         let fileName = "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg"
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -503,7 +503,7 @@ struct BLEFileTransferHandlerTests {
         let content = Data([0xFF, 0xD8, 0xFF, 0xD9])
         let fileName =
             "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg"
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -621,7 +621,7 @@ struct BLEFileTransferHandlerTests {
         recorder.peers = [remotePeerID: makePeerInfo(remotePeerID, nickname: "Alice", isVerified: true)]
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF]) + Data(repeating: 0x41, count: 128)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "photo.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -652,7 +652,7 @@ struct BLEFileTransferHandlerTests {
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF]) + Data(repeating: 0x41, count: 128)
         let fileName = "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg"
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -701,7 +701,7 @@ struct BLEFileTransferHandlerTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let store = BLEIncomingFileStore(baseDirectory: root)
         let content = Data([0xFF, 0xD8, 0xFF, 0xD9])
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -773,7 +773,7 @@ struct BLEFileTransferHandlerTests {
         let recorder = Recorder()
         recorder.peers = [remotePeerID: makePeerInfo(remotePeerID, nickname: "Alice", isVerified: true)]
         let content = Data([0xFF, 0xD8, 0xFF]) + Data(repeating: 0x41, count: 128)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -839,7 +839,7 @@ struct BLEFileTransferHandlerTests {
         recorder.receiptStates[messageID] = .unavailable
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF, 0xD9])
-        let payload = try #require(BitchatFilePacket(
+        let payload = try #require(YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -869,7 +869,7 @@ struct BLEFileTransferHandlerTests {
         recorder.receiptCommitSucceeds = false
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF, 0xD9])
-        let payload = try #require(BitchatFilePacket(
+        let payload = try #require(YarikFilePacket(
             fileName: "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -896,7 +896,7 @@ struct BLEFileTransferHandlerTests {
         recorder.peers = [remotePeerID: makePeerInfo(remotePeerID, nickname: "Alice", isVerified: true)]
         let handler = makeHandler(recorder: recorder)
         let content = Data([0xFF, 0xD8, 0xFF]) + Data(repeating: 0x41, count: 128)
-        let file = BitchatFilePacket(
+        let file = YarikFilePacket(
             fileName: "img_20260725_105708_1CC2760D-76AA-40C3-8013-C7FAA6C2EF99.jpg",
             fileSize: UInt64(content.count),
             mimeType: "image/jpeg",
@@ -935,7 +935,7 @@ struct BLEFileTransferHandlerTests {
         let handler = makeHandler(recorder: recorder)
         let oversizedCount = FileTransferLimits.maxPayloadBytes + 1
         var length = UInt32(oversizedCount).bigEndian
-        var payload = Data([0x04]) // BitchatFilePacket CONTENT TLV
+        var payload = Data([0x04]) // YarikFilePacket CONTENT TLV
         withUnsafeBytes(of: &length) { payload.append(contentsOf: $0) }
         payload.append(Data(repeating: 0x41, count: oversizedCount))
 
@@ -958,7 +958,7 @@ struct BLEFileTransferHandlerTests {
         recorder.peers = [remotePeerID: makePeerInfo(remotePeerID, nickname: "Alice", isVerified: true, signingPublicKey: sampleSigningKey)]
         recorder.signatureVerifies = true
         let handler = makeHandler(recorder: recorder)
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: Data(hexString: remotePeerID.id) ?? Data(),
             recipientID: nil,
@@ -1008,7 +1008,7 @@ struct BLEFileTransferHandlerTests {
         var payload = Data([0x04])
         withUnsafeBytes(of: &length) { payload.append(contentsOf: $0) }
         payload.append(Data(repeating: 0x41, count: oversizedCount))
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: Data(hexString: remotePeerID.id) ?? Data(),
             recipientID: nil,
@@ -1443,15 +1443,15 @@ struct BLEFileTransferHandlerTests {
         recipientID: Data? = nil,
         fileName: String = "sample",
         hasSignature: Bool = true
-    ) throws -> BitchatPacket {
-        let filePacket = BitchatFilePacket(
+    ) throws -> YarikPacket {
+        let filePacket = YarikFilePacket(
             fileName: fileName,
             fileSize: UInt64(content.count),
             mimeType: mimeType,
             content: content
         )
         let payload = try #require(filePacket.encode())
-        return BitchatPacket(
+        return YarikPacket(
             type: MessageType.fileTransfer.rawValue,
             senderID: Data(hexString: sender.id) ?? Data(),
             recipientID: recipientID,

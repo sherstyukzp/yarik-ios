@@ -1,6 +1,6 @@
 //
 // TestHelpers.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -22,8 +22,8 @@ final class TestHelpers {
         isPrivate: Bool = false,
         recipientNickname: String? = nil,
         mentions: [String]? = nil
-    ) -> BitchatMessage {
-        return BitchatMessage(
+    ) -> YarikMessage {
+        return YarikMessage(
             id: UUID().uuidString,
             sender: sender,
             content: content,
@@ -44,8 +44,8 @@ final class TestHelpers {
         payload: Data = Data("test payload".utf8),
         signature: Data? = nil,
         ttl: UInt8 = 3
-    ) -> BitchatPacket {
-        return BitchatPacket(
+    ) -> YarikPacket {
+        return YarikPacket(
             type: type,
             senderID: Data(senderID.id.utf8),
             recipientID: recipientID?.id.data(using: .utf8),
@@ -107,7 +107,7 @@ extension ChatViewModel {
     /// (upsert keeps re-seeding with updated copies working the way the old
     /// dictionary assignment did).
     @MainActor
-    func seedPrivateChat(_ messages: [BitchatMessage], for peerID: PeerID) {
+    func seedPrivateChat(_ messages: [YarikMessage], for peerID: PeerID) {
         _ = conversations.conversation(for: .directPeer(peerID))
         for message in messages {
             conversations.upsertByID(message, in: .directPeer(peerID))
@@ -119,7 +119,7 @@ extension ChatViewModel {
     /// `ConversationStore` intents (upsert keeps re-seeding with updated
     /// copies working the way the old array assignment did).
     @MainActor
-    func seedPublicMessages(_ messages: [BitchatMessage], for channel: ChannelID = .mesh) {
+    func seedPublicMessages(_ messages: [YarikMessage], for channel: ChannelID = .mesh) {
         for message in messages {
             conversations.upsertByID(message, in: ConversationID(channelID: channel))
         }

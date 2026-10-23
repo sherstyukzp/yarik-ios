@@ -1,6 +1,6 @@
 //
 // MeshSightingsTracker.swift
-// bitchat
+// yarik
 //
 // Privacy-preserving daily tally of mesh peers that came within radio range,
 // so an empty timeline can say "3 devices passed within range today" instead

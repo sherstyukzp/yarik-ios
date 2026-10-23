@@ -1,6 +1,6 @@
 //
 // ChatViewModel+Nostr.swift
-// bitchat
+// yarik
 //
 // Geohash and Nostr logic for ChatViewModel
 //

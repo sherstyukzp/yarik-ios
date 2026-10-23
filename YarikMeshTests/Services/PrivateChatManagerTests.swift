@@ -1,6 +1,6 @@
 //
 // PrivateChatManagerTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for PrivateChatManager read receipt and selection behavior.
 // Message storage lives in the single-writer ConversationStore; the
@@ -28,7 +28,7 @@ struct PrivateChatManagerTests {
         let peerID = PeerID(str: "00000000000000AA")
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-1",
                 sender: "Peer",
                 content: "Hi",
@@ -60,7 +60,7 @@ struct PrivateChatManagerTests {
         transport.reachablePeers.insert(peerID)
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-2",
                 sender: "Peer",
                 content: "Hi",
@@ -89,7 +89,7 @@ struct PrivateChatManagerTests {
         let peerID = PeerID(str: "00000000000000CC")
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-fallback",
                 sender: "Peer",
                 content: "Hi",
@@ -123,7 +123,7 @@ struct PrivateChatManagerTests {
         transport.reachablePeers.insert(peerID)
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-double",
                 sender: "Peer",
                 content: "Hi",
@@ -157,7 +157,7 @@ struct PrivateChatManagerTests {
         let peerID = PeerID(str: "00000000000000DF")
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "pm-unroutable",
                 sender: "Peer",
                 content: "Hi",
@@ -203,7 +203,7 @@ struct PrivateChatManagerTests {
         try? await Task.sleep(nanoseconds: 50_000_000)
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "stable-msg",
                 sender: "Alice",
                 content: "Hello from stable",
@@ -234,7 +234,7 @@ struct PrivateChatManagerTests {
         let tempPeerID = PeerID(nostr_: "0000000000000000000000000000000000000000000000000000000000000042")
 
         store.append(
-            BitchatMessage(
+            YarikMessage(
                 id: "geo-msg",
                 sender: "Alice",
                 content: "Geo hello",
@@ -265,7 +265,7 @@ struct PrivateChatManagerTests {
         let peerID = PeerID(str: "00000000000000DD")
 
         let seeded = [
-            BitchatMessage(
+            YarikMessage(
                 id: "sent-read",
                 sender: "Me",
                 content: "One",
@@ -276,7 +276,7 @@ struct PrivateChatManagerTests {
                 senderPeerID: transport.myPeerID,
                 deliveryStatus: .read(by: "Peer", at: Date())
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "sent-delivered",
                 sender: "Me",
                 content: "Two",
@@ -287,7 +287,7 @@ struct PrivateChatManagerTests {
                 senderPeerID: transport.myPeerID,
                 deliveryStatus: .delivered(to: "Peer", at: Date())
             ),
-            BitchatMessage(
+            YarikMessage(
                 id: "sent-failed",
                 sender: "Me",
                 content: "Three",
@@ -320,8 +320,8 @@ struct PrivateChatManagerTests {
         let peerID = PeerID(str: "00000000000000EE")
         let base = Date(timeIntervalSince1970: 10)
 
-        func message(_ id: String, _ content: String, offset: TimeInterval) -> BitchatMessage {
-            BitchatMessage(
+        func message(_ id: String, _ content: String, offset: TimeInterval) -> YarikMessage {
+            YarikMessage(
                 id: id,
                 sender: "Peer",
                 content: content,

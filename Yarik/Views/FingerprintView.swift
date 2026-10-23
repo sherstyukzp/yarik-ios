@@ -1,6 +1,6 @@
 //
 // FingerprintView.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -69,7 +69,7 @@ struct FingerprintView: View {
             // Header
             HStack {
                 Text(Strings.title)
-                    .bitchatFont(size: 16, weight: .bold)
+                    .yarikFont(size: 16, weight: .bold)
                     .foregroundColor(textColor)
                 
                 Spacer()
@@ -83,17 +83,17 @@ struct FingerprintView: View {
                 HStack {
                     if let icon = fingerprintState.encryptionStatus.icon {
                         Image(systemName: icon)
-                            .font(.bitchatSystem(size: 20))
+                            .font(.yarikSystem(size: 20))
                             .foregroundColor(fingerprintState.encryptionStatus == .noiseVerified ? Color.green : textColor)
                     }
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text(fingerprintState.peerNickname)
-                            .bitchatFont(size: 18, weight: .semibold)
+                            .yarikFont(size: 18, weight: .semibold)
                             .foregroundColor(textColor)
                         
                         Text(fingerprintState.encryptionStatus.description)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(textColor.opacity(0.7))
                     }
                     
@@ -106,11 +106,11 @@ struct FingerprintView: View {
                 if fingerprintState.canEditLocalAlias {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(verbatim: Strings.localAlias)
-                            .bitchatFont(size: 12, weight: .bold)
+                            .yarikFont(size: 12, weight: .bold)
                             .foregroundColor(textColor.opacity(0.7))
 
                         TextField(Strings.localAliasPlaceholder, text: $aliasDraft)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(textColor)
                             .padding(10)
                             .background(palette.secondary.opacity(0.1))
@@ -118,7 +118,7 @@ struct FingerprintView: View {
                             .onSubmit { commitAlias() }
 
                         Text(verbatim: Strings.localAliasHint)
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(textColor.opacity(0.6))
                     }
                 }
@@ -126,12 +126,12 @@ struct FingerprintView: View {
                 // Their fingerprint
                 VStack(alignment: .leading, spacing: 8) {
                     Text(Strings.theirFingerprint)
-                        .bitchatFont(size: 12, weight: .bold)
+                        .yarikFont(size: 12, weight: .bold)
                         .foregroundColor(textColor.opacity(0.7))
                     
                     if let fingerprint = fingerprintState.theirFingerprint {
                         Text(formatFingerprint(fingerprint))
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(textColor)
                             .multilineTextAlignment(.leading)
                             .lineLimit(nil)
@@ -152,7 +152,7 @@ struct FingerprintView: View {
                             }
                     } else {
                         Text(Strings.handshakePending)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(Color.orange)
                             .padding()
                     }
@@ -161,11 +161,11 @@ struct FingerprintView: View {
                 // My fingerprint
                 VStack(alignment: .leading, spacing: 8) {
                     Text(Strings.yourFingerprint)
-                        .bitchatFont(size: 12, weight: .bold)
+                        .yarikFont(size: 12, weight: .bold)
                         .foregroundColor(textColor.opacity(0.7))
                     
                     Text(formatFingerprint(fingerprintState.myFingerprint))
-                        .bitchatFont(size: 14)
+                        .yarikFont(size: 14)
                         .foregroundColor(textColor)
                         .multilineTextAlignment(.leading)
                         .lineLimit(nil)
@@ -193,23 +193,23 @@ struct FingerprintView: View {
                     VStack(spacing: 8) {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark.seal")
-                                .font(.bitchatSystem(size: 14))
+                                .font(.yarikSystem(size: 14))
                                 .foregroundColor(.teal)
                             Text(Strings.vouchedBadge)
-                                .bitchatFont(size: 14, weight: .bold)
+                                .yarikFont(size: 14, weight: .bold)
                                 .foregroundColor(.teal)
                         }
                         .frame(maxWidth: .infinity)
 
                         Text(Strings.vouchedBy(fingerprintState.voucherCount))
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(textColor.opacity(0.7))
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
 
                         if !fingerprintState.voucherNames.isEmpty {
                             Text(fingerprintState.voucherNames.joined(separator: ", "))
-                                .bitchatFont(size: 12)
+                                .yarikFont(size: 12)
                                 .foregroundColor(textColor.opacity(0.7))
                                 .multilineTextAlignment(.center)
                                 .lineLimit(nil)
@@ -225,7 +225,7 @@ struct FingerprintView: View {
                 if fingerprintState.canToggleVerification {
                     VStack(spacing: 12) {
                         Text(fingerprintState.isVerified ? Strings.verifiedBadge : Strings.notVerifiedBadge)
-                            .bitchatFont(size: 14, weight: .bold)
+                            .yarikFont(size: 14, weight: .bold)
                             .foregroundColor(fingerprintState.isVerified ? Color.green : Color.orange)
                             .frame(maxWidth: .infinity)
                         
@@ -236,7 +236,7 @@ struct FingerprintView: View {
                                 Text(Strings.verifyHint(fingerprintState.peerNickname))
                             }
                         }
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(textColor.opacity(0.7))
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -249,7 +249,7 @@ struct FingerprintView: View {
                                 dismiss()
                             }) {
                                 Text(Strings.markVerified)
-                                    .bitchatFont(size: 14, weight: .bold)
+                                    .yarikFont(size: 14, weight: .bold)
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 10)
@@ -263,7 +263,7 @@ struct FingerprintView: View {
                                 dismiss()
                             }) {
                                 Text(Strings.removeVerification)
-                                    .bitchatFont(size: 14, weight: .bold)
+                                    .yarikFont(size: 14, weight: .bold)
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 10)

@@ -67,7 +67,7 @@ struct ChatUnreadStateResolverTests {
             nostrPeerID: nil,
             nickname: "Alice"
         )
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: "alice",
             content: "hi",
             timestamp: Date(timeIntervalSince1970: 1),
@@ -95,7 +95,7 @@ struct ChatUnreadStateResolverTests {
             nostrPeerID: nil,
             nickname: "Alice"
         )
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: "bob",
             content: "hi",
             timestamp: Date(timeIntervalSince1970: 1),

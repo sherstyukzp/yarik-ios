@@ -1,6 +1,6 @@
 //
 // PacketPayloadCapInteropTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -115,7 +115,7 @@ struct PacketPayloadCapInteropTests {
         // inflation a broadcast file can ask for.
         var content = Data([0xFF, 0xD8, 0xFF, 0xE0])
         content.append(Data(count: FileTransferLimits.maxPayloadBytes - content.count))
-        let file = BitchatFilePacket(fileName: "photo.jpg", fileSize: nil, mimeType: "image/jpeg", content: content)
+        let file = YarikFilePacket(fileName: "photo.jpg", fileSize: nil, mimeType: "image/jpeg", content: content)
         let payload = try #require(file.encode())
         let packet = makePacket(type: .fileTransfer, payload: payload, version: 2)
         #expect(try roundTripIsCompressed(packet))
@@ -193,9 +193,9 @@ struct PacketPayloadCapInteropTests {
             senderNickname: String(repeating: "n", count: 50),
             senderSigningKey: Data(repeating: 0x51, count: 32),
             timestampMs: 1_740_000_000_000,
-            groupID: Data(repeating: 0x52, count: BitchatGroup.groupIDLength),
+            groupID: Data(repeating: 0x52, count: YarikGroup.groupIDLength),
             epoch: 1,
-            key: Data(repeating: 0x53, count: BitchatGroup.keyLength),
+            key: Data(repeating: 0x53, count: YarikGroup.keyLength),
             sign: { [signature] _ in signature }
         )
     }
@@ -220,8 +220,8 @@ struct PacketPayloadCapInteropTests {
 
     // MARK: - Helpers
 
-    private func makePacket(type: MessageType, payload: Data, version: UInt8 = 1) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(type: MessageType, payload: Data, version: UInt8 = 1) -> YarikPacket {
+        YarikPacket(
             type: type.rawValue,
             senderID: senderID,
             recipientID: nil,
@@ -235,7 +235,7 @@ struct PacketPayloadCapInteropTests {
 
     /// Encodes as on the wire (padded), decodes, and checks the payload
     /// survives; returns whether the frame went out compressed.
-    private func roundTripIsCompressed(_ packet: BitchatPacket) throws -> Bool {
+    private func roundTripIsCompressed(_ packet: YarikPacket) throws -> Bool {
         let frame = try #require(packet.toBinaryData())
         let decoded = try #require(BinaryProtocol.decode(frame), "type \(packet.type) failed to decode")
         #expect(decoded.payload == packet.payload)

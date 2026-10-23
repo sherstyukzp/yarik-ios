@@ -20,9 +20,9 @@ struct BLEQueueContractTests {
 
     private static let bleRoot = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()  // Services
-        .deletingLastPathComponent()  // bitchatTests
+        .deletingLastPathComponent()  // YarikMeshTests
         .deletingLastPathComponent()  // repo root
-        .appendingPathComponent("bitchat/Services/BLE")
+        .appendingPathComponent("yarik/Services/BLE")
 
     private struct Line {
         let file: String

@@ -12,7 +12,7 @@ enum ChatUnreadStateResolver {
     static func hasUnreadMessages(
         for context: ChatUnreadPeerContext,
         unreadPrivateMessages: Set<PeerID>,
-        privateChats: [PeerID: [BitchatMessage]]
+        privateChats: [PeerID: [YarikMessage]]
     ) -> Bool {
         if unreadPrivateMessages.contains(context.peerID) {
             return true

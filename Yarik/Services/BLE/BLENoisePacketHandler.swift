@@ -39,7 +39,7 @@ struct BLENoisePacketHandlerEnvironment {
     /// Initiates a fresh Noise handshake with the peer (crypto + send).
     let initiateHandshake: (PeerID) -> Void
     /// Broadcasts a packet on the mesh (caller is already on the message queue).
-    let broadcastPacket: (BitchatPacket) -> Void
+    let broadcastPacket: (YarikPacket) -> Void
     /// Updates the registry last-seen timestamp for the peer (async barrier write).
     let updatePeerLastSeen: (PeerID) -> Void
     /// Decrypts an encrypted payload from the peer (crypto).
@@ -67,7 +67,7 @@ struct BLENoisePacketHandlerEnvironment {
 /// and session recovery on decrypt failure.
 final class BLENoisePacketHandler {
     private struct DeferredCiphertext {
-        let packet: BitchatPacket
+        let packet: YarikPacket
         let receivedAt: Date
     }
 
@@ -97,12 +97,12 @@ final class BLENoisePacketHandler {
     /// Callers use this to distinguish an authenticated reconnect completion
     /// from a rejected ordinary responder while rollback state is restored.
     @discardableResult
-    func handleHandshake(_ packet: BitchatPacket, from peerID: PeerID) -> Bool {
+    func handleHandshake(_ packet: YarikPacket, from peerID: PeerID) -> Bool {
         handleHandshakeWithResult(packet, from: peerID).processed
     }
 
     func handleHandshakeWithResult(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         from peerID: PeerID
     ) -> BLENoiseHandshakeHandlingResult {
         let env = environment
@@ -116,7 +116,7 @@ final class BLENoisePacketHandler {
                 )
                 if let response = result.response {
                     // Send response
-                    let responsePacket = BitchatPacket(
+                    let responsePacket = YarikPacket(
                         type: MessageType.noiseHandshake.rawValue,
                         senderID: env.localPeerIDData(),
                         recipientID: Data(hexString: peerID.id),
@@ -174,7 +174,7 @@ final class BLENoisePacketHandler {
         )
     }
 
-    func handleEncrypted(_ packet: BitchatPacket, from peerID: PeerID) {
+    func handleEncrypted(_ packet: YarikPacket, from peerID: PeerID) {
         handleEncrypted(packet, from: peerID, isDeferredRetry: false)
     }
 
@@ -195,7 +195,7 @@ final class BLENoisePacketHandler {
     }
 
     private func handleEncrypted(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         from peerID: PeerID,
         isDeferredRetry: Bool
     ) {
@@ -353,7 +353,7 @@ final class BLENoisePacketHandler {
         return error is CryptoKitError
     }
 
-    private func deferCiphertext(_ packet: BitchatPacket, from peerID: PeerID) {
+    private func deferCiphertext(_ packet: YarikPacket, from peerID: PeerID) {
         guard NoiseSecurityValidator.validatePrivateFileCiphertextSize(
             packet.payload
         ) else {

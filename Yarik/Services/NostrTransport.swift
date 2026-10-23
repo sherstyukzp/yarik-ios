@@ -68,7 +68,7 @@ final class NostrTransport: Transport, @unchecked Sendable {
     }
 
     // BLE short peer ID embedded in favorites (recipient-addressed) envelopes.
-    // Geohash envelopes never carry it (see NostrEmbeddedBitChat).
+    // Geohash envelopes never carry it (see NostrEmbeddedYarik).
     var senderPeerID = PeerID(str: "")
 
     // Throttle outbound acks — READ receipts and DELIVERED acks, direct and
@@ -198,7 +198,7 @@ final class NostrTransport: Transport, @unchecked Sendable {
 
     // MARK: - Transport Protocol Conformance
 
-    weak var delegate: BitchatDelegate?
+    weak var delegate: YarikDelegate?
     weak var eventDelegate: TransportEventDelegate?
     weak var peerEventsDelegate: TransportPeerEventsDelegate?
 
@@ -258,7 +258,7 @@ final class NostrTransport: Transport, @unchecked Sendable {
                   let recipientHex = npubToHex(recipientNpub),
                   let senderIdentity = try? dependencies.currentIdentity() else { return }
             SecureLogger.debug("NostrTransport: preparing PM to \(recipientNpub.prefix(16))… id=\(messageID.prefix(8))…", category: .session)
-            guard let embedded = NostrEmbeddedBitChat.encodePMForNostr(content: content, messageID: messageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
+            guard let embedded = NostrEmbeddedYarik.encodePMForNostr(content: content, messageID: messageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
                 SecureLogger.error("NostrTransport: failed to embed PM packet", category: .session)
                 return
             }
@@ -284,7 +284,7 @@ final class NostrTransport: Transport, @unchecked Sendable {
                   let senderIdentity = try? dependencies.currentIdentity() else { return }
             let content = isFavorite ? "[FAVORITED]:\(senderIdentity.npub)" : "[UNFAVORITED]:\(senderIdentity.npub)"
             SecureLogger.debug("NostrTransport: preparing FAVORITE(\(isFavorite)) to \(recipientNpub.prefix(16))…", category: .session)
-            guard let embedded = NostrEmbeddedBitChat.encodePMForNostr(content: content, messageID: UUID().uuidString, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
+            guard let embedded = NostrEmbeddedYarik.encodePMForNostr(content: content, messageID: UUID().uuidString, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
                 SecureLogger.error("NostrTransport: failed to embed favorite notification", category: .session)
                 return
             }
@@ -316,7 +316,7 @@ extension NostrTransport {
         Task { @MainActor in
             guard !recipientHex.isEmpty else { return }
             SecureLogger.debug("GeoDM: send PM mid=\(messageID.prefix(8))…", category: .session)
-            guard let embedded = NostrEmbeddedBitChat.encodePMForNostrNoRecipient(content: content, messageID: messageID) else {
+            guard let embedded = NostrEmbeddedYarik.encodePMForNostrNoRecipient(content: content, messageID: messageID) else {
                 SecureLogger.error("NostrTransport: failed to embed geohash PM packet", category: .session)
                 return
             }
@@ -364,7 +364,7 @@ extension NostrTransport {
                       let recipientHex = npubToHex(recipientNpub),
                       let senderIdentity = try? dependencies.currentIdentity() else { return }
                 SecureLogger.debug("NostrTransport: preparing READ ack id=\(receipt.originalMessageID.prefix(8))…", category: .session)
-                guard let ack = NostrEmbeddedBitChat.encodeAckForNostr(type: .readReceipt, messageID: receipt.originalMessageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
+                guard let ack = NostrEmbeddedYarik.encodeAckForNostr(type: .readReceipt, messageID: receipt.originalMessageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
                     SecureLogger.error("NostrTransport: failed to embed READ ack", category: .session)
                     return
                 }
@@ -375,7 +375,7 @@ extension NostrTransport {
                       let recipientHex = npubToHex(recipientNpub),
                       let senderIdentity = try? dependencies.currentIdentity() else { return }
                 SecureLogger.debug("NostrTransport: preparing DELIVERED ack id=\(messageID.prefix(8))…", category: .session)
-                guard let ack = NostrEmbeddedBitChat.encodeAckForNostr(type: .delivered, messageID: messageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
+                guard let ack = NostrEmbeddedYarik.encodeAckForNostr(type: .delivered, messageID: messageID, recipientPeerID: peerID, senderPeerID: senderPeerID) else {
                     SecureLogger.error("NostrTransport: failed to embed DELIVERED ack", category: .session)
                     return
                 }
@@ -383,12 +383,12 @@ extension NostrTransport {
 
             case .deliveredGeohash(let messageID, let recipientHex, let identity):
                 SecureLogger.debug("GeoDM: send DELIVERED mid=\(messageID.prefix(8))…", category: .session)
-                guard let embedded = NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(type: .delivered, messageID: messageID) else { return }
+                guard let embedded = NostrEmbeddedYarik.encodeAckForNostrNoRecipient(type: .delivered, messageID: messageID) else { return }
                 sendWrappedMessage(content: embedded, recipientHex: recipientHex, senderIdentity: identity, registerPending: true)
 
             case .readGeohash(let messageID, let recipientHex, let identity):
                 SecureLogger.debug("GeoDM: send READ mid=\(messageID.prefix(8))…", category: .session)
-                guard let embedded = NostrEmbeddedBitChat.encodeAckForNostrNoRecipient(type: .readReceipt, messageID: messageID) else { return }
+                guard let embedded = NostrEmbeddedYarik.encodeAckForNostrNoRecipient(type: .readReceipt, messageID: messageID) else { return }
                 sendWrappedMessage(content: embedded, recipientHex: recipientHex, senderIdentity: identity, registerPending: true)
             }
         }

@@ -1,6 +1,6 @@
 //
 // GeohashPresenceService.swift
-// bitchat
+// yarik
 //
 // Manages the broadcasting of ephemeral presence heartbeats (Kind 20001)
 // to geohash location channels.

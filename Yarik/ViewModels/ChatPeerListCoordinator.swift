@@ -15,7 +15,7 @@ protocol ChatPeerListContext: AnyObject {
     var isConnected: Bool { get set }
     /// A single private chat's timeline (store-direct lookup on
     /// `ChatViewModel`; no `privateChats` dictionary build).
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage]
+    func privateMessages(for peerID: PeerID) -> [YarikMessage]
     var unreadPrivateMessages: Set<PeerID> { get }
     /// Clears the peer's unread flag (single-writer store intent).
     func markPrivateChatRead(_ peerID: PeerID)
@@ -24,7 +24,7 @@ protocol ChatPeerListContext: AnyObject {
     func cleanupOldReadReceipts()
 
     // MARK: Peers & sessions
-    var unifiedPeers: [BitchatPeer] { get }
+    var unifiedPeers: [YarikPeer] { get }
     func isPeerConnected(_ peerID: PeerID) -> Bool
     func isPeerReachable(_ peerID: PeerID) -> Bool
     /// Number of mesh peers currently connected or reachable, from the
@@ -34,7 +34,7 @@ protocol ChatPeerListContext: AnyObject {
     func updateEncryptionStatusForPeers()
 
     // MARK: Notifications
-    /// Posts the "bitchatters nearby" local notification.
+    /// Posts the "yarikters nearby" local notification.
     func notifyNetworkAvailable(peerCount: Int)
 
     /// Records peers seen within range for the daily ambient sightings tally.
@@ -74,7 +74,7 @@ extension ChatViewModel: ChatPeerListContext {
 final class ChatPeerListCoordinator: @unchecked Sendable {
     private unowned let context: any ChatPeerListContext
     private var recentlySeenPeers: Set<PeerID> = []
-    // The "bitchatters nearby" notification only fires on the transition from
+    // The "yarikters nearby" notification only fires on the transition from
     // an empty mesh to a populated one — joining peers while already meshed
     // are visible in the app and must not notify. Set back to true only after
     // a confirmed-empty reset, so brief link flaps stay silent.
@@ -161,7 +161,7 @@ private extension ChatPeerListCoordinator {
             lastNetworkNotificationTime = Date()
             context.notifyNetworkAvailable(peerCount: meshPeers.count)
             SecureLogger.info(
-                "👥 Sent bitchatters nearby notification for \(meshPeers.count) mesh peers (new: \(newPeers.count))",
+                "👥 Sent yarikters nearby notification for \(meshPeers.count) mesh peers (new: \(newPeers.count))",
                 category: .session
             )
         }

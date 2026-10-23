@@ -1,6 +1,6 @@
 //
 // PerformanceBaselineTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Performance baselines for hot paths so regressions are measured, not
 // guessed. Uses XCTest `measure {}` (swift-testing has no equivalent) with
@@ -144,7 +144,7 @@ final class PerformanceBaselineTests: XCTestCase {
     func testBLEInboundPacketPipeline() throws {
         var rng = SeededGenerator(seed: 0xB17C4A7)
         let baseTimestamp = UInt64(1_700_000_000_000)
-        var packets: [BitchatPacket] = []
+        var packets: [YarikPacket] = []
         var dedupIDs: [String] = []
         packets.reserveCapacity(1000)
         dedupIDs.reserveCapacity(1000)
@@ -152,7 +152,7 @@ final class PerformanceBaselineTests: XCTestCase {
             let senderID = Data((0..<8).map { _ in UInt8.random(in: 0...255, using: &rng) })
             let payloadSize = Int.random(in: 100...300, using: &rng)
             let payload = Data((0..<payloadSize).map { _ in UInt8.random(in: 0...255, using: &rng) })
-            let packet = BitchatPacket(
+            let packet = YarikPacket(
                 type: MessageType.message.rawValue,
                 senderID: senderID,
                 recipientID: nil,
@@ -175,7 +175,7 @@ final class PerformanceBaselineTests: XCTestCase {
             var duplicateCount = 0
             for (index, packet) in packets.enumerated() {
                 guard let data = packet.toBinaryData(),
-                      let decoded = BitchatPacket.from(data) else { continue }
+                      let decoded = YarikPacket.from(data) else { continue }
                 decodedCount += 1
                 _ = decoded.payload.count
                 if deduplicator.isDuplicate(dedupIDs[index]) { duplicateCount += 1 }
@@ -307,14 +307,14 @@ final class PerformanceBaselineTests: XCTestCase {
         let contents: [(String, [String]?)] = [
             ("hello mesh, anyone around tonight?", nil),
             ("@carol#a1b2 did you see this? https://example.com/threads/42", ["carol"]),
-            ("checking in from the harbor #bitchat #mesh", nil),
+            ("checking in from the harbor #yarik #mesh", nil),
             ("@bob#0042 ping me when you get this", ["bob#0042"]),
             ("long form update with a link https://news.example.org/articles/2026/06/mesh-networks and a tag #geohash", nil)
         ]
-        let batches: [[BitchatMessage]] = (0..<batchCount).map { batch in
+        let batches: [[YarikMessage]] = (0..<batchCount).map { batch in
             (0..<batchSize).map { i in
                 let (content, mentions) = contents[i % contents.count]
-                return BitchatMessage(
+                return YarikMessage(
                     id: "fmt-\(batch)-\(i)",
                     sender: "alice#a1b\(i % 10)",
                     content: content,
@@ -361,8 +361,8 @@ final class PerformanceBaselineTests: XCTestCase {
         // and ephemeral-mirror paths so every pass does identical work.
         let peerID = PeerID(str: String(repeating: "ab", count: 32))
         let base = Date(timeIntervalSince1970: 1_700_000_000)
-        let messages: [BitchatMessage] = (0..<messageCount).map { i in
-            BitchatMessage(
+        let messages: [YarikMessage] = (0..<messageCount).map { i in
+            YarikMessage(
                 id: "perf-dm-\(i)",
                 sender: "perfsender",
                 content: "private pipeline message \(i)",
@@ -477,11 +477,11 @@ final class PerformanceBaselineTests: XCTestCase {
     func testConversationStoreAppend() {
         let messageCount = 1000
         let base = Date(timeIntervalSince1970: 1_700_000_000)
-        let messages: [BitchatMessage] = (0..<messageCount).map { i in
+        let messages: [YarikMessage] = (0..<messageCount).map { i in
             // Every 10th message is "late": its timestamp predates already
             // appended messages, forcing the ordered-insert slow path.
             let offset = (i % 10 == 9) ? Double(i) - 5.5 : Double(i)
-            return BitchatMessage(
+            return YarikMessage(
                 id: "perf-store-\(i)",
                 sender: "perfsender",
                 content: "store append message \(i)",
@@ -518,7 +518,7 @@ final class PerformanceBaselineTests: XCTestCase {
 
         for i in 0..<cap {
             store.append(
-                BitchatMessage(
+                YarikMessage(
                     id: "perf-steady-seed-\(i)",
                     sender: "perfsender",
                     content: "steady-state seed \(i)",
@@ -537,7 +537,7 @@ final class PerformanceBaselineTests: XCTestCase {
             for offset in 0..<messagesPerPass {
                 let i = startIndex + offset
                 store.append(
-                    BitchatMessage(
+                    YarikMessage(
                         id: "perf-steady-\(i)",
                         sender: "perfsender",
                         content: "steady-state message \(i)",
@@ -610,7 +610,7 @@ final class PerformanceBaselineTests: XCTestCase {
             "hello from the geohash",
             "anyone near the station?",
             "@bob#0042 are you on mesh too?",
-            "check this out https://example.com/p/123 #bitchat",
+            "check this out https://example.com/p/123 #yarik",
             "teleport check, who's local?"
         ]
         return try (0..<count).map { i in
@@ -666,17 +666,17 @@ private final class PerfNostrContext: ChatNostrContext {
         return Array(geoSamplingSubs.keys)
     }
 
-    var messages: [BitchatMessage] = []
+    var messages: [YarikMessage] = []
     func flushPublicMessagePipeline() {}
     func refreshVisibleMessages(from channel: ChannelID?) {}
     func addPublicSystemMessage(_ content: String) {}
     func drainPendingGeohashSystemMessages() -> [String] { [] }
-    func appendGeohashMessageIfAbsent(_ message: BitchatMessage, toGeohash geohash: String) -> Bool { true }
+    func appendGeohashMessageIfAbsent(_ message: YarikMessage, toGeohash geohash: String) -> Bool { true }
 
     private(set) var handledPublicMessageCount = 0
-    func handlePublicMessage(_ message: BitchatMessage, powBits: Int) { handledPublicMessageCount += 1 }
-    func checkForMentions(_ message: BitchatMessage) {}
-    func sendHapticFeedback(for message: BitchatMessage) {}
+    func handlePublicMessage(_ message: YarikMessage, powBits: Int) { handledPublicMessageCount += 1 }
+    func checkForMentions(_ message: YarikMessage) {}
+    func sendHapticFeedback(for message: YarikMessage) {}
     func parseMentions(from content: String) -> [String] {
         MessageFormattingEngine.extractMentions(from: content)
     }
@@ -796,7 +796,7 @@ private final class PerfDeliveryContext: ChatDeliveryContext {
         let base = Date(timeIntervalSince1970: 1_700_000_000)
         let geohashID = ConversationID.geohash("u4pruyd")
         for i in 0..<publicCount {
-            let message = BitchatMessage(
+            let message = YarikMessage(
                 id: "pub-\(i)",
                 sender: "peer\(i % 20)",
                 content: "public message number \(i)",
@@ -810,7 +810,7 @@ private final class PerfDeliveryContext: ChatDeliveryContext {
             let peerID = PeerID(str: String(format: "%016x", 0xA000_0000 + p))
             var messageIDs: [String] = []
             for i in 0..<messagesPerPeer {
-                let message = BitchatMessage(
+                let message = YarikMessage(
                     id: "dm-\(p)-\(i)",
                     sender: "peer\(p)",
                     content: "private message \(i) for peer \(p)",
@@ -893,7 +893,7 @@ private final class PerfPipelineFixture {
 private final class PerfFormattingContext: MessageFormattingContext {
     let nickname: String
     init(nickname: String) { self.nickname = nickname }
-    func isSelfMessage(_ message: BitchatMessage) -> Bool { false }
-    func senderColor(for message: BitchatMessage, isDark: Bool) -> Color { .blue }
-    func peerURL(for peerID: PeerID) -> URL? { URL(string: "bitchat://peer/\(peerID.id)") }
+    func isSelfMessage(_ message: YarikMessage) -> Bool { false }
+    func senderColor(for message: YarikMessage, isDark: Bool) -> Color { .blue }
+    func peerURL(for peerID: PeerID) -> URL? { URL(string: "yarik://peer/\(peerID.id)") }
 }

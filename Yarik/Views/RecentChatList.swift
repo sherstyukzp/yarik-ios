@@ -1,6 +1,6 @@
 //
 // RecentChatList.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -47,20 +47,20 @@ struct RecentChatList: View {
                 ForEach(chats) { chat in
                     HStack(spacing: 4) {
                         Text(verbatim: chat.displayName)
-                            .bitchatFont(size: 14)
+                            .yarikFont(size: 14)
                             .foregroundColor(palette.primary)
                             .lineLimit(1)
                             .truncationMode(.tail)
 
                         Text(verbatim: Self.relativeFormatter.localizedString(for: chat.lastActivity, relativeTo: Date()))
-                            .bitchatFont(size: 11)
+                            .yarikFont(size: 11)
                             .foregroundColor(palette.secondary.opacity(0.8))
 
                         Spacer()
 
                         if chat.hasUnread {
                             Image(systemName: "envelope.fill")
-                                .font(.bitchatSystem(size: 10))
+                                .font(.yarikSystem(size: 10))
                                 .foregroundColor(.orange)
                                 .help(Strings.newMessagesTooltip)
                         }

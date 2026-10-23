@@ -1,6 +1,6 @@
 //
-// BitchatMessage+Media.swift
-// bitchat
+// YarikMessage+Media.swift
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -9,7 +9,7 @@
 import BitFoundation
 import Foundation
 
-extension BitchatMessage {
+extension YarikMessage {
     enum Media {
         case voice(URL)
         case image(URL)

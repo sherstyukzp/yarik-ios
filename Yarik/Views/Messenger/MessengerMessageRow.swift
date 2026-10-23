@@ -4,7 +4,7 @@ import SwiftUI
 struct MessengerMessageRow: View {
     @EnvironmentObject private var conversationUIModel: ConversationUIModel
 
-    let message: BitchatMessage
+    let message: YarikMessage
     let showsSenderName: Bool
     @Binding var imagePreviewURL: URL?
 
@@ -108,7 +108,7 @@ struct MessengerMessageRow: View {
                 HStack(spacing: 4) {
                     DeliveryStatusView(status: message.deliveryStatus)
                     if showDeliveryDetail || isFailed {
-                        Text(message.deliveryStatus.bitchatDescription)
+                        Text(message.deliveryStatus.yarikDescription)
                             .font(.caption2)
                             .foregroundStyle(isFailed ? Color.red : Color.secondary)
                     }
@@ -133,7 +133,7 @@ struct MessengerMessageRow: View {
         return false
     }
 
-    private func mediaRow(_ media: BitchatMessage.Media) -> some View {
+    private func mediaRow(_ media: YarikMessage.Media) -> some View {
         HStack {
             if isMine { Spacer(minLength: 48) }
             MediaMessageView(message: message, media: media, imagePreviewURL: $imagePreviewURL)

@@ -1,6 +1,6 @@
 //
 // ChatComposerCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatComposerCoordinator` against a mock `ChatComposerContext` —
 // proving the coordinator works without a `ChatViewModel`, following the

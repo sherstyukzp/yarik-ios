@@ -12,13 +12,13 @@ struct BLEFragmentHandlerEnvironment {
     /// Local peer identity at the time the fragment is handled.
     let localPeerID: () -> PeerID
     /// Tracks broadcast fragments for gossip sync.
-    let trackPacketSeen: (BitchatPacket) -> Void
+    let trackPacketSeen: (YarikPacket) -> Void
     /// Appends the fragment to the assembly buffer (collections barrier write).
     let appendFragment: (BLEFragmentHeader) -> BLEFragmentAssemblyBuffer.AppendResult
     /// Ingress acceptance check for the reassembled inner packet.
-    let isAcceptedIngressPayload: (_ packet: BitchatPacket, _ innerSender: PeerID) -> Bool
+    let isAcceptedIngressPayload: (_ packet: YarikPacket, _ innerSender: PeerID) -> Bool
     /// Re-enters the receive pipeline with the reassembled packet (TTL already zeroed).
-    let processReassembledPacket: (_ packet: BitchatPacket, _ from: PeerID) -> Void
+    let processReassembledPacket: (_ packet: YarikPacket, _ from: PeerID) -> Void
 }
 
 /// Orchestrates inbound fragments: self-fragment suppression, gossip tracking,
@@ -31,7 +31,7 @@ final class BLEFragmentHandler {
         self.environment = environment
     }
 
-    func handle(_ packet: BitchatPacket, from peerID: PeerID) {
+    func handle(_ packet: YarikPacket, from peerID: PeerID) {
         let env = environment
         guard let header = BLEFragmentHeader(packet: packet) else { return }
 

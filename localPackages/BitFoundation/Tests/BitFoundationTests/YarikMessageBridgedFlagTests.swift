@@ -1,5 +1,5 @@
 //
-// BitchatMessageBridgedFlagTests.swift
+// YarikMessageBridgedFlagTests.swift
 // BitFoundationTests
 //
 // This is free and unencumbered software released into the public domain.
@@ -10,10 +10,10 @@ import Foundation
 import Testing
 @testable import BitFoundation
 
-@Suite("BitchatMessage bridged flag")
-struct BitchatMessageBridgedFlagTests {
+@Suite("YarikMessage bridged flag")
+struct YarikMessageBridgedFlagTests {
     @Test func bridgedFlagSurvivesBinaryRoundTrip() throws {
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: "far-friend",
             content: "hello from across the hill",
             timestamp: Date(),
@@ -22,27 +22,27 @@ struct BitchatMessageBridgedFlagTests {
             isBridged: true
         )
         let binary = try #require(message.toBinaryPayload())
-        let decoded = try #require(BitchatMessage(binary))
+        let decoded = try #require(YarikMessage(binary))
         #expect(decoded.isBridged)
         #expect(decoded.senderPeerID?.isBridge == true)
     }
 
     @Test func plainMessageStaysUnbridgedThroughBinary() throws {
-        let plain = BitchatMessage(
+        let plain = YarikMessage(
             sender: "neighbor",
             content: "radio only",
             timestamp: Date(),
             isRelay: false
         )
         let binary = try #require(plain.toBinaryPayload())
-        let decoded = try #require(BitchatMessage(binary))
+        let decoded = try #require(YarikMessage(binary))
         #expect(!decoded.isBridged)
     }
 
     @Test func legacyBinaryWithoutBridgedBitDecodesUnbridged() throws {
         // A pre-bridge encoder never sets flag bit 0x40; decoding such a
         // payload must default to unbridged.
-        let message = BitchatMessage(
+        let message = YarikMessage(
             sender: "old",
             content: "hi",
             timestamp: Date(),
@@ -51,7 +51,7 @@ struct BitchatMessageBridgedFlagTests {
         )
         var binary = try #require(message.toBinaryPayload())
         binary[0] &= ~UInt8(0x40) // strip the bridged bit like an old client
-        let decoded = try #require(BitchatMessage(binary))
+        let decoded = try #require(YarikMessage(binary))
         #expect(!decoded.isBridged)
     }
 }

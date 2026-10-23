@@ -1,6 +1,6 @@
 //
 // GeoChannelCoordinator.swift
-// bitchat
+// yarik
 //
 // Centralizes Combine wiring for location channel selection and sampling.
 //

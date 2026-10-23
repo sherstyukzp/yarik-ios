@@ -1,6 +1,6 @@
 //
 // CourierVectorTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -39,7 +39,7 @@ struct CourierVectorTests {
     /// The published file, located relative to this source file. It lives at
     /// repo-root `docs/`, outside this package, so it cannot be a SwiftPM
     /// resource the way `NoiseTestVectors.json` is — the repo already resolves
-    /// a repo-root path this way in `bitchatTests/LocalizationCoverageTests`.
+    /// a repo-root path this way in `YarikMeshTests/LocalizationCoverageTests`.
     static let vectorFileURL = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()   // → BitFoundationTests
         .deletingLastPathComponent()   // → Tests
@@ -239,8 +239,8 @@ struct CourierVectorTests {
 
     /// A real `courierEnvelope` frame: type 0x04 carrying an encoded envelope,
     /// which is what a deposit actually puts on the wire.
-    static func envelopePacket(from v: Vectors) throws -> BitchatPacket {
-        BitchatPacket(type: try flagByte(v.packetSigning.packet.type),
+    static func envelopePacket(from v: Vectors) throws -> YarikPacket {
+        YarikPacket(type: try flagByte(v.packetSigning.packet.type),
                       senderID: try hex(v.inputs.senderID),
                       recipientID: try hex(v.inputs.recipientID),
                       timestamp: v.inputs.timestampMillis,

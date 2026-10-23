@@ -313,8 +313,8 @@ struct ViewSmokeTests {
 
         let image = try makeCGImage()
 
-        let myQR = MyQRView(qrString: "bitchat://verify?name=alice&npub=npub1test")
-        let qrCode = QRCodeImage(data: "bitchat://verify?hello=world", size: 96)
+        let myQR = MyQRView(qrString: "yarik://verify?name=alice&npub=npub1test")
+        let qrCode = QRCodeImage(data: "yarik://verify?hello=world", size: 96)
         let imageWrapper = ImageWrapper(image: image)
 
         _ = myQR.body
@@ -661,7 +661,7 @@ struct ViewSmokeTests {
         let geohashPeopleList = GeohashPeopleList(
             onTapPerson: {}
         )
-        let truncatableMessage = BitchatMessage(
+        let truncatableMessage = YarikMessage(
             sender: viewModel.nickname,
             content: String(repeating: "verylongtoken ", count: 160),
             timestamp: Date(),
@@ -669,7 +669,7 @@ struct ViewSmokeTests {
             isPrivate: false,
             deliveryStatus: .sent
         )
-        let paymentMessage = BitchatMessage(
+        let paymentMessage = YarikMessage(
             sender: viewModel.nickname,
             content: "lightning:lnbc1test cashuA_test-token",
             timestamp: Date(),
@@ -759,7 +759,7 @@ struct ViewSmokeTests {
 
     @Test
     func messageRows_snapshotDeliveryStatusForSwiftUIDiffing() {
-        // Regression: `BitchatMessage` is a reference type mutated in place
+        // Regression: `YarikMessage` is a reference type mutated in place
         // by `ConversationStore.applyDeliveryStatus`, and SwiftUI compares
         // reference-typed view fields by identity — so a status-only change
         // (delivered → read) on the SAME instance is invisible to the row's
@@ -774,7 +774,7 @@ struct ViewSmokeTests {
         }
 
         let delivered = DeliveryStatus.delivered(to: "builder", at: Date(timeIntervalSince1970: 50))
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: "dm-status-1",
             sender: "anon",
             content: "hello",

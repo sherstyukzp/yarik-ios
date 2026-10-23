@@ -1,6 +1,6 @@
 //
-// BitchatMessage.swift
-// bitchat
+// YarikMessage.swift
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -14,11 +14,11 @@ import struct Foundation.Date
 import struct Foundation.TimeInterval
 import struct Foundation.UUID
 
-/// Represents a user-visible message in the BitChat system.
+/// Represents a user-visible message in the Yarik system.
 /// Handles both broadcast messages and private encrypted messages,
 /// with support for mentions, replies, and delivery tracking.
 /// - Note: This is the primary data model for chat messages
-public final class BitchatMessage: Codable {
+public final class YarikMessage: Codable {
     public let id: String
     public let sender: String
     public let content: String
@@ -102,8 +102,8 @@ public final class BitchatMessage: Codable {
 
 // MARK: - Equatable Conformance
 
-extension BitchatMessage: Equatable {
-    public static func == (lhs: BitchatMessage, rhs: BitchatMessage) -> Bool {
+extension YarikMessage: Equatable {
+    public static func == (lhs: YarikMessage, rhs: YarikMessage) -> Bool {
         return lhs.id == rhs.id &&
                lhs.sender == rhs.sender &&
                lhs.content == rhs.content &&
@@ -121,7 +121,7 @@ extension BitchatMessage: Equatable {
 
 // MARK: - Binary encoding
 
-extension BitchatMessage {
+extension YarikMessage {
     func toBinaryPayload() -> Data? {
         var data = Data()
         
@@ -357,7 +357,7 @@ extension BitchatMessage {
 
 // MARK: - Helpers
 
-extension BitchatMessage {
+extension YarikMessage {
     
     private static let timestampFormatter: DateFormatter = {
         let formatter = DateFormatter()

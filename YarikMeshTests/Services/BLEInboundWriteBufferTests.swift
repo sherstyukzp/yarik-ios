@@ -126,8 +126,8 @@ struct BLEInboundWriteBufferTests {
         }
     }
 
-    private func makePacket(timestamp: UInt64 = 0x0102030405) -> BitchatPacket {
-        BitchatPacket(
+    private func makePacket(timestamp: UInt64 = 0x0102030405) -> YarikPacket {
+        YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]),
             recipientID: nil,

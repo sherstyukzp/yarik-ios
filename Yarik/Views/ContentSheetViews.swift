@@ -327,13 +327,13 @@ private struct ContentPeopleListView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 12) {
                     Text(peopleSheetTitle)
-                        .bitchatFont(size: 18)
+                        .yarikFont(size: 18)
                         .foregroundColor(palette.primary)
                     Spacer()
                     if case .mesh = locationChannelsModel.selectedChannel {
                         Button(action: { showVerifySheet = true }) {
                             Image(systemName: "qrcode")
-                                .font(.bitchatSystem(size: 14))
+                                .font(.yarikSystem(size: 14))
                         }
                         .buttonStyle(.plain)
                         // .help maps to the accessibility *hint* on iOS, so the
@@ -360,7 +360,7 @@ private struct ContentPeopleListView: View {
                 // Location channels keep their geohash subtitle.
                 if case .location(let channel) = locationChannelsModel.selectedChannel {
                     Text(verbatim: "#\(channel.geohash.lowercased())")
-                        .bitchatFont(size: 12)
+                        .yarikFont(size: 12)
                         .foregroundColor(palette.locationAccent)
                 }
             }
@@ -497,7 +497,7 @@ private struct ContentPrivateChatSheetView: View {
                         }
                     }) {
                         Image(systemName: "chevron.left")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .foregroundColor(palette.primary)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
@@ -520,7 +520,7 @@ private struct ContentPrivateChatSheetView: View {
                                 privateConversationModel.toggleFavoriteForSelectedConversation()
                             }) {
                                 Image(systemName: headerState.isFavorite ? "star.fill" : "star")
-                                    .font(.bitchatSystem(size: 14))
+                                    .font(.yarikSystem(size: 14))
                                     .foregroundColor(headerState.isFavorite ? Color.yellow : palette.primary)
                                     // Same visual box + 44pt hit target as SheetCloseButton.
                                     .frame(width: 32, height: 32)
@@ -625,12 +625,12 @@ private struct ContentPrivateChatSheetView: View {
     private var privacyCaption: some View {
         HStack(spacing: 5) {
             Image(systemName: "lock.fill")
-                .font(.bitchatSystem(size: 9))
+                .font(.yarikSystem(size: 9))
                 // Optical centering: lock.fill's ink is bottom-heavy, so
                 // geometric centering reads low next to the caption text.
                 .offset(y: -1)
             Text(verbatim: privacyCaptionText)
-                .bitchatFont(size: 11, weight: .medium)
+                .yarikFont(size: 11, weight: .medium)
         }
         .foregroundColor(Color.orange)
         .frame(maxWidth: .infinity)
@@ -647,7 +647,7 @@ private struct ContentPrivateChatSheetView: View {
         if privateConversationModel.selectedPeerID?.isGroup == true {
             return String(localized: "content.private.caption_group", comment: "Caption above the group chat composer noting messages are encrypted to group members")
         }
-        // Geohash DMs use BitChat's private-envelope encryption over Nostr —
+        // Geohash DMs use Yarik's private-envelope encryption over Nostr —
         // always end-to-end encrypted,
         // even though they carry no Noise session status. Mesh DMs earn the
         // "encrypted" claim only once the Noise handshake has secured — or
@@ -706,24 +706,24 @@ private struct ContentPrivateHeaderInfoButton: View {
             HStack(spacing: 6) {
                 if headerState.isGroupConversation {
                     Image(systemName: "person.3.fill")
-                        .font(.bitchatSystem(size: 14))
+                        .font(.yarikSystem(size: 14))
                         .foregroundColor(palette.primary)
                         .accessibilityLabel(String(localized: "content.accessibility.group_chat", comment: "Accessibility label for the group chat indicator"))
                 } else {
                     switch headerState.availability {
                     case .bluetoothConnected:
                         Image(systemName: "dot.radiowaves.left.and.right")
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                             .foregroundColor(palette.primary)
                             .accessibilityLabel(String(localized: "content.accessibility.connected_mesh", comment: "Accessibility label for mesh-connected peer indicator"))
                     case .meshReachable:
                         Image(systemName: "point.3.filled.connected.trianglepath.dotted")
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                             .foregroundColor(palette.primary)
                             .accessibilityLabel(String(localized: "content.accessibility.reachable_mesh", comment: "Accessibility label for mesh-reachable peer indicator"))
                     case .nostrAvailable:
                         Image(systemName: "globe")
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                             .foregroundColor(.purple)
                             .accessibilityLabel(String(localized: "content.accessibility.available_nostr", comment: "Accessibility label for Nostr-available peer indicator"))
                     case .offline:
@@ -732,14 +732,14 @@ private struct ContentPrivateHeaderInfoButton: View {
                         // one read as part of the name: "sin conexión bob").
                         // VoiceOver still says it.
                         Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                            .font(.bitchatSystem(size: 14))
+                            .font(.yarikSystem(size: 14))
                             .foregroundColor(palette.secondary)
                             .accessibilityLabel(String(localized: "mesh_peers.state.offline", comment: "State label for a peer that is not currently reachable"))
                     }
                 }
 
                 Text(headerState.displayName)
-                    .bitchatFont(size: 16, weight: .medium)
+                    .yarikFont(size: 16, weight: .medium)
                     .foregroundColor(palette.primary)
                     // Middle truncation keeps the identity suffix visible on
                     // long nicknames instead of wrapping into the fixed-height
@@ -750,7 +750,7 @@ private struct ContentPrivateHeaderInfoButton: View {
                 if let encryptionStatus = headerState.encryptionStatus,
                    let icon = encryptionStatus.icon {
                     Image(systemName: icon)
-                        .font(.bitchatSystem(size: 14))
+                        .font(.yarikSystem(size: 14))
                         // Optical centering: the lock glyphs' ink is bottom-heavy
                         // (solid body, thin shackle), so geometric centering reads
                         // ~1pt low next to the name. The seal badge is symmetric

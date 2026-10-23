@@ -1,6 +1,6 @@
 //
 // ConversationStoreTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for the new single-source-of-truth ConversationStore
 // (docs/CONVERSATION-STORE-DESIGN.md): intent API, ordered insertion,
@@ -24,8 +24,8 @@ private func makeMessage(
     content: String? = nil,
     isPrivate: Bool = false,
     deliveryStatus: DeliveryStatus? = nil
-) -> BitchatMessage {
-    BitchatMessage(
+) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "alice",
         content: content ?? "message \(id)",
@@ -55,7 +55,7 @@ private struct ReferenceConversationTimeline {
         let content: String
         var deliveryStatus: DeliveryStatus?
 
-        init(_ message: BitchatMessage) {
+        init(_ message: YarikMessage) {
             id = message.id
             timestamp = message.timestamp
             content = message.content
@@ -75,7 +75,7 @@ private struct ReferenceConversationTimeline {
         messages.contains { $0.id == id }
     }
 
-    mutating func append(_ message: BitchatMessage) -> AppendResult {
+    mutating func append(_ message: YarikMessage) -> AppendResult {
         guard !contains(message.id) else {
             return AppendResult(inserted: false, trimmedCount: 0)
         }
@@ -100,7 +100,7 @@ private struct ReferenceConversationTimeline {
         return AppendResult(inserted: true, trimmedCount: overflow)
     }
 
-    mutating func upsert(_ message: BitchatMessage) -> Int {
+    mutating func upsert(_ message: YarikMessage) -> Int {
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
             messages[index] = Message(message)
             return 0
@@ -354,7 +354,7 @@ struct ConversationStoreTests {
         var filterCount = 0
         var clearCount = 0
 
-        func issueMessage(timestamp: TimeInterval? = nil, tag: String) -> BitchatMessage {
+        func issueMessage(timestamp: TimeInterval? = nil, tag: String) -> YarikMessage {
             let number = nextID
             nextID += 1
             let id = "diff-\(number)"
@@ -375,7 +375,7 @@ struct ConversationStoreTests {
         }
 
         @discardableResult
-        func appendAndCompare(_ message: BitchatMessage, checkpoint: String) -> ReferenceConversationTimeline.AppendResult {
+        func appendAndCompare(_ message: YarikMessage, checkpoint: String) -> ReferenceConversationTimeline.AppendResult {
             let expected = reference.append(message)
             let actual = store.append(message, to: .mesh)
             #expect(actual == expected.inserted, "append result mismatch at \(checkpoint)")
@@ -485,7 +485,7 @@ struct ConversationStoreTests {
                 }
 
             case 81..<90:
-                let message: BitchatMessage
+                let message: YarikMessage
                 if step.isMultiple(of: 4) || reference.messages.isEmpty {
                     let timestamp = reference.messages.isEmpty
                         ? nil
@@ -1123,7 +1123,7 @@ struct ConversationStoreTests {
         let store = ConversationStore()
         let stable = makeDirectConversationID("stable")
         let ephemeral = makeDirectConversationID("ephemeral")
-        // The production mirroring path upserts the SAME BitchatMessage
+        // The production mirroring path upserts the SAME YarikMessage
         // instance (reference type) into both conversations.
         let message = makeMessage(id: "dm-1", timestamp: 1, isPrivate: true, deliveryStatus: .sent)
         store.upsertByID(message, in: stable)

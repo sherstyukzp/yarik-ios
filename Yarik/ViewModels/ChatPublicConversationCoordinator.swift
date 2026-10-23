@@ -35,13 +35,13 @@ protocol ChatPublicConversationContext: AnyObject {
     /// Appends a public message in timestamp order. Returns `false` when a
     /// message with the same ID is already in that conversation.
     @discardableResult
-    func appendPublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) -> Bool
+    func appendPublicMessage(_ message: YarikMessage, to conversationID: ConversationID) -> Bool
     func publicConversationContainsMessage(withID messageID: String, in conversationID: ConversationID) -> Bool
     /// Removes a message by ID from whichever public conversation contains it.
     @discardableResult
-    func removePublicMessage(withID messageID: String) -> BitchatMessage?
+    func removePublicMessage(withID messageID: String) -> YarikMessage?
     /// Removes every matching message from a geohash conversation (block purge).
-    func removePublicMessages(fromGeohash geohash: String, where predicate: (BitchatMessage) -> Bool)
+    func removePublicMessages(fromGeohash geohash: String, where predicate: (YarikMessage) -> Bool)
     /// Empties a public conversation's timeline (`/clear`).
     func clearPublicConversation(_ conversationID: ConversationID)
     /// Erases the on-disk archive of carried public mesh messages, so clearing
@@ -57,8 +57,8 @@ protocol ChatPublicConversationContext: AnyObject {
     /// Removes a message by ID from every private chat containing it,
     /// dropping chats that become empty. Returns the removed message.
     @discardableResult
-    func removePrivateMessage(withID messageID: String) -> BitchatMessage?
-    func cleanupLocalFile(forMessage message: BitchatMessage)
+    func removePrivateMessage(withID messageID: String) -> YarikMessage?
+    func cleanupLocalFile(forMessage message: YarikMessage)
 
     // MARK: Geohash participants & presence
     var geoNicknames: [String: String] { get }
@@ -80,14 +80,14 @@ protocol ChatPublicConversationContext: AnyObject {
     func sendMeshMessage(_ content: String, mentions: [String], messageID: String, timestamp: Date)
 
     // MARK: Inbound public message processing
-    func processActionMessage(_ message: BitchatMessage) -> BitchatMessage
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool
+    func processActionMessage(_ message: YarikMessage) -> YarikMessage
+    func isMessageBlocked(_ message: YarikMessage) -> Bool
     /// `powBits` is the validated NIP-13 difficulty of the source Nostr event
     /// (0 for mesh messages); sufficient PoW relaxes the per-sender bucket.
     func allowPublicMessage(senderKey: String, contentKey: String, powBits: Int) -> Bool
     /// Buffers a visible-channel message for the batched (~80 ms) pipeline
     /// flush, which commits it to `conversationID` in the store.
-    func enqueuePublicMessage(_ message: BitchatMessage, to conversationID: ConversationID)
+    func enqueuePublicMessage(_ message: YarikMessage, to conversationID: ConversationID)
     func cachedStablePeerID(for shortPeerID: PeerID) -> PeerID?
 
     // MARK: Content dedup & formatting
@@ -95,7 +95,7 @@ protocol ChatPublicConversationContext: AnyObject {
     func contentTimestamp(forKey key: String) -> Date?
     func recordContentKey(_ key: String, timestamp: Date)
     /// Pre-renders the message so the formatting cache is warm before display.
-    func prewarmMessageFormatting(_ message: BitchatMessage)
+    func prewarmMessageFormatting(_ message: YarikMessage)
 
     // MARK: Notifications
     /// Posts the you-were-mentioned local notification.
@@ -142,7 +142,7 @@ extension ChatViewModel: ChatPublicConversationContext {
         publicRateLimiter.allow(senderKey: senderKey, contentKey: contentKey, powBits: powBits)
     }
 
-    func enqueuePublicMessage(_ message: BitchatMessage, to conversationID: ConversationID) {
+    func enqueuePublicMessage(_ message: YarikMessage, to conversationID: ConversationID) {
         publicMessagePipeline.enqueue(message, to: conversationID)
     }
 
@@ -158,7 +158,7 @@ extension ChatViewModel: ChatPublicConversationContext {
         deduplicationService.recordContentKey(key, timestamp: timestamp)
     }
 
-    func prewarmMessageFormatting(_ message: BitchatMessage) {
+    func prewarmMessageFormatting(_ message: YarikMessage) {
         _ = formatMessageAsText(message, colorScheme: currentColorScheme)
     }
 
@@ -205,7 +205,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
         context.removeGeoParticipant(pubkeyHex: hex)
 
         if let gh = context.currentGeohash {
-            let predicate: (BitchatMessage) -> Bool = { [unowned context] message in
+            let predicate: (YarikMessage) -> Bool = { [unowned context] message in
                 guard let senderPeerID = message.senderPeerID,
                       senderPeerID.isGeoDM || senderPeerID.isGeoChat else {
                     return false
@@ -344,7 +344,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
     }
 
     func addSystemMessage(_ content: String, timestamp: Date = Date()) {
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             sender: "system",
             content: content,
             timestamp: timestamp,
@@ -354,7 +354,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
     }
 
     func addMeshOnlySystemMessage(_ content: String) {
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             sender: "system",
             content: content,
             timestamp: Date(),
@@ -364,7 +364,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
     }
 
     func addPublicSystemMessage(_ content: String) {
-        let systemMessage = BitchatMessage(
+        let systemMessage = YarikMessage(
             sender: "system",
             content: content,
             timestamp: Date(),
@@ -445,7 +445,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
         return "\(senderPeerID?.id ?? "")|\(msKey)|\(content)"
     }
 
-    func handlePublicMessage(_ message: BitchatMessage, powBits: Int = 0) {
+    func handlePublicMessage(_ message: YarikMessage, powBits: Int = 0) {
         let finalMessage = context.processActionMessage(message)
         if context.isMessageBlocked(finalMessage) { return }
 
@@ -511,7 +511,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
         }
     }
 
-    func checkForMentions(_ message: BitchatMessage) {
+    func checkForMentions(_ message: YarikMessage) {
         let myNickname = context.nickname.normalizedNickname
         var myTokens: Set<String> = [myNickname]
         let meshPeers = context.meshPeerNicknames()
@@ -528,7 +528,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
         }
     }
 
-    func sendHapticFeedback(for message: BitchatMessage) {
+    func sendHapticFeedback(for message: YarikMessage) {
         #if os(iOS)
         guard UIApplication.shared.applicationState == .active else { return }
 
@@ -578,11 +578,11 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
         context.recordContentKey(key, timestamp: timestamp)
     }
 
-    func pipeline(_: PublicMessagePipeline, commit message: BitchatMessage, to conversationID: ConversationID) -> Bool {
+    func pipeline(_: PublicMessagePipeline, commit message: YarikMessage, to conversationID: ConversationID) -> Bool {
         context.appendPublicMessage(message, to: conversationID)
     }
 
-    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: BitchatMessage) {
+    func pipelinePrewarmMessage(_: PublicMessagePipeline, message: YarikMessage) {
         context.prewarmMessageFormatting(message)
     }
 
@@ -592,7 +592,7 @@ final class ChatPublicConversationCoordinator: PublicMessagePipelineDelegate {
 }
 
 private extension ChatPublicConversationCoordinator {
-    func normalizedSenderKey(for message: BitchatMessage) -> String {
+    func normalizedSenderKey(for message: YarikMessage) -> String {
         if let senderPeerID = message.senderPeerID {
             if senderPeerID.isGeoChat || senderPeerID.isGeoDM {
                 let full = (context.nostrKeyMapping[senderPeerID] ?? senderPeerID.bare).lowercased()

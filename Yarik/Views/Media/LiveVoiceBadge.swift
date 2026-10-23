@@ -1,6 +1,6 @@
 //
 // LiveVoiceBadge.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -35,7 +35,7 @@ struct LiveVoiceBadge: View {
                 .fill(Color.red)
                 .frame(width: 6, height: 6)
             Text("media.voice.live_badge", comment: "Badge on a voice message that is currently streaming in live")
-                .bitchatFont(size: 10, weight: .bold)
+                .yarikFont(size: 10, weight: .bold)
                 .foregroundColor(.red)
         }
         .padding(.horizontal, 6)

@@ -1,6 +1,6 @@
 //
 // BLESourceRouteOriginationPolicyTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -20,8 +20,8 @@ struct BLESourceRouteOriginationPolicyTests {
         senderID: Data? = nil,
         recipientID: Data? = Data(hexString: "1112131415161718"),
         ttl: UInt8 = 7
-    ) -> BitchatPacket {
-        BitchatPacket(
+    ) -> YarikPacket {
+        YarikPacket(
             type: MessageType.noiseEncrypted.rawValue,
             senderID: senderID ?? localPeerIDData,
             recipientID: recipientID,
@@ -33,7 +33,7 @@ struct BLESourceRouteOriginationPolicyTests {
     }
 
     private func route(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         isRecipientConnected: Bool = false,
         shouldAttemptRoute: Bool = true,
         computedRoute: [Data]? = nil

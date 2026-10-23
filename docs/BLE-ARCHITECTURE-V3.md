@@ -203,7 +203,7 @@ throughput is nowhere near what one serial queue sustains.
 
    **The simulator half is done — simulator-first.** Because the B2
    receive path already hands `(packet, linkID)` up through one choke
-   point, `SimulatedMesh` (bitchatTests/Simulation/) wires real
+   point, `SimulatedMesh` (YarikMeshTests/Simulation/) wires real
    CB-free `BLEService` engines edge-to-edge through the outbound tap
    and `_test_ingestFrame` (the production attribution path), with
    per-edge synthetic link IDs and manual-scheduler time. Five

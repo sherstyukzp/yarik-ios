@@ -1,6 +1,6 @@
 //
 // LargeTopologyTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -75,7 +75,7 @@ struct LargeTopologyTests {
         var maxSeenTTL: [String: UInt8] = [:]
         for name in chain.dropFirst() {
             helper.nodes[name]!.packetDeliveryHandler = { packet in
-                if let message = BitchatMessage(packet.payload),
+                if let message = YarikMessage(packet.payload),
                    message.content == "deep chain probe" {
                     maxSeenTTL[name] = max(maxSeenTTL[name] ?? 0, packet.ttl)
                 }

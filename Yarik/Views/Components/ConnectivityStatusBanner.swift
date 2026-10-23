@@ -1,6 +1,6 @@
 //
 // ConnectivityStatusBanner.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -101,9 +101,9 @@ struct ConnectivityStatusBanner: View {
     private var label: some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Image(systemName: issue == .torBlocked ? "network.slash" : "antenna.radiowaves.left.and.right.slash")
-                .bitchatFont(size: 11, weight: .semibold)
+                .yarikFont(size: 11, weight: .semibold)
             Text(message)
-                .bitchatFont(size: 11)
+                .yarikFont(size: 11)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .foregroundColor(palette.alertRed)

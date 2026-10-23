@@ -1,6 +1,6 @@
 //
 // PrivateChatManager.swift
-// bitchat
+// yarik
 //
 // Manages private chat sessions and messages
 // This is free and unencumbered software released into the public domain.
@@ -66,7 +66,7 @@ final class PrivateChatManager: ObservableObject {
     /// All private chats keyed by routing peer ID, derived from the store.
     /// Mutations go through the store's intent API only.
     @MainActor
-    var privateChats: [PeerID: [BitchatMessage]] {
+    var privateChats: [PeerID: [YarikMessage]] {
         conversationStore?.directMessagesByRoutingPeerID() ?? [:]
     }
 
@@ -77,7 +77,7 @@ final class PrivateChatManager: ObservableObject {
     }
 
     @MainActor
-    private func messages(for peerID: PeerID) -> [BitchatMessage] {
+    private func messages(for peerID: PeerID) -> [YarikMessage] {
         conversationStore?.conversationsByID[.directPeer(peerID)]?.messages ?? []
     }
 
@@ -103,7 +103,7 @@ final class PrivateChatManager: ObservableObject {
             if noiseKeyHex != peerID, !nostrMessages.isEmpty {
                 for message in nostrMessages {
                     // Update senderPeerID for correct read receipts
-                    let updatedMessage = BitchatMessage(
+                    let updatedMessage = YarikMessage(
                         id: message.id,
                         sender: message.sender,
                         content: message.content,
@@ -164,7 +164,7 @@ final class PrivateChatManager: ObservableObject {
                 }
 
                 for message in messages(for: tempPeerID) {
-                    let updatedMessage = BitchatMessage(
+                    let updatedMessage = YarikMessage(
                         id: message.id,
                         sender: message.sender,
                         content: message.content,
@@ -248,7 +248,7 @@ final class PrivateChatManager: ObservableObject {
 
     // MARK: - Private Methods
 
-    private func sendReadReceipt(for message: BitchatMessage) {
+    private func sendReadReceipt(for message: YarikMessage) {
         guard !sentReadReceipts.contains(message.id),
               let senderPeerID = message.senderPeerID else {
             return

@@ -26,7 +26,7 @@ struct BLEAnnounceHandlerEnvironment {
     /// peer-state payload, if any (persistent identity-state read).
     let authenticatedSigningPublicKey: (_ noisePublicKey: Data) -> Data?
     /// Verifies the packet signature against the announced signing key.
-    let verifySignature: (_ packet: BitchatPacket, _ signingPublicKey: Data) -> Bool
+    let verifySignature: (_ packet: YarikPacket, _ signingPublicKey: Data) -> Bool
     /// Direct link state for the peer (BLE-queue read).
     let linkState: (PeerID) -> (hasPeripheral: Bool, hasCentral: Bool)
     /// Whether the link this packet arrived on is already bound to a
@@ -34,7 +34,7 @@ struct BLEAnnounceHandlerEnvironment {
     /// rides on the unsigned TTL, so a replayed announce can look "direct"
     /// on the replayer's link; that link must not shortcut an absent peer
     /// into "connected".
-    let linkBoundToOtherPeer: (_ packet: BitchatPacket, _ peerID: PeerID) -> Bool
+    let linkBoundToOtherPeer: (_ packet: YarikPacket, _ peerID: PeerID) -> Bool
     /// Runs the registry mutation phase under the collections barrier.
     let withRegistryBarrier: (() -> Void) -> Void
     /// Upserts the verified announce into the peer registry.
@@ -69,7 +69,7 @@ struct BLEAnnounceHandlerEnvironment {
         _ scheduleInitialSync: Bool
     ) -> Void
     /// Tracks the announce packet for gossip sync.
-    let trackPacketSeen: (BitchatPacket) -> Void
+    let trackPacketSeen: (YarikPacket) -> Void
     /// Reciprocates the announce for bidirectional discovery.
     let sendAnnounceBack: () -> Void
     /// Schedules a delayed re-announce (afterglow) after the given delay.
@@ -96,7 +96,7 @@ final class BLEAnnounceHandler {
     }
 
     @discardableResult
-    func handle(_ packet: BitchatPacket, from peerID: PeerID) -> BLEAnnounceHandlingResult? {
+    func handle(_ packet: YarikPacket, from peerID: PeerID) -> BLEAnnounceHandlingResult? {
         let env = environment
         let now = env.now()
         let preflight = BLEAnnouncePreflightPolicy.evaluate(

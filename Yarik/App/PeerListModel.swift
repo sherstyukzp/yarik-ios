@@ -55,7 +55,7 @@ struct RecentChatRow: Identifiable, Equatable {
 
 @MainActor
 final class PeerListModel: ObservableObject {
-    @Published private(set) var allPeers: [BitchatPeer] = []
+    @Published private(set) var allPeers: [YarikPeer] = []
     @Published private(set) var meshRows: [MeshPeerRow] = []
     @Published private(set) var geohashPeople: [GeohashPersonRow] = []
     @Published private(set) var groupRows: [GroupChatRow] = []

@@ -1,6 +1,6 @@
 //
 // PrekeyEndToEndTests.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -22,19 +22,19 @@ struct PrekeyEndToEndTests {
 
     private final class PacketTap {
         private let lock = NSLock()
-        private var packets: [BitchatPacket] = []
+        private var packets: [YarikPacket] = []
 
-        func record(_ packet: BitchatPacket) {
+        func record(_ packet: YarikPacket) {
             lock.lock(); packets.append(packet); lock.unlock()
         }
 
-        func first(ofType type: MessageType) -> BitchatPacket? {
+        func first(ofType type: MessageType) -> YarikPacket? {
             lock.lock(); defer { lock.unlock() }
             return packets.first { $0.type == type.rawValue }
         }
     }
 
-    private final class NoiseCaptureDelegate: BitchatDelegate {
+    private final class NoiseCaptureDelegate: YarikDelegate {
         private let lock = NSLock()
         private var payloads: [(peerID: PeerID, type: NoisePayloadType, payload: Data)] = []
 
@@ -47,8 +47,8 @@ struct PrekeyEndToEndTests {
             return payloads
         }
 
-        // Unused BitchatDelegate requirements.
-        func didReceiveMessage(_ message: BitchatMessage) {}
+        // Unused YarikDelegate requirements.
+        func didReceiveMessage(_ message: YarikMessage) {}
         func didConnectToPeer(_ peerID: PeerID) {}
         func didDisconnectFromPeer(_ peerID: PeerID) {}
         func didUpdatePeerList(_ peers: [PeerID]) {}
@@ -70,7 +70,7 @@ struct PrekeyEndToEndTests {
     }
 
     private func preseedConnectedPeer(_ peer: BLEService, in service: BLEService) {
-        let packet = BitchatPacket(
+        let packet = YarikPacket(
             type: MessageType.message.rawValue,
             senderID: Data(hexString: peer.myPeerID.id) ?? Data(),
             recipientID: nil,
@@ -83,7 +83,7 @@ struct PrekeyEndToEndTests {
     }
 
     /// Broadcast announce + prekey bundle from `peer` and return both packets.
-    private func captureAnnounceAndBundle(from peer: BLEService, tap: PacketTap) async throws -> (announce: BitchatPacket, bundle: BitchatPacket) {
+    private func captureAnnounceAndBundle(from peer: BLEService, tap: PacketTap) async throws -> (announce: YarikPacket, bundle: YarikPacket) {
         peer.sendBroadcastAnnounce()
         let published = await TestHelpers.waitUntil(
             { tap.first(ofType: .announce) != nil && tap.first(ofType: .prekeyBundle) != nil },
@@ -195,7 +195,7 @@ struct PrekeyEndToEndTests {
         //    the duplicate is absorbed before delivery — the receiver dedups
         //    on the inner message ID, so redundant courier copies never
         //    re-deliver (or re-ack) the same message.
-        let redelivery = BitchatPacket(
+        let redelivery = YarikPacket(
             type: MessageType.courierEnvelope.rawValue,
             senderID: Data(hexString: carol.myPeerID.id) ?? Data(),
             recipientID: handoverPacket.recipientID,
@@ -297,7 +297,7 @@ struct PrekeyEndToEndTests {
             generatedAt: bundle.generatedAt,
             signature: forgedSignature
         )
-        let forgedPacket = BitchatPacket(
+        let forgedPacket = YarikPacket(
             type: MessageType.prekeyBundle.rawValue,
             senderID: bundlePacket.senderID,
             recipientID: nil,
@@ -351,7 +351,7 @@ struct PrekeyEndToEndTests {
         // signature is bound to Bob's sender ID, so the spoof is dropped — no
         // cache entry, and no gossip entry under either the fake or real ID.
         let fakeSender = Data((0..<8).map { _ in UInt8.random(in: 0...255) })
-        let spoofed = BitchatPacket(
+        let spoofed = YarikPacket(
             type: MessageType.prekeyBundle.rawValue,
             senderID: fakeSender,
             recipientID: nil,
@@ -383,7 +383,7 @@ struct PrekeyEndToEndTests {
 
         // Rewriting the outer timestamp (to defeat the freshness window)
         // invalidates the packet signature, which covers senderID + timestamp.
-        let replay = BitchatPacket(
+        let replay = YarikPacket(
             type: MessageType.prekeyBundle.rawValue,
             senderID: bundlePacket.senderID,
             recipientID: nil,

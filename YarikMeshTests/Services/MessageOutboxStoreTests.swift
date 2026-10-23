@@ -1,6 +1,6 @@
 //
 // MessageOutboxStoreTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Tests for the encrypted-at-rest outbox persistence.
 //

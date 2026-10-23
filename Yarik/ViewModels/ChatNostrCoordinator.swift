@@ -61,7 +61,7 @@ final class ChatNostrCoordinator {
 
     @MainActor
     func sendDeliveryAckViaNostrEmbedded(
-        _ message: BitchatMessage,
+        _ message: YarikMessage,
         wasReadBefore: Bool,
         senderPubkey: String,
         key: Data?

@@ -20,7 +20,7 @@ enum BLEAnnouncePreflightDecision {
 
 enum BLEAnnouncePreflightPolicy {
     static func evaluate(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         from peerID: PeerID,
         localPeerID: PeerID,
         now: Date

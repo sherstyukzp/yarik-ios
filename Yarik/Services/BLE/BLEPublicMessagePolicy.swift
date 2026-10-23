@@ -17,7 +17,7 @@ enum BLEPublicMessageDecision: Equatable {
 
 enum BLEPublicMessagePolicy {
     static func evaluate(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         from peerID: PeerID,
         localPeerID: PeerID,
         now: Date

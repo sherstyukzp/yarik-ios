@@ -25,7 +25,7 @@ struct MyQRView: View {
     var body: some View {
         VStack(spacing: 12) {
             Text(Strings.title)
-                .bitchatFont(size: 16, weight: .bold)
+                .yarikFont(size: 16, weight: .bold)
 
             VStack(spacing: 10) {
                 QRCodeImage(data: qrString, size: 240)
@@ -33,7 +33,7 @@ struct MyQRView: View {
 
                 // Non-scrolling, fully visible URL (wraps across lines)
                 Text(qrString)
-                    .bitchatFont(size: 11)
+                    .yarikFont(size: 11)
                     .textSelection(.enabled)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -74,7 +74,7 @@ struct QRCodeImage: View {
                     .frame(width: size, height: size)
                     .overlay(
                         Text(Strings.unavailable)
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                             .foregroundColor(palette.secondary)
                     )
             }
@@ -150,7 +150,7 @@ struct QRScanView: View {
                 }
                 if cameraUnavailable {
                     Text(Strings.cameraUnavailable)
-                        .bitchatFont(size: 13, weight: .medium)
+                        .yarikFont(size: 13, weight: .medium)
                         .foregroundColor(palette.secondary)
                         .multilineTextAlignment(.center)
                         .padding(16)
@@ -161,7 +161,7 @@ struct QRScanView: View {
 
             #if os(macOS)
             Text(Strings.pastePrompt)
-                .bitchatFont(size: 14, weight: .medium)
+                .yarikFont(size: 14, weight: .medium)
             TextEditor(text: $input)
                 .frame(height: 100)
                 .border(palette.secondary.opacity(0.4))
@@ -171,7 +171,7 @@ struct QRScanView: View {
             .buttonStyle(.bordered)
             if !result.isEmpty {
                 Text(result)
-                    .bitchatFont(size: 12)
+                    .yarikFont(size: 12)
                     .foregroundColor(palette.secondary)
             }
             #endif
@@ -416,7 +416,7 @@ struct VerificationSheetView: View {
             // Top header (always at top)
             HStack {
                 Text("verification.sheet.title")
-                    .bitchatFont(size: 14, weight: .bold)
+                    .yarikFont(size: 14, weight: .bold)
                     .foregroundColor(accentColor)
                 Spacer()
                 SheetCloseButton {
@@ -436,7 +436,7 @@ struct VerificationSheetView: View {
                 if showingScanner {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("verification.scan.prompt_friend")
-                            .bitchatFont(size: 16, weight: .bold)
+                            .yarikFont(size: 16, weight: .bold)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .foregroundColor(accentColor)
@@ -463,13 +463,13 @@ struct VerificationSheetView: View {
                 if showingScanner {
                     Button(action: { showingScanner = false }) {
                         Label("show my qr", systemImage: "qrcode")
-                            .bitchatFont(size: 13)
+                            .yarikFont(size: 13)
                     }
                     .buttonStyle(.bordered)
                 } else {
                     Button(action: { showingScanner = true }) {
                         Label("scan someone else's qr", systemImage: "camera.viewfinder")
-                            .bitchatFont(size: 13, weight: .medium)
+                            .yarikFont(size: 13, weight: .medium)
                     }
                     .buttonStyle(.bordered)
                     .tint(.gray)
@@ -480,7 +480,7 @@ struct VerificationSheetView: View {
                    verificationModel.isVerified(peerID: peerID) {
                     Button(action: { verificationModel.unverifyFingerprint(for: peerID) }) {
                         Label("remove verification", systemImage: "minus.circle")
-                            .bitchatFont(size: 12)
+                            .yarikFont(size: 12)
                     }
                     .buttonStyle(.bordered)
                     .tint(.gray)

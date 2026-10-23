@@ -1,4 +1,4 @@
-# bitchat Protocol Whitepaper
+# yarik Protocol Whitepaper
 
 **Version 2.0**
 
@@ -8,7 +8,7 @@
 
 ## Abstract
 
-bitchat is a decentralized, peer-to-peer messaging application for secure, private, censorship-resistant communication that works with or without the internet. Nearby devices form an ad-hoc Bluetooth Low Energy (BLE) mesh; distant peers are reached over the Nostr protocol when a connection exists. A layered store-and-forward stack — a persistent sender outbox, opportunistic couriers with a spray-and-wait copy budget, gossip-synced public history, and Nostr relay mailboxes — delivers messages to peers who are out of range at send time. This document describes the protocol and its delivery guarantees as implemented.
+yarik is a decentralized, peer-to-peer messaging application for secure, private, censorship-resistant communication that works with or without the internet. Nearby devices form an ad-hoc Bluetooth Low Energy (BLE) mesh; distant peers are reached over the Nostr protocol when a connection exists. A layered store-and-forward stack — a persistent sender outbox, opportunistic couriers with a spray-and-wait copy budget, gossip-synced public history, and Nostr relay mailboxes — delivers messages to peers who are out of range at send time. This document describes the protocol and its delivery guarantees as implemented.
 
 ---
 
@@ -25,7 +25,7 @@ bitchat is a decentralized, peer-to-peer messaging application for secure, priva
 Two transports implement a common `Transport` interface and are coordinated by a `MessageRouter`:
 
 * **BLE mesh** — every device is simultaneously a GATT central and peripheral, relaying packets in a controlled flood. No infrastructure, pairing, or accounts.
-* **Nostr** — private messages to mutual favorites travel in BitChat's app-specific encrypted envelopes over public relays (over Tor where enabled), bridging separate meshes through the internet.
+* **Nostr** — private messages to mutual favorites travel in Yarik's app-specific encrypted envelopes over public relays (over Tor where enabled), bridging separate meshes through the internet.
 
 The router prefers a live mesh link, falls back to Nostr, and engages the courier system when neither can deliver promptly.
 
@@ -82,9 +82,9 @@ Courier envelopes are sealed to the recipient's *static* key with the one-way No
 
 ### 5.3 Nostr Path
 
-Private messages to mutual favorites use BitChat's proprietary private-envelope protocol. An unsigned inner message (kind 14) is encrypted and placed in a sender-signed seal (kind 13); that seal is encrypted again inside a public envelope (kind 1059) signed by a one-time key, so relays learn neither the stable sender identity nor the content. Each encrypted content field is `v2:` followed by base64url of a 24-byte nonce, XChaCha20-Poly1305 ciphertext, and its 16-byte tag. Keys come from secp256k1 ECDH and HKDF-SHA256 (the derivation reuses a "nip44-v2" info label but is not the NIP-44 key schedule).
+Private messages to mutual favorites use Yarik's proprietary private-envelope protocol. An unsigned inner message (kind 14) is encrypted and placed in a sender-signed seal (kind 13); that seal is encrypted again inside a public envelope (kind 1059) signed by a one-time key, so relays learn neither the stable sender identity nor the content. Each encrypted content field is `v2:` followed by base64url of a 24-byte nonce, XChaCha20-Poly1305 ciphertext, and its 16-byte tag. Keys come from secp256k1 ECDH and HKDF-SHA256 (the derivation reuses a "nip44-v2" info label but is not the NIP-44 key schedule).
 
-This format reuses NIP-17/NIP-59 kind numbers but is **not NIP-17, NIP-44, or NIP-59 compatible** and interoperates only with BitChat clients. The outer `p` tag exposes the recipient's Nostr public key to relays; the plaintext and stable sender identity remain inside authenticated ciphertext. Public seal and envelope timestamps are randomized by up to ±15 minutes, while the actual message timestamp is encrypted. The protocol does not provide forward secrecy: compromise of the recipient's static Nostr private key can expose stored envelopes addressed to that key.
+This format reuses NIP-17/NIP-59 kind numbers but is **not NIP-17, NIP-44, or NIP-59 compatible** and interoperates only with Yarik clients. The outer `p` tag exposes the recipient's Nostr public key to relays; the plaintext and stable sender identity remain inside authenticated ciphertext. Public seal and envelope timestamps are randomized by up to ±15 minutes, while the actual message timestamp is encrypted. The protocol does not provide forward secrecy: compromise of the recipient's static Nostr private key can expose stored envelopes addressed to that key.
 
 ## 6. Store and Forward
 
@@ -111,7 +111,7 @@ Public broadcast messages are cached (1000 packets) and reconciled between peers
 
 ### 6.4 Nostr Mailboxes
 
-BitChat private envelopes rest on Nostr relays; clients re-subscribe with a 24-hour lookback on reconnect, covering the both-devices-offline case for mutual favorites whenever either side touches the internet.
+Yarik private envelopes rest on Nostr relays; clients re-subscribe with a 24-hour lookback on reconnect, covering the both-devices-offline case for mutual favorites whenever either side touches the internet.
 
 ### 6.5 Delivery Metrics
 

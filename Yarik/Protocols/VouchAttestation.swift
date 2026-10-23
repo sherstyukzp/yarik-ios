@@ -1,6 +1,6 @@
 //
 // VouchAttestation.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -25,14 +25,14 @@ import Foundation
 /// - `0x02` voucheeSigningKey: 32 bytes, Ed25519; anchors the vouch to a concrete identity
 /// - `0x03` timestamp: 8 bytes big-endian, milliseconds since 1970
 /// - `0x04` signature: 64 bytes, Ed25519 by the VOUCHER's signing key over
-///   `"bitchat-vouch-v1" | voucheeFingerprint | voucheeSigningKey | timestamp`
+///   `"yarik-vouch-v1" | voucheeFingerprint | voucheeSigningKey | timestamp`
 ///
 /// Unknown TLV types are skipped for forward compatibility.
 ///
 /// Batch format (the `vouch` Noise payload body):
 /// `[count: UInt8]` then per attestation `[length: UInt16 BE][attestation TLV]`.
 struct VouchAttestation: Equatable {
-    static let signingContext = "bitchat-vouch-v1"
+    static let signingContext = "yarik-vouch-v1"
     /// Receiver-side expiry for attestations.
     static let maxAge: TimeInterval = 30 * 24 * 60 * 60
     /// Tolerated clock skew for attestations timestamped in the future.

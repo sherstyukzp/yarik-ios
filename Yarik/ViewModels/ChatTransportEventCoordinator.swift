@@ -17,13 +17,13 @@ protocol ChatTransportEventContext: AnyObject {
     var myPeerID: PeerID { get }
     /// A single private chat's timeline (store-direct lookup on
     /// `ChatViewModel`; no `privateChats` dictionary build).
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage]
+    func privateMessages(for peerID: PeerID) -> [YarikMessage]
     var unreadPrivateMessages: Set<PeerID> { get }
     var selectedPrivateChatPeer: PeerID? { get set }
     /// Appends a private message via the single-writer store intent;
     /// returns `false` on duplicate message ID.
     @discardableResult
-    func appendPrivateMessage(_ message: BitchatMessage, to peerID: PeerID) -> Bool
+    func appendPrivateMessage(_ message: YarikMessage, to peerID: PeerID) -> Bool
     /// Removes the peer's chat entirely, including unread state.
     func removePrivateChat(_ peerID: PeerID)
     func markPrivateChatUnread(_ peerID: PeerID)
@@ -36,17 +36,17 @@ protocol ChatTransportEventContext: AnyObject {
     func notifyUIChanged()
 
     // MARK: Inbound message handling
-    func isMessageBlocked(_ message: BitchatMessage) -> Bool
-    func handlePrivateMessage(_ message: BitchatMessage)
-    func handlePublicMessage(_ message: BitchatMessage)
-    func checkForMentions(_ message: BitchatMessage)
-    func sendHapticFeedback(for message: BitchatMessage)
+    func isMessageBlocked(_ message: YarikMessage) -> Bool
+    func handlePrivateMessage(_ message: YarikMessage)
+    func handlePublicMessage(_ message: YarikMessage)
+    func checkForMentions(_ message: YarikMessage)
+    func sendHapticFeedback(for message: YarikMessage)
     func parseMentions(from content: String) -> [String]
 
     // MARK: Peer identity & sessions
     func isPeerBlocked(_ peerID: PeerID) -> Bool
     /// The peer's current entry in the unified peer service, if known.
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer?
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer?
     func resolveNickname(for peerID: PeerID) -> String
     func registerEphemeralSession(peerID: PeerID)
     func removeEphemeralSession(peerID: PeerID)
@@ -98,7 +98,7 @@ extension ChatViewModel: ChatTransportEventContext {
     // `ChatViewModel`. The members below flatten nested service accesses into
     // intent-named calls.
 
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer? {
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer? {
         unifiedPeerService.getPeer(by: peerID)
     }
 
@@ -175,7 +175,7 @@ final class ChatTransportEventCoordinator {
         self.context = context
     }
 
-    func didReceiveMessage(_ message: BitchatMessage) {
+    func didReceiveMessage(_ message: YarikMessage) {
         runOnMain { [self] context in
             handleReceivedMessage(message, in: context)
         }
@@ -186,7 +186,7 @@ final class ChatTransportEventCoordinator {
     /// the transport completes delivery.
     @MainActor
     @discardableResult
-    func didReceiveMessageSynchronously(_ message: BitchatMessage) -> Bool {
+    func didReceiveMessageSynchronously(_ message: YarikMessage) -> Bool {
         handleReceivedMessage(message, in: context)
     }
 
@@ -334,7 +334,7 @@ private extension ChatTransportEventCoordinator {
     ) {
         let normalized = content.trimmed
         let mentions = context.parseMentions(from: normalized)
-        let message = BitchatMessage(
+        let message = YarikMessage(
             id: messageID,
             sender: nickname,
             content: normalized,
@@ -355,7 +355,7 @@ private extension ChatTransportEventCoordinator {
     @MainActor
     @discardableResult
     func handleReceivedMessage(
-        _ message: BitchatMessage,
+        _ message: YarikMessage,
         in context: any ChatTransportEventContext
     ) -> Bool {
         guard !context.isMessageBlocked(message) else { return false }
@@ -392,7 +392,7 @@ private extension ChatTransportEventCoordinator {
             for message in shortPeerMessages {
                 // Rewrite senderPeerID to the stable key so read receipts
                 // keep working; store append dedups by ID and keeps order.
-                let migrated = BitchatMessage(
+                let migrated = YarikMessage(
                     id: message.id,
                     sender: message.sender,
                     content: message.content,
@@ -440,7 +440,7 @@ private extension ChatTransportEventCoordinator {
 
             let senderName = context.unifiedPeer(for: peerID)?.nickname ?? "Unknown"
             let mentions = context.parseMentions(from: packet.content)
-            let message = BitchatMessage(
+            let message = YarikMessage(
                 id: packet.messageID,
                 sender: senderName,
                 content: packet.content,

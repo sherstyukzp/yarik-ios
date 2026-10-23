@@ -1,6 +1,6 @@
 //
 // BoardStore.swift
-// bitchat
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -51,13 +51,13 @@ final class BoardStore {
 
     private struct StoredPost {
         let post: BoardPostPacket
-        let packet: BitchatPacket
+        let packet: YarikPacket
         let rawPacket: Data
     }
 
     private struct StoredTombstone {
         let tombstone: BoardTombstonePacket
-        let packet: BitchatPacket
+        let packet: YarikPacket
         let rawPacket: Data
         let retainUntil: UInt64
         /// True when no matching post was known at ingest time; only these
@@ -107,7 +107,7 @@ final class BoardStore {
     /// Ingest a board packet whose payload decodes to `wire`. The caller must
     /// have verified the wire signature already (`BoardWire.verifySignature`).
     @discardableResult
-    func ingest(_ wire: BoardWire, packet: BitchatPacket) -> BoardIngestResult {
+    func ingest(_ wire: BoardWire, packet: YarikPacket) -> BoardIngestResult {
         guard let rawPacket = packet.toBinaryData(padding: false) else { return .rejected }
         let nowMs = currentMs()
         return queue.sync {
@@ -136,7 +136,7 @@ final class BoardStore {
     }
 
     /// Raw signed packets (posts and live tombstones) for gossip sync rounds.
-    func syncCandidates() -> [BitchatPacket] {
+    func syncCandidates() -> [YarikPacket] {
         let nowMs = currentMs()
         return queue.sync {
             pruneExpiredLocked(nowMs: nowMs)
@@ -165,7 +165,7 @@ final class BoardStore {
 
     private func ingestLocked(
         _ wire: BoardWire,
-        packet: BitchatPacket,
+        packet: YarikPacket,
         rawPacket: Data,
         nowMs: UInt64,
         retainUntilOverride: UInt64? = nil
@@ -179,7 +179,7 @@ final class BoardStore {
         }
     }
 
-    private func ingestPostLocked(_ post: BoardPostPacket, packet: BitchatPacket, rawPacket: Data, nowMs: UInt64) -> BoardIngestResult {
+    private func ingestPostLocked(_ post: BoardPostPacket, packet: YarikPacket, rawPacket: Data, nowMs: UInt64) -> BoardIngestResult {
         guard post.expiresAt > nowMs else { return .rejected }
         // Receive-time sanity (this is the single chokepoint for radio, sync,
         // and disk restores): the decoder only enforces the createdAt to
@@ -212,7 +212,7 @@ final class BoardStore {
 
     private func ingestTombstoneLocked(
         _ tombstone: BoardTombstonePacket,
-        packet: BitchatPacket,
+        packet: YarikPacket,
         rawPacket: Data,
         nowMs: UInt64,
         retainUntilOverride: UInt64? = nil
@@ -344,7 +344,7 @@ final class BoardStore {
         let nowMs = currentMs()
         queue.sync {
             for entry in payloads {
-                guard let packet = BitchatPacket.from(entry.packet),
+                guard let packet = YarikPacket.from(entry.packet),
                       packet.type == MessageType.boardPost.rawValue,
                       let wire = BoardWire.decode(from: packet.payload),
                       wire.verifySignature() else { continue }

@@ -1,6 +1,6 @@
 //
 // ChatPeerListCoordinatorContextTests.swift
-// bitchatTests
+// YarikMeshTests
 //
 // Exercises `ChatPeerListCoordinator` against a mock `ChatPeerListContext` —
 // proving the coordinator works without a `ChatViewModel`, following the
@@ -26,9 +26,9 @@ import BitFoundation
 private final class MockChatPeerListContext: ChatPeerListContext {
     // Connection & chat state
     var isConnected = false
-    var privateChats: [PeerID: [BitchatMessage]] = [:]
+    var privateChats: [PeerID: [YarikMessage]] = [:]
 
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         privateChats[peerID] ?? []
     }
     var unreadPrivateMessages: Set<PeerID> = []
@@ -49,7 +49,7 @@ private final class MockChatPeerListContext: ChatPeerListContext {
     }
 
     // Peers & sessions
-    var unifiedPeers: [BitchatPeer] = []
+    var unifiedPeers: [YarikPeer] = []
     var connectedMeshPeers: Set<PeerID> = []
     var reachableMeshPeers: Set<PeerID> = []
     var activeMeshPeerCountValue = 0
@@ -85,8 +85,8 @@ private func drainMainActorTasks() async {
     for _ in 0..<10 { await Task.yield() }
 }
 
-private func makeMessage(id: String, senderPeerID: PeerID? = nil) -> BitchatMessage {
-    BitchatMessage(
+private func makeMessage(id: String, senderPeerID: PeerID? = nil) -> YarikMessage {
+    YarikMessage(
         id: id,
         sender: "alice",
         content: "hello",
@@ -171,7 +171,7 @@ struct ChatPeerListCoordinatorContextTests {
         let noiseKeyWithMessages = PeerID(str: String(repeating: "ef", count: 32))
 
         context.unifiedPeers = [
-            BitchatPeer(
+            YarikPeer(
                 peerID: currentPeer,
                 noisePublicKey: Data(repeating: 0x01, count: 32),
                 nickname: "alice"

@@ -1,6 +1,6 @@
 //
 //  CommandSuggestionsView.swift
-//  bitchat
+//  yarik
 //
 //  Created by Islam on 29/10/2025.
 //
@@ -63,20 +63,20 @@ struct CommandSuggestionsView: View {
     private func buttonRow(for command: CommandInfo) -> some View {
         HStack {
             Text(command.alias)
-                .bitchatFont(size: 11)
+                .yarikFont(size: 11)
                 .foregroundColor(palette.primary)
                 .fontWeight(.medium)
 
             if let placeholder = command.placeholder {
                 Text(placeholder)
-                    .bitchatFont(size: 10)
+                    .yarikFont(size: 10)
                     .foregroundColor(palette.secondary.opacity(0.8))
             }
 
             Spacer()
 
             Text(command.description)
-                .bitchatFont(size: 10)
+                .yarikFont(size: 10)
                 .foregroundColor(palette.secondary)
         }
         .padding(.horizontal, 12)

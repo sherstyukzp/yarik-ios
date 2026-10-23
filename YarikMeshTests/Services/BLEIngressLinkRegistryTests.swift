@@ -206,8 +206,8 @@ struct BLEIngressLinkRegistryTests {
     }
 }
 
-private func makePacket(sender: PeerID, timestamp: UInt64) -> BitchatPacket {
-    BitchatPacket(
+private func makePacket(sender: PeerID, timestamp: UInt64) -> YarikPacket {
+    YarikPacket(
         type: MessageType.message.rawValue,
         senderID: Data(hexString: sender.id) ?? Data(),
         recipientID: nil,
@@ -218,8 +218,8 @@ private func makePacket(sender: PeerID, timestamp: UInt64) -> BitchatPacket {
     )
 }
 
-private func makeRequestSyncPacket(sender: PeerID) -> BitchatPacket {
-    BitchatPacket(
+private func makeRequestSyncPacket(sender: PeerID) -> YarikPacket {
+    YarikPacket(
         type: MessageType.requestSync.rawValue,
         senderID: Data(hexString: sender.id) ?? Data(),
         recipientID: nil,
@@ -230,8 +230,8 @@ private func makeRequestSyncPacket(sender: PeerID) -> BitchatPacket {
     )
 }
 
-private func makeAnnouncePacket(sender: PeerID, ttl: UInt8) -> BitchatPacket {
-    BitchatPacket(
+private func makeAnnouncePacket(sender: PeerID, ttl: UInt8) -> YarikPacket {
+    YarikPacket(
         type: MessageType.announce.rawValue,
         senderID: Data(hexString: sender.id) ?? Data(),
         recipientID: nil,

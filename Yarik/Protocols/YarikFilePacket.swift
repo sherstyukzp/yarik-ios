@@ -1,6 +1,6 @@
 //
-// BitchatFilePacket.swift
-// bitchat
+// YarikFilePacket.swift
+// yarik
 //
 // This is free and unencumbered software released into the public domain.
 // For more information, see <https://unlicense.org>
@@ -12,7 +12,7 @@ import BitLogger
 
 /// TLV payload for Bluetooth mesh file transfers (voice notes, images, generic files).
 /// Mirrors the Android client specification to ensure cross-platform interoperability.
-struct BitchatFilePacket {
+struct YarikFilePacket {
     var fileName: String?
     var fileSize: UInt64?
     var mimeType: String?
@@ -66,7 +66,7 @@ struct BitchatFilePacket {
     }
 
     /// Decodes TLV payloads, tolerating legacy encodings (FILE_SIZE len=8, CONTENT len=2) when possible.
-    static func decode(_ data: Data) -> BitchatFilePacket? {
+    static func decode(_ data: Data) -> YarikFilePacket? {
         var cursor = data.startIndex
         let end = data.endIndex
 
@@ -146,7 +146,7 @@ struct BitchatFilePacket {
 
         guard !content.isEmpty else { return nil }
         guard FileTransferLimits.isValidPayload(content.count) else { return nil }
-        return BitchatFilePacket(
+        return YarikFilePacket(
             fileName: fileName,
             fileSize: fileSize ?? UInt64(content.count),
             mimeType: mimeType,
@@ -166,7 +166,7 @@ struct BitchatFilePacket {
 /// converge. Android and older-iOS timestamp-only names remain ineligible and
 /// retain their legacy random local IDs (transfer-compatible, no receipts).
 enum PrivateMediaMessageIdentity {
-    private static let domain = Data("bitchat-private-media-message-v1".utf8)
+    private static let domain = Data("yarik-private-media-message-v1".utf8)
     private static let idPrefix = "media-"
     private static let digestHexLength = 32
 
@@ -230,7 +230,7 @@ enum PrivateMediaMessageIdentity {
     }
 
     static func stableID(
-        for packet: BitchatFilePacket,
+        for packet: YarikFilePacket,
         senderPeerID: PeerID,
         recipientPeerID: PeerID
     ) -> String? {

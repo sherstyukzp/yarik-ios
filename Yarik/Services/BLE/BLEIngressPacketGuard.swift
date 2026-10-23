@@ -10,7 +10,7 @@ enum BLEIngressPacketGuard {
     }
 
     static func evaluate(
-        packet: BitchatPacket,
+        packet: YarikPacket,
         claimedSenderID: PeerID,
         boundPeerID: PeerID?,
         localPeerID: PeerID,
@@ -52,7 +52,7 @@ enum BLEIngressPacketGuard {
     }
 
     static func validatePayload(
-        _ packet: BitchatPacket,
+        _ packet: YarikPacket,
         from peerID: PeerID,
         nowMs: UInt64 = UInt64(Date().timeIntervalSince1970 * 1000),
         maxTimestampSkewMs: UInt64 = TransportConfig.bleMaxTimestampSkewMs,

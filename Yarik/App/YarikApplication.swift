@@ -8,7 +8,7 @@ import AppKit
 
 /// Process identity used by the keychain and the shared app group.
 /// The type name stays so existing keychain service identifiers keep resolving.
-enum BitchatApp {
+enum YarikAppIdentity {
     static var bundleID: String {
         Bundle.main.bundleIdentifier ?? "com.ukropsoft.yarik"
     }

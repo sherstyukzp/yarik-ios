@@ -1,6 +1,6 @@
 //
 //  MediaMessageView.swift
-//  bitchat
+//  yarik
 //
 //  Created by Islam on 30/03/2026.
 //
@@ -13,10 +13,10 @@ struct MediaMessageView: View {
     @Environment(\.appTheme) private var theme
     @ThemedPalette private var palette
     @EnvironmentObject private var conversationUIModel: ConversationUIModel
-    let message: BitchatMessage
-    let media: BitchatMessage.Media
+    let message: YarikMessage
+    let media: YarikMessage.Media
     /// Value snapshot of the message's mutable delivery status, captured at
-    /// construction (see `TextMessageView.deliveryStatus`): `BitchatMessage`
+    /// construction (see `TextMessageView.deliveryStatus`): `YarikMessage`
     /// is a reference type mutated in place, and SwiftUI compares reference
     /// fields by identity, so without the snapshot a status-only change
     /// (send progress, delivered → read) would not re-render this row.
@@ -25,7 +25,7 @@ struct MediaMessageView: View {
 
     @Binding var imagePreviewURL: URL?
 
-    init(message: BitchatMessage, media: BitchatMessage.Media, imagePreviewURL: Binding<URL?>) {
+    init(message: YarikMessage, media: YarikMessage.Media, imagePreviewURL: Binding<URL?>) {
         self.message = message
         self.media = media
         self.deliveryStatus = message.deliveryStatus
@@ -43,14 +43,14 @@ struct MediaMessageView: View {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
             if message.isPrivate {
                 Image(systemName: "lock.fill")
-                    .font(.bitchatSystem(size: 8))
+                    .font(.yarikSystem(size: 8))
                     .foregroundColor(Color.orange.opacity(0.75))
                     .padding(.trailing, 4)
                     .accessibilityHidden(true)
             }
             if conversationUIModel.showsVerifiedSeal(for: message) {
                 Image(systemName: "checkmark.seal.fill")
-                    .font(.bitchatSystem(size: 8))
+                    .font(.yarikSystem(size: 8))
                     .foregroundColor(Color.green.opacity(0.85))
                     .padding(.trailing, 4)
                     .accessibilityLabel(
@@ -86,13 +86,13 @@ struct MediaMessageView: View {
                 if message.isPrivate && conversationUIModel.isSentByCurrentUser(message),
                    deliveryStatus != .notSentYet {
                     if case .failed = deliveryStatus {
-                        Text(verbatim: deliveryStatus.bitchatDescription)
-                            .bitchatFont(size: 11)
+                        Text(verbatim: deliveryStatus.yarikDescription)
+                            .yarikFont(size: 11)
                             .foregroundColor(Color.red.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
                     } else if showDeliveryDetail {
-                        Text(verbatim: deliveryStatus.bitchatDescription)
-                            .bitchatFont(size: 11)
+                        Text(verbatim: deliveryStatus.yarikDescription)
+                            .yarikFont(size: 11)
                             .foregroundColor(palette.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -142,7 +142,7 @@ struct MediaMessageView: View {
     }
 
     private func mediaSendState(for deliveryStatus: DeliveryStatus, isFromMe: Bool) -> (isSending: Bool, progress: Double?, canCancel: Bool) {
-        // A received message is never in a send state: BitchatMessage defaults
+        // A received message is never in a send state: YarikMessage defaults
         // private messages to .sending, so an incoming message's status must
         // not drive the reveal mask or disable the reveal tap.
         guard isFromMe else { return (false, nil, false) }

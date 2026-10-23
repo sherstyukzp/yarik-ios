@@ -43,7 +43,7 @@ struct ContentHeaderView: View {
     var body: some View {
         HStack(spacing: 0) {
             Text(verbatim: "Yarik")
-                .bitchatFont(size: 18, weight: .medium)
+                .yarikFont(size: 18, weight: .medium)
                 .lineLimit(1)
                 .foregroundColor(palette.primary)
                 // When icons crowd the header, squeeze the nickname first
@@ -70,7 +70,7 @@ struct ContentHeaderView: View {
                 // stays undiscoverable on purpose — it's destructive.)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint(
-                    String(localized: "content.accessibility.app_info_hint", comment: "Accessibility hint on the bitchat/ logo explaining a tap opens app info")
+                    String(localized: "content.accessibility.app_info_hint", comment: "Accessibility hint on the yarik/ logo explaining a tap opens app info")
                 )
                 .accessibilityAction {
                     appChromeModel.presentAppInfo()
@@ -78,7 +78,7 @@ struct ContentHeaderView: View {
 
             HStack(spacing: 0) {
                 Text(verbatim: "@")
-                    .bitchatFont(size: 14)
+                    .yarikFont(size: 14)
                     .foregroundColor(palette.secondary)
                     // Keep the sigil whole while the field beside it shrinks.
                     .fixedSize()
@@ -91,7 +91,7 @@ struct ContentHeaderView: View {
                     )
                 )
                 .textFieldStyle(.plain)
-                .bitchatFont(size: 14)
+                .yarikFont(size: 14)
                 .frame(maxWidth: 80)
                 .foregroundColor(palette.primary)
                 .focused(isNicknameFieldFocused)
@@ -130,7 +130,7 @@ struct ContentHeaderView: View {
                     // now, so the indicator deep-links there.
                     Button(action: { appChromeModel.presentAppInfo() }) {
                         Image(systemName: "globe")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .foregroundColor(palette.secondary.opacity(0.8))
                             .headerTapTarget()
                     }
@@ -148,7 +148,7 @@ struct ContentHeaderView: View {
 
                 if carriedMailCount > 0 {
                     Image(systemName: "figure.walk")
-                        .font(.bitchatSystem(size: 12))
+                        .font(.yarikSystem(size: 12))
                         .foregroundColor(palette.secondary.opacity(0.8))
                         .headerTapTarget()
                         .accessibilityLabel(
@@ -166,7 +166,7 @@ struct ContentHeaderView: View {
                 if appChromeModel.hasUnreadPrivateMessages {
                     Button(action: { appChromeModel.openMostRelevantPrivateChat() }) {
                         Image(systemName: "envelope.fill")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .foregroundColor(Color.orange)
                             .headerTapTarget()
                     }
@@ -187,7 +187,7 @@ struct ContentHeaderView: View {
                     // Filled whenever the current scope has notices at all
                     // (matching the orange tint); hollow means nothing here.
                     Image(systemName: scopeHasNotices || unseenNoticesCount > 0 ? "pin.fill" : "pin")
-                        .font(.bitchatSystem(size: 12))
+                        .font(.yarikSystem(size: 12))
                         .foregroundColor(
                             scopeHasNotices || unseenNoticesCount > 0
                                 ? Color.orange.opacity(0.8)
@@ -215,7 +215,7 @@ struct ContentHeaderView: View {
                 if case .location(let channel) = locationChannelsModel.selectedChannel {
                     Button(action: { locationChannelsModel.toggleBookmark(channel.geohash) }) {
                         Image(systemName: locationChannelsModel.isBookmarked(channel.geohash) ? "bookmark.fill" : "bookmark")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .headerTapTarget()
                     }
                     .buttonStyle(.plain)
@@ -229,7 +229,7 @@ struct ContentHeaderView: View {
 
                     Button(action: { requestHeaderShare(forGeohash: channel.geohash) }) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.bitchatSystem(size: 12))
+                            .font(.yarikSystem(size: 12))
                             .headerTapTarget()
                     }
                     .buttonStyle(.plain)
@@ -255,7 +255,7 @@ struct ContentHeaderView: View {
                     }()
 
                     Text(badgeText)
-                        .bitchatFont(size: 14)
+                        .yarikFont(size: 14)
                         .foregroundColor(badgeColor)
                         .lineLimit(headerLineLimit)
                         .fixedSize(horizontal: true, vertical: false)
@@ -374,7 +374,7 @@ struct ContentHeaderView: View {
                 pendingShareGeohash = nil
             }
         } message: {
-            Text(String(localized: "channel.share.precision_warning.message", defaultValue: "this channel covers a small area. an invite sent over sms or imessage is visible to the carrier and both handsets — it discloses interest in that place, not only that someone uses bitchat.", comment: "Body of the confirmation before sharing a fine-precision geohash invite"))
+            Text(String(localized: "channel.share.precision_warning.message", defaultValue: "this channel covers a small area. an invite sent over sms or imessage is visible to the carrier and both handsets — it discloses interest in that place, not only that someone uses yarik.", comment: "Body of the confirmation before sharing a fine-precision geohash invite"))
         }
         .sheet(item: $activeSharePayload) { payload in
             ShareActivityView(text: payload.text)

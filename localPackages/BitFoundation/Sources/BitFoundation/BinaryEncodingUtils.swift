@@ -1,6 +1,6 @@
 //
 // BinaryEncodingUtils.swift
-// bitchat
+// yarik
 //
 // Binary encoding utilities for efficient protocol messages
 //

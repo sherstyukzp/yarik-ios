@@ -1,6 +1,6 @@
 //
 // NearbyNotesCounter.swift
-// bitchat
+// yarik
 //
 // Counts unexpired location notes left at the user's current building-level
 // geohash so the empty mesh timeline can say "📍 3 notes left here". Only

@@ -17,10 +17,10 @@ import Foundation
 @MainActor
 protocol ChatPeerIdentityContext: AnyObject {
     // MARK: Conversation state
-    var privateChats: [PeerID: [BitchatMessage]] { get }
+    var privateChats: [PeerID: [YarikMessage]] { get }
     /// A single private chat's timeline. Witnessed by the store-direct
     /// lookup on `ChatViewModel` (no `privateChats` dictionary build).
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage]
+    func privateMessages(for peerID: PeerID) -> [YarikMessage]
     var unreadPrivateMessages: Set<PeerID> { get }
     /// Clears the peer's unread flag (single-writer store intent).
     func markPrivateChatRead(_ peerID: PeerID)
@@ -52,7 +52,7 @@ protocol ChatPeerIdentityContext: AnyObject {
     // MARK: Unified peer service
     var connectedPeers: Set<PeerID> { get }
     /// The peer's current entry in the unified peer service, if known.
-    func unifiedPeer(for peerID: PeerID) -> BitchatPeer?
+    func unifiedPeer(for peerID: PeerID) -> YarikPeer?
     func unifiedIsBlocked(_ peerID: PeerID) -> Bool
     func unifiedToggleFavorite(_ peerID: PeerID)
     func unifiedFingerprint(for peerID: PeerID) -> String?
@@ -677,7 +677,7 @@ private extension ChatPeerIdentityCoordinator {
 /// Default for conforming test contexts that model chats as a dictionary;
 /// `ChatViewModel` overrides with a store-direct lookup.
 extension ChatPeerIdentityContext {
-    func privateMessages(for peerID: PeerID) -> [BitchatMessage] {
+    func privateMessages(for peerID: PeerID) -> [YarikMessage] {
         privateChats[peerID] ?? []
     }
 }
