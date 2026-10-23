@@ -108,11 +108,9 @@ struct ContentView: View {
     @State private var showSidebar = false
     @State private var selectedMessageSender: String?
     @State private var selectedMessageSenderID: PeerID?
-    @FocusState private var isNicknameFieldFocused: Bool
     @State private var isAtBottomPublic = true
     @State private var isAtBottomPrivate = true
     @State private var autocompleteDebounceTimer: Timer?
-    @State private var showVerifySheet = false
     @State private var imagePreviewURL: URL?
     #if os(iOS)
     @State private var showImagePicker = false
@@ -120,9 +118,7 @@ struct ContentView: View {
     #else
     @State private var showMacImagePicker = false
     #endif
-    @ScaledMetric(relativeTo: .body) private var headerHeight: CGFloat = 44
-    @ScaledMetric(relativeTo: .subheadline) private var headerPeerIconSize: CGFloat = 11
-    @ScaledMetric(relativeTo: .subheadline) private var headerPeerCountFontSize: CGFloat = 12
+    @State private var path: [MessengerRoute] = []
     @State private var windowCountPublic: Int = 300
     @State private var windowCountPrivate: [PeerID: Int] = [:]
 
@@ -140,11 +136,7 @@ struct ContentView: View {
         )
     }
 
-    private var usesGlassLayout: Bool { appTheme.usesGlassChrome }
-
-    private var isPeopleSheetPresented: Bool {
-        showSidebar || selectedPrivatePeerID != nil
-    }
+    private var isPeopleSheetPresented: Bool { false }
 
     private func rootModalPresentationState(
         includingVoiceAlert: Bool
@@ -159,7 +151,7 @@ struct ContentView: View {
             appChromeModel: appChromeModel,
             isPeopleSheetPresented: isPeopleSheetPresented,
             isImagePreviewPresented: imagePreviewURL != nil,
-            isVerificationSheetPresented: showVerifySheet,
+            isVerificationSheetPresented: false,
             isVoiceAlertPresented: includingVoiceAlert && voiceRecordingVM.showAlert,
             isMediaPickerPresented: isMediaPickerPresented
         )
@@ -244,7 +236,6 @@ struct ContentView: View {
                 }
                 #if os(macOS)
                 DispatchQueue.main.async {
-                    isNicknameFieldFocused = false
                     isTextFieldFocused = true
                 }
                 #endif
@@ -268,9 +259,6 @@ struct ContentView: View {
         .frame(minWidth: 600, minHeight: 400)
         #endif
         .onChange(of: selectedPrivatePeerID) { newValue in
-            if newValue != nil {
-                showSidebar = true
-            }
             sharedContentImportModel.updateDestination(sharedContentDestination)
             switchComposerDraft(to: ComposerDraftStore.Key.from(
                 peerID: newValue,
@@ -298,82 +286,6 @@ struct ContentView: View {
                 ComposerDraftStore.save(messageText, for: activeDraftKey)
             }
         }
-        .sheet(
-            isPresented: Binding(
-                get: { isPeopleSheetPresented },
-                set: { isPresented in
-                    if !isPresented {
-                        showSidebar = false
-                        // Scene/background and alert-presentation
-                        // reconciliation (Bluetooth-off, recording errors)
-                        // are not user requests to leave the conversation.
-                        // Keep the selected DM so the sheet remains live
-                        // when the app returns from Settings.
-                        if scenePhase == .active,
-                           !appChromeModel.showBluetoothAlert,
-                           !voiceRecordingVM.showAlert {
-                            privateConversationModel.endConversation()
-                        }
-                    }
-                }
-            )
-        ) {
-            #if os(iOS)
-            ContentPeopleSheetView(
-                showSidebar: $showSidebar,
-                messageText: $messageText,
-                selectedMessageSender: $selectedMessageSender,
-                selectedMessageSenderID: $selectedMessageSenderID,
-                imagePreviewURL: $imagePreviewURL,
-                windowCountPublic: $windowCountPublic,
-                windowCountPrivate: $windowCountPrivate,
-                isAtBottomPrivate: $isAtBottomPrivate,
-                isTextFieldFocused: $isTextFieldFocused,
-                voiceRecordingVM: voiceRecordingVM,
-                autocompleteDebounceTimer: $autocompleteDebounceTimer,
-                headerHeight: headerHeight,
-                onSendMessage: sendMessage,
-                showImagePicker: $showImagePicker,
-                imagePickerSourceType: $imagePickerSourceType
-            )
-            // Sheets + NavigationStack can drop inherited EnvironmentObjects on
-            // some iOS versions (#1558). Re-inject every model the sheet tree
-            // reads so ContentPeopleListView / MessageListView never crash.
-            .environmentObject(appChromeModel)
-            .environmentObject(privateConversationModel)
-            .environmentObject(verificationModel)
-            .environmentObject(conversationUIModel)
-            .environmentObject(locationChannelsModel)
-            .environmentObject(peerListModel)
-            .environmentObject(publicChatModel)
-            .environmentObject(privateInboxModel)
-            #else
-            ContentPeopleSheetView(
-                showSidebar: $showSidebar,
-                messageText: $messageText,
-                selectedMessageSender: $selectedMessageSender,
-                selectedMessageSenderID: $selectedMessageSenderID,
-                imagePreviewURL: $imagePreviewURL,
-                windowCountPublic: $windowCountPublic,
-                windowCountPrivate: $windowCountPrivate,
-                isAtBottomPrivate: $isAtBottomPrivate,
-                isTextFieldFocused: $isTextFieldFocused,
-                voiceRecordingVM: voiceRecordingVM,
-                autocompleteDebounceTimer: $autocompleteDebounceTimer,
-                headerHeight: headerHeight,
-                onSendMessage: sendMessage,
-                showMacImagePicker: $showMacImagePicker
-            )
-            .environmentObject(appChromeModel)
-            .environmentObject(privateConversationModel)
-            .environmentObject(verificationModel)
-            .environmentObject(conversationUIModel)
-            .environmentObject(locationChannelsModel)
-            .environmentObject(peerListModel)
-            .environmentObject(publicChatModel)
-            .environmentObject(privateInboxModel)
-            #endif
-        }
         .sheet(isPresented: $appChromeModel.isAppInfoPresented) {
             AppInfoView(
                 topologyProvider: { appChromeModel.meshTopologyDisplayModel() },
@@ -382,7 +294,7 @@ struct ContentView: View {
             .environmentObject(locationChannelsModel)
         }
         .sheet(isPresented: Binding(
-            get: { appChromeModel.showingFingerprintFor != nil && !showSidebar && selectedPrivatePeerID == nil },
+            get: { appChromeModel.showingFingerprintFor != nil },
             set: { _ in appChromeModel.clearFingerprint() }
         )) {
             if let peerID = appChromeModel.showingFingerprintFor {
@@ -392,7 +304,7 @@ struct ContentView: View {
         }
         #if os(iOS)
         .fullScreenCover(isPresented: Binding(
-            get: { showImagePicker && !showSidebar && selectedPrivatePeerID == nil },
+            get: { showImagePicker },
             set: { newValue in
                 if !newValue {
                     showImagePicker = false
@@ -408,7 +320,7 @@ struct ContentView: View {
         #endif
         #if os(macOS)
         .sheet(isPresented: Binding(
-            get: { showMacImagePicker && !showSidebar && selectedPrivatePeerID == nil },
+            get: { showMacImagePicker },
             set: { newValue in
                 if !newValue {
                     showMacImagePicker = false
@@ -488,108 +400,20 @@ struct ContentView: View {
         }
     }
 
-    /// Matrix: classic opaque bars with dividers. Glass: full-bleed message
-    /// list scrolling underneath floating chrome panels (safe-area insets),
-    /// so the translucency gains usable space instead of losing it.
     @ViewBuilder
     private var mainContent: some View {
-        if usesGlassLayout {
-            publicMessageList
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    headerView
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    if selectedPrivatePeerID == nil {
-                        composerView
-                    }
-                }
-        } else {
-            VStack(spacing: 0) {
-                headerView
-
-                Divider()
-
-                GeometryReader { geometry in
-                    VStack(spacing: 0) {
-                        publicMessageList
-                            .background(palette.background)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                }
-
-                Divider()
-
-                if selectedPrivatePeerID == nil {
-                    composerView
-                }
-            }
-        }
-    }
-
-    private var headerView: some View {
-        VStack(spacing: 0) {
-            ContentHeaderView(
-                showSidebar: $showSidebar,
-                showVerifySheet: $showVerifySheet,
-                isNicknameFieldFocused: $isNicknameFieldFocused,
-                headerHeight: headerHeight,
-                headerPeerIconSize: headerPeerIconSize,
-                headerPeerCountFontSize: headerPeerCountFontSize
-            )
-
-            // Failed-wipe outranks connectivity: "your data may still be
-            // here" matters more than "the radio is off".
-            if appChromeModel.panicWipeBlocked {
-                PanicWipeBlockedBanner()
-            }
-
-            if let issue = ConnectivityIssue.resolve(
-                bluetoothState: appChromeModel.bluetoothState,
-                torBlocked: appChromeModel.torBlocked
-            ) {
-                ConnectivityStatusBanner(issue: issue)
-            }
-        }
-        // Hosted here rather than on the logo Text so the pending dialog
-        // survives whatever happens to the header chrome.
-        .confirmationDialog(
-            Text(
-                String(localized: "app_info.settings.danger.panic_confirm_title", defaultValue: "wipe all data?", comment: "Title of the confirmation dialog before a panic wipe")
-            ),
-            isPresented: $appChromeModel.showPanicConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button(role: .destructive) {
-                appChromeModel.panicClearAllData()
-            } label: {
-                Text(
-                    String(localized: "app_info.settings.danger.panic_confirm_action", defaultValue: "wipe everything", comment: "Destructive confirmation button that performs the panic wipe")
-                )
-            }
-            Button("common.cancel", role: .cancel) {}
-        }
-    }
-
-    private var publicMessageList: some View {
-        MessageListView(
-            privatePeer: nil,
-            isAtBottom: $isAtBottomPublic,
+        #if os(iOS)
+        MessengerInboxView(
+            path: $path,
             messageText: $messageText,
             selectedMessageSender: $selectedMessageSender,
             selectedMessageSenderID: $selectedMessageSenderID,
             imagePreviewURL: $imagePreviewURL,
             windowCountPublic: $windowCountPublic,
             windowCountPrivate: $windowCountPrivate,
+            isAtBottomPublic: $isAtBottomPublic,
+            isAtBottomPrivate: $isAtBottomPrivate,
             showSidebar: $showSidebar,
-            isTextFieldFocused: $isTextFieldFocused
-        )
-    }
-
-    private var composerView: some View {
-        #if os(iOS)
-        ContentComposerView(
-            messageText: $messageText,
             isTextFieldFocused: $isTextFieldFocused,
             voiceRecordingVM: voiceRecordingVM,
             autocompleteDebounceTimer: $autocompleteDebounceTimer,
@@ -598,8 +422,17 @@ struct ContentView: View {
             imagePickerSourceType: $imagePickerSourceType
         )
         #else
-        ContentComposerView(
+        MessengerInboxView(
+            path: $path,
             messageText: $messageText,
+            selectedMessageSender: $selectedMessageSender,
+            selectedMessageSenderID: $selectedMessageSenderID,
+            imagePreviewURL: $imagePreviewURL,
+            windowCountPublic: $windowCountPublic,
+            windowCountPrivate: $windowCountPrivate,
+            isAtBottomPublic: $isAtBottomPublic,
+            isAtBottomPrivate: $isAtBottomPrivate,
+            showSidebar: $showSidebar,
             isTextFieldFocused: $isTextFieldFocused,
             voiceRecordingVM: voiceRecordingVM,
             autocompleteDebounceTimer: $autocompleteDebounceTimer,

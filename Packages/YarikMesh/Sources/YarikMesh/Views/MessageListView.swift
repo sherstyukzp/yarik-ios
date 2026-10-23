@@ -23,9 +23,6 @@ struct MessageListView: View {
     @EnvironmentObject private var appChromeModel: AppChromeModel
     @ObservedObject private var nearbyNotes = NearbyNotesCounter.shared
 
-    @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.appTheme) private var theme
-
     let privatePeer: PeerID?
     @Binding var isAtBottom: Bool
     @Binding var messageText: String
@@ -177,7 +174,10 @@ struct MessageListView: View {
                 // sightings, live hints) stays visible below it instead of
                 // vanishing the moment echoes exist.
                 if privatePeer == nil, showsAmbientFooter(messageItems: messageItems) {
-                    MeshEmptyStateView(compact: true, bluetoothAvailable: bluetoothCanScan)
+                    Text("Це попередні повідомлення з цього місця.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 12)
                         .padding(.top, 20)
                         .padding(.bottom, 8)
@@ -297,15 +297,6 @@ struct MessageListView: View {
 }
 
 private extension MessageListView {
-    /// Whether the radio could be scanning at all — the empty-state radar
-    /// must not sweep over a switched-off or denied radio.
-    var bluetoothCanScan: Bool {
-        switch appChromeModel.bluetoothState {
-        case .poweredOff, .unauthorized, .unsupported: return false
-        default: return true
-        }
-    }
-
     var currentContextKey: String {
         if let peer = privatePeer {
             return "dm:\(peer)"
@@ -383,10 +374,16 @@ private extension MessageListView {
         VStack(alignment: .leading, spacing: 6) {
             switch locationChannelsModel.selectedChannel {
             case .mesh:
-                MeshEmptyStateView(
-                    fillHeight: max(0, fillHeight - 24),
-                    bluetoothAvailable: bluetoothCanScan
-                )
+                VStack(spacing: 8) {
+                    Image(systemName: "antenna.radiowaves.left.and.right")
+                        .font(.largeTitle)
+                        .foregroundStyle(.secondary)
+                    Text("Напишіть щось — це побачать люди в радіусі Bluetooth.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, minHeight: max(0, fillHeight - 24))
             case .location(let channel):
                 emptyStateLine(
                     String(
@@ -508,25 +505,12 @@ private extension MessageListView {
 
     @ViewBuilder
     func messageRow(for message: BitchatMessage) -> some View {
-        Group {
-            if message.sender == "system" {
-                systemMessageRow(message)
-            } else if let media = conversationUIModel.mediaAttachment(for: message) {
-                MediaMessageView(message: message, media: media, imagePreviewURL: $imagePreviewURL)
-            } else {
-                TextMessageView(message: message)
-            }
-        }
-        // Archived echoes ("heard here earlier") render dimmed: real history,
-        // visually distinct from the live conversation.
+        MessengerMessageRow(
+            message: message,
+            showsSenderName: privatePeer == nil || privatePeer?.isGroup == true,
+            imagePreviewURL: $imagePreviewURL
+        )
         .opacity(message.isArchivedEcho ? 0.55 : 1)
-    }
-
-    @ViewBuilder
-    func systemMessageRow(_ message: BitchatMessage) -> some View {
-        Text(conversationUIModel.formatMessage(message, colorScheme: colorScheme, theme: theme))
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     func expandWindow(ifNeededFor message: BitchatMessage,

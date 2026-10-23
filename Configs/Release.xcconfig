@@ -9,5 +9,5 @@ SWIFT_VERSION = 5.0
 DEVELOPMENT_TEAM =
 CODE_SIGN_STYLE = Automatic
 
-PRODUCT_BUNDLE_IDENTIFIER = com.yarik
-APP_GROUP_ID = group.com.yarik
+PRODUCT_BUNDLE_IDENTIFIER = com.ukropsoft.yarik
+APP_GROUP_ID = group.com.ukropsoft.yarik

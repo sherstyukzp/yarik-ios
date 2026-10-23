@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		17901751FD8010AFC8E750F2 /* YarikShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 61F92EBA29C47C0FCC482F1F /* YarikShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		YRK944308B708300AE4DBF /* YarikMesh in Frameworks */ = {isa = PBXBuildFile; productRef = YRK943308B708300AE4DBE /* YarikMesh */; };
-		YRK944308B708300AE4DC0 /* YarikMesh in Frameworks */ = {isa = PBXBuildFile; productRef = YRK943308B708300AE4DBE /* YarikMesh */; };
+		B1C0FFEE0000000000000001 /* SharedContentHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C0FFEE0000000000000003 /* SharedContentHandoff.swift */; };
+		B1C0FFEE0000000000000002 /* TransportConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C0FFEE0000000000000004 /* TransportConfig.swift */; };
 		E0A1B2C3D4E5F6012345678D /* relays/online_relays_gps.csv in Resources */ = {isa = PBXBuildFile; fileRef = E0A1B2C3D4E5F6012345678A /* relays/online_relays_gps.csv */; };
 		E0A1B2C3D4E5F6012345678E /* relays/online_relays_gps.csv in Resources */ = {isa = PBXBuildFile; fileRef = E0A1B2C3D4E5F6012345678A /* relays/online_relays_gps.csv */; };
+		YRK944308B708300AE4DBF /* YarikMesh in Frameworks */ = {isa = PBXBuildFile; productRef = YRK943308B708300AE4DBE /* YarikMesh */; };
+		YRK944308B708300AE4DC0 /* YarikMesh in Frameworks */ = {isa = PBXBuildFile; productRef = YRK943308B708300AE4DBE /* YarikMesh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,19 +58,13 @@
 		8F3A7C058C2C8E1A06C8CF8B /* Yarik.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yarik.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96D0D41CA19EE5A772AA8434 /* Yarik.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yarik.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6F183FC2E948783006A9046 /* tor-nolzma.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "tor-nolzma.xcframework"; path = "localPackages/Tor/Frameworks/tor-nolzma.xcframework"; sourceTree = "<group>"; };
+		B1C0FFEE0000000000000003 /* SharedContentHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SharedContentHandoff.swift; path = Packages/YarikMesh/Sources/YarikMesh/Services/SharedContentHandoff.swift; sourceTree = "<group>"; };
+		B1C0FFEE0000000000000004 /* TransportConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportConfig.swift; path = Packages/YarikMesh/Sources/YarikMesh/Services/TransportConfig.swift; sourceTree = "<group>"; };
 		C0DB1DE27F0AAB5092663E8E /* YarikMeshTests_iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YarikMeshTests_iOS.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0A1B2C3D4E5F6012345678A /* relays/online_relays_gps.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = relays/online_relays_gps.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A6E32D1B2E762EA70032EA8A /* Exceptions for YarikMesh in YarikShareExtension target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Services/SharedContentHandoff.swift,
-				Services/TransportConfig.swift,
-			);
-			target = 57CA17A36A2532A6CFF367BB /* YarikShareExtension */;
-		};
 		A6E32D232E762EAB0032EA8A /* Exceptions for "YarikShareExtension" folder in "YarikShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -76,7 +72,7 @@
 			);
 			target = 57CA17A36A2532A6CFF367BB /* YarikShareExtension */;
 		};
-		C5E027A52ECCDFD700BD6012 /* Exceptions for "bitchatTests" folder in "YarikMeshTests_macOS" target */ = {
+		C5E027A52ECCDFD700BD6012 /* Exceptions for "YarikMeshTests" folder in "YarikMeshTests_macOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -85,7 +81,7 @@
 			);
 			target = 47FF23248747DD7CB666CB91 /* YarikMeshTests_macOS */;
 		};
-		C5E027A82ECCDFE200BD6012 /* Exceptions for "bitchatTests" folder in "YarikMeshTests_iOS" target */ = {
+		C5E027A82ECCDFE200BD6012 /* Exceptions for "YarikMeshTests" folder in "YarikMeshTests_iOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -97,14 +93,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A6E32C972E762EA70032EA8A /* YarikMesh */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A6E32D1B2E762EA70032EA8A /* Exceptions for YarikMesh in YarikShareExtension target */,
-			);
-			path = Packages/YarikMesh/Sources/YarikMesh;
-			sourceTree = "<group>";
-		};
 		A6E32D212E762EAB0032EA8A /* YarikShareExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -116,8 +104,8 @@
 		A6E32D412E762EAE0032EA8A /* YarikMeshTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C5E027A82ECCDFE200BD6012 /* Exceptions for "bitchatTests" folder in "YarikMeshTests_iOS" target */,
-				C5E027A52ECCDFD700BD6012 /* Exceptions for "bitchatTests" folder in "YarikMeshTests_macOS" target */,
+				C5E027A82ECCDFE200BD6012 /* Exceptions for "YarikMeshTests" folder in "YarikMeshTests_iOS" target */,
+				C5E027A52ECCDFD700BD6012 /* Exceptions for "YarikMeshTests" folder in "YarikMeshTests_macOS" target */,
 			);
 			path = YarikMeshTests;
 			sourceTree = "<group>";
@@ -127,13 +115,12 @@
 			path = Configs;
 			sourceTree = "<group>";
 		};
-
 		C0585B240308B708300AE4DBE /* Yarik */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Yarik;
 			sourceTree = "<group>";
 		};
-	/* End PBXFileSystemSynchronizedRootGroup section */
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		31F6FDADA63050361C14F3A1 /* Frameworks */ = {
@@ -155,7 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				C0585B240308B708300AE4DBE /* Yarik */,
-				A6E32C972E762EA70032EA8A /* YarikMesh */,
+				B1C0FFEE0000000000000005 /* ShareHandoff */,
 				E0A1B2C3D4E5F6012345678A /* relays/online_relays_gps.csv */,
 				A6E32D212E762EAB0032EA8A /* YarikShareExtension */,
 				A6E32D412E762EAE0032EA8A /* YarikMeshTests */,
@@ -183,6 +170,15 @@
 				A6F183FC2E948783006A9046 /* tor-nolzma.xcframework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B1C0FFEE0000000000000005 /* ShareHandoff */ = {
+			isa = PBXGroup;
+			children = (
+				B1C0FFEE0000000000000003 /* SharedContentHandoff.swift */,
+				B1C0FFEE0000000000000004 /* TransportConfig.swift */,
+			);
+			name = ShareHandoff;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,10 +221,10 @@
 				A6E32D412E762EAE0032EA8A /* YarikMeshTests */,
 			);
 			name = YarikMeshTests_macOS;
-			productName = YarikMeshTests_macOS;
 			packageProductDependencies = (
 				YRK943308B708300AE4DBE /* YarikMesh */,
 			);
+			productName = YarikMeshTests_macOS;
 			productReference = 03C57F452B55FD0FD8F51421 /* YarikMeshTests_macOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -243,7 +239,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A6E32D212E762EAB0032EA8A /* YarikShareExtension */,
-				A6E32C972E762EA70032EA8A /* YarikMesh */,
 			);
 			name = YarikShareExtension;
 			productName = YarikShareExtension;
@@ -266,10 +261,10 @@
 				A6E32D412E762EAE0032EA8A /* YarikMeshTests */,
 			);
 			name = YarikMeshTests_iOS;
-			productName = YarikMeshTests_iOS;
 			packageProductDependencies = (
 				YRK943308B708300AE4DBE /* YarikMesh */,
 			);
+			productName = YarikMeshTests_iOS;
 			productReference = C0DB1DE27F0AAB5092663E8E /* YarikMeshTests_iOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -385,6 +380,8 @@
 		0A08E70F08F55FD5BA8C7EF3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				B1C0FFEE0000000000000001 /* SharedContentHandoff.swift in Sources */,
+				B1C0FFEE0000000000000002 /* TransportConfig.swift in Sources */,
 			);
 		};
 		137ABE739BF20ACDDF8CC605 /* Sources */ = {
@@ -437,6 +434,7 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikMeshTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -461,6 +459,7 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikMeshTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -484,9 +483,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikMeshTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -511,6 +512,7 @@
 				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = YarikShareExtension/YarikShareExtension.entitlements;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
@@ -541,11 +543,20 @@
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_ENTITLEMENTS = Yarik/Yarik.entitlements;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
-				
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configs/Yarik-iOS-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Yarik uses Bluetooth to chat with people nearby over a secure mesh.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Yarik uses Bluetooth to discover and connect with people nearby.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Yarik uses the camera to scan QR codes to verify peers.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Yarik uses your location for optional place channels and nearby labels. Exact coordinates are not sent in messages.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Yarik uses the microphone for voice notes and live push-to-talk in chats.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Yarik lets you pick photos to share in chats.";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -571,9 +582,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikMeshTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -599,11 +612,20 @@
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_ENTITLEMENTS = Yarik/Yarik.entitlements;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
-				
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configs/Yarik-iOS-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Yarik uses Bluetooth to chat with people nearby over a secure mesh.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Yarik uses Bluetooth to discover and connect with people nearby.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Yarik uses the camera to scan QR codes to verify peers.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Yarik uses your location for optional place channels and nearby labels. Exact coordinates are not sent in messages.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Yarik uses the microphone for voice notes and live push-to-talk in chats.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Yarik lets you pick photos to share in chats.";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -631,9 +653,11 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_ENTITLEMENTS = "Yarik/Yarik-macOS.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
@@ -723,9 +747,11 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGNING_REQUIRED = YES;
 				CODE_SIGN_ENTITLEMENTS = "Yarik/Yarik-macOS.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
@@ -822,6 +848,7 @@
 				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = YarikShareExtension/YarikShareExtension.entitlements;
 				CODE_SIGN_STYLE = "$(CODE_SIGN_STYLE)";
+				DEVELOPMENT_TEAM = U6LJ73DDJU;
 				INFOPLIST_FILE = YarikShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Yarik;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(IPHONEOS_DEPLOYMENT_TARGET)";
@@ -907,12 +934,11 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = localPackages/Arti;
 		};
-
 		YRK942308B708300AE4DBE /* XCLocalSwiftPackageReference "Packages/YarikMesh" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/YarikMesh;
 		};
-	/* End XCLocalSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		B8C407587481BBB190741C93 /* XCRemoteSwiftPackageReference "swift-secp256k1" */ = {
@@ -926,48 +952,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4EB6BA1B8464F1EA38F4E286 /* P256K */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B8C407587481BBB190741C93 /* XCRemoteSwiftPackageReference "swift-secp256k1" */;
-			productName = P256K;
-		};
-		A6BCF9472F80953E001CF9B9 /* BitFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BitFoundation;
-		};
-		A6BCF9492F809550001CF9B9 /* BitFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A6BCF9462F80953E001CF9B9 /* XCLocalSwiftPackageReference "localPackages/BitFoundation" */;
-			productName = BitFoundation;
-		};
-		A6E3E56F2E77036A0032EA8A /* BitLogger */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BitLogger;
-		};
-		A6E3E5712E7703760032EA8A /* BitLogger */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BitLogger;
-		};
-		A6E3EA7E2E7706720032EA8A /* Tor */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Tor;
-		};
-		A6E3EA802E7706A80032EA8A /* Tor */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Tor;
-		};
-		B1D9136AA0083366353BFA2F /* P256K */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B8C407587481BBB190741C93 /* XCRemoteSwiftPackageReference "swift-secp256k1" */;
-			productName = P256K;
-		};
-
 		YRK943308B708300AE4DBE /* YarikMesh */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = YRK942308B708300AE4DBE /* XCLocalSwiftPackageReference "Packages/YarikMesh" */;
 			productName = YarikMesh;
 		};
-	/* End XCSwiftPackageProductDependency section */
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 475D96681D0EA0AE57A4E06E /* Project object */;
 }

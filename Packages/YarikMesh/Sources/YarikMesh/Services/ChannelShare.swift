@@ -31,8 +31,8 @@ enum ChannelShare {
         let gh = geohash.lowercased()
         return String(
             format: String(
-                localized: "channel.share.payload",
-                defaultValue: "join the #%1$@ channel on bitchat: bitchat://geohash/%1$@ — new to bitchat? get it at %2$@ then type #%1$@ under location channels.",
+                localized: "yarik.channel.share.payload",
+                defaultValue: "join the #%1$@ channel on Yarik: bitchat://geohash/%1$@ — new to Yarik? get it at %2$@ then type #%1$@ under places.",
                 comment: "Plain-text share payload for a location channel; %1$@ is the geohash, %2$@ is the App Store URL"
             ),
             locale: .current,

@@ -11,7 +11,6 @@ struct ContentComposerView: View {
     @EnvironmentObject private var privateConversationModel: PrivateConversationModel
     @EnvironmentObject private var locationChannelsModel: LocationChannelsModel
     @ObservedObject private var bridgeService = BridgeService.shared
-    @Environment(\.appTheme) private var theme
     @ThemedPalette private var palette
 
     @Binding var messageText: String
@@ -73,8 +72,8 @@ struct ContentComposerView: View {
                         .foregroundColor(palette.secondary.opacity(0.6))
                 )
                 .textFieldStyle(.plain)
-                .bitchatFont(size: 15)
-                .foregroundColor(palette.primary)
+                .font(.body)
+                .foregroundColor(.primary)
                 .focused(isTextFieldFocused)
                 .autocorrectionDisabled(true)
                 #if os(iOS)
@@ -110,9 +109,9 @@ struct ContentComposerView: View {
                     // dismissed keyboard, so it stays out of this.
                     isTextFieldFocused.wrappedValue = true
                 }
-                .padding(.vertical, theme.usesGlassChrome ? 8 : 4)
-                .padding(.horizontal, 6)
-                .themedInputBackground()
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(Color.secondary.opacity(0.15), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .modifier(FocusEffectDisabledModifier())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onChange(of: messageText) { newValue in
@@ -138,10 +137,10 @@ struct ContentComposerView: View {
                 }
             }
         }
-        .padding(.horizontal, 6)
-        .padding(.top, theme.usesGlassChrome ? 8 : 6)
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
         .padding(.bottom, 8)
-        .themedChromePanel(edge: .bottom)
+        .background(.bar)
         .onDisappear {
             autocompleteDebounceTimer?.invalidate()
         }
@@ -252,9 +251,7 @@ private extension ContentComposerView {
         )
     }
 
-    var composerAccentColor: Color {
-        privateConversationModel.selectedPeerID != nil ? Color.orange : palette.accent
-    }
+    var composerAccentColor: Color { .blue }
 
     var attachmentButton: some View {
         #if os(iOS)

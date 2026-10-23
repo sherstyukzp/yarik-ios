@@ -5,7 +5,7 @@
 - **App target (`Yarik/`)** — SwiftUI starter shell (SwiftData). This is what opens in Xcode as the product UI.
 - **Mesh stack (`Packages/YarikMesh`)** — Bluetooth mesh, Noise, Nostr, and related services vendored from upstream; see [UPSTREAM.md](./UPSTREAM.md).
 
-**Bundle ID:** `com.yarik` · **App group:** `group.com.yarik` · **Display name:** Yarik  
+**Bundle ID:** `com.ukropsoft.yarik` · **App group:** `group.com.ukropsoft.yarik` · **Display name:** Yarik  
 **Schemes:** `Yarik (iOS)`, `Yarik (macOS)`
 
 ## Build (macOS + Xcode)
