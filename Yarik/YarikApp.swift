@@ -4,7 +4,7 @@ import SwiftUI
 struct YarikApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            YarikRootView()
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)

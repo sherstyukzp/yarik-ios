@@ -12,7 +12,7 @@ default:
     @echo "Yarik developer commands:"
     @echo "  just run                Build and run the macOS app"
     @echo "  just build              Build the macOS app without signing"
-    @echo "  just test               Run the SwiftPM test suite"
+    @echo "  just test               Run macOS unit tests"
     @echo "  just test-ios           Run tests on the iPhone 17 simulator"
     @echo "  just clean              Remove repo-local build artifacts only"
     @echo "  just nuke               Also remove nested package build caches"
@@ -40,8 +40,8 @@ run: build
 # Backward-compatible alias for the old quick-run recipe.
 dev-run: run
 
-test:
-    @swift test
+test: check
+    @xcodebuild -project "{{project}}" -scheme "{{macos_scheme}}" -configuration Debug -derivedDataPath "{{derived_data}}" CODE_SIGNING_ALLOWED=NO test
 
 test-ios: check
     @xcodebuild -project "{{project}}" -scheme "{{ios_scheme}}" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath "{{derived_data}}" test
