@@ -183,7 +183,9 @@ final class BLEService: NSObject {
     
     // MARK: - Constants
     
-    #if DEBUG
+    // Mainnet matches Yarik Android and release bitchat iOS. Define MESH_TESTNET
+    // at compile time for an isolated testnet (upstream used #if DEBUG).
+    #if MESH_TESTNET
     static let serviceUUID = CBUUID(string: "F47B5E2D-4A9E-4C5A-9B3F-8E1D2C3A4B5A") // testnet
     #else
     static let serviceUUID = CBUUID(string: "F47B5E2D-4A9E-4C5A-9B3F-8E1D2C3A4B5C") // mainnet
