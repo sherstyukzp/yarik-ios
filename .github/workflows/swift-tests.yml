@@ -152,8 +152,8 @@ jobs:
         # Arti simulator slice and the configuration that ships.
         run: |
           set -o pipefail
-          xcodebuild -project bitchat.xcodeproj \
-            -scheme "bitchat (iOS)" \
+          xcodebuild -project Yarik.xcodeproj \
+            -scheme "Yarik (iOS)" \
             -configuration Release \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
@@ -165,8 +165,8 @@ jobs:
       - name: Build macOS (universal, no signing)
         run: |
           set -o pipefail
-          xcodebuild -project bitchat.xcodeproj \
-            -scheme "bitchat (macOS)" \
+          xcodebuild -project Yarik.xcodeproj \
+            -scheme "Yarik (macOS)" \
             -configuration Release \
             -destination 'generic/platform=macOS' \
             ARCHS='arm64 x86_64' \
@@ -199,7 +199,7 @@ jobs:
         id: destination
         run: |
           set -uo pipefail
-          destinations=$(xcodebuild -project bitchat.xcodeproj -scheme "bitchat (iOS)" -showdestinations 2>/dev/null || true)
+          destinations=$(xcodebuild -project Yarik.xcodeproj -scheme "Yarik (iOS)" -showdestinations 2>/dev/null || true)
           destination_id=$(awk -F'id:' '
             /platform:iOS Simulator/ && /name:iPhone/ \
               && !/error/ && !/unavailable/ && !found {
@@ -256,8 +256,8 @@ jobs:
       - name: Run iOS tests
         run: |
           set -o pipefail
-          xcodebuild -project bitchat.xcodeproj \
-            -scheme "bitchat (iOS)" \
+          xcodebuild -project Yarik.xcodeproj \
+            -scheme "Yarik (iOS)" \
             -sdk iphonesimulator \
             -destination "platform=iOS Simulator,id=${{ steps.destination.outputs.id }}" \
             -parallel-testing-enabled NO \

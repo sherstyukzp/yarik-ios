@@ -1,15 +1,15 @@
-# BitChat developer commands
+# Yarik developer commands
 #
 # Builds use a repository-local, ignored DerivedData directory. No recipe
 # patches, restores, or removes tracked project/configuration files.
 
-project := "bitchat.xcodeproj"
-macos_scheme := "bitchat (macOS)"
-ios_scheme := "bitchat (iOS)"
+project := "Yarik.xcodeproj"
+macos_scheme := "Yarik (macOS)"
+ios_scheme := "Yarik (iOS)"
 derived_data := ".DerivedData"
 
 default:
-    @echo "BitChat developer commands:"
+    @echo "Yarik developer commands:"
     @echo "  just run                Build and run the macOS app"
     @echo "  just build              Build the macOS app without signing"
     @echo "  just test               Run the SwiftPM test suite"
@@ -31,7 +31,7 @@ check: check-clean-safety
     @echo "✅ Development environment ready (a signing identity is not required for just build)"
 
 build: check
-    @echo "Building BitChat for macOS..."
+    @echo "Building Yarik for macOS..."
     @xcodebuild -project "{{project}}" -scheme "{{macos_scheme}}" -configuration Debug -derivedDataPath "{{derived_data}}" CODE_SIGNING_ALLOWED=NO build
 
 run: build
@@ -61,6 +61,6 @@ nuke: clean
     @echo "✅ Removed repository build caches; tracked files were untouched"
 
 info:
-    @echo "BitChat - decentralized mesh messaging"
+    @echo "Yarik - decentralized mesh messaging"
     @echo "macOS 13+ and iOS 16+"
     @echo "Bluetooth mesh behavior requires physical Bluetooth-capable devices"

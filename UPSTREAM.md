@@ -16,7 +16,7 @@ Yarik iOS ships the [permissionlesstech/bitchat](https://github.com/permissionle
 - Xcode `INFOPLIST_KEY_CFBundleDisplayName = Yarik` (iOS/macOS app + share extension)
 - `DEVELOPMENT_TEAM` cleared — set in ignored `Configs/Local.xcconfig` for device signing
 
-Protocol, BLE mesh, and Noise layers are unchanged from upstream at the pinned SHA so Yarik remains wire-compatible with official Bitchat clients for mesh messaging.
+Protocol, BLE mesh, and Noise layers are unchanged from upstream at the pinned SHA so Yarik remains wire-compatible with other clients built from the same upstream commit for mesh messaging.
 
 ## Refreshing from upstream
 
