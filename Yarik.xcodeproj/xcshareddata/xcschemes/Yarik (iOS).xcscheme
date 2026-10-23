@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "57CA17A36A2532A6CFF367BB"
-               BuildableName = "bitchatShareExtension.appex"
-               BlueprintName = "bitchatShareExtension"
+               BuildableName = "YarikShareExtension.appex"
+               BlueprintName = "YarikShareExtension"
                ReferencedContainer = "container:Yarik.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,8 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AF077EA0474EDEDE2C72716C"
-               BuildableName = "bitchat.app"
-               BlueprintName = "bitchat_iOS"
+               BuildableName = "Yarik.app"
+               BlueprintName = "Yarik_iOS"
                ReferencedContainer = "container:Yarik.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,8 +47,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AF077EA0474EDEDE2C72716C"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_iOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_iOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -56,8 +56,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AF077EA0474EDEDE2C72716C"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_iOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_iOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
@@ -69,8 +69,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6CB97DF2EA57234CB3E563B8"
-               BuildableName = "bitchatTests_iOS.xctest"
-               BlueprintName = "bitchatTests_iOS"
+               BuildableName = "YarikMeshTests_iOS.xctest"
+               BlueprintName = "YarikMeshTests_iOS"
                ReferencedContainer = "container:Yarik.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -91,18 +91,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AF077EA0474EDEDE2C72716C"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_iOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_iOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "BITCHAT_LOG_LEVEL"
-            value = "debug"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -115,8 +108,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AF077EA0474EDEDE2C72716C"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_iOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_iOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

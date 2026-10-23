@@ -35,7 +35,7 @@ build: check
     @xcodebuild -project "{{project}}" -scheme "{{macos_scheme}}" -configuration Debug -derivedDataPath "{{derived_data}}" CODE_SIGNING_ALLOWED=NO build
 
 run: build
-    @app="{{derived_data}}/Build/Products/Debug/bitchat.app"; test -d "$app" || (echo "❌ Built app not found at $app" && exit 1); open "$app"
+    @app="{{derived_data}}/Build/Products/Debug/Yarik.app"; test -d "$app" || (echo "❌ Built app not found at $app" && exit 1); open "$app"
 
 # Backward-compatible alias for the old quick-run recipe.
 dev-run: run

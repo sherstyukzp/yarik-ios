@@ -1,8 +1,12 @@
 # Yarik (iOS / macOS)
 
-Decentralized Bluetooth mesh messenger for the [Yarik](https://ukropsoft.atlassian.net/jira/software/projects/YI) project. Client logic and wire protocol come from an integrated upstream open-source mesh client; see [UPSTREAM.md](./UPSTREAM.md) for the pinned commit and refresh procedure.
+[Yarik](https://ukropsoft.atlassian.net/jira/software/projects/YI) messenger for iOS and macOS.
 
-**Bundle ID:** `com.yarik` · **App group:** `group.com.yarik` · **Display name:** Yarik
+- **App target (`Yarik/`)** — SwiftUI starter shell (SwiftData). This is what opens in Xcode as the product UI.
+- **Mesh stack (`Packages/YarikMesh`)** — Bluetooth mesh, Noise, Nostr, and related services vendored from upstream; see [UPSTREAM.md](./UPSTREAM.md).
+
+**Bundle ID:** `com.yarik` · **App group:** `group.com.yarik` · **Display name:** Yarik  
+**Schemes:** `Yarik (iOS)`, `Yarik (macOS)`
 
 ## Build (macOS + Xcode)
 
@@ -31,43 +35,51 @@ xcodebuild -project Yarik.xcodeproj \
   build
 ```
 
-Open `Yarik.xcodeproj` in Xcode, select scheme **Yarik (iOS)** or **Yarik (macOS)**, then **Product → Run**.
+Open `Yarik.xcodeproj`, choose **Yarik (iOS)** or **Yarik (macOS)**, then **Product → Run**.
+
+SwiftPM mesh unit tests (from repo root):
+
+```bash
+swift test --package-path Packages/YarikMesh   # library compile check
+swift test                                     # YarikMeshTests via root Package.swift
+```
 
 On macOS you can also use the repo `Justfile`:
 
 ```bash
-just build      # macOS app
-just test       # SwiftPM unit tests (BitFoundation + app tests)
+just build      # macOS Yarik app
+just test       # SwiftPM tests
 just test-ios   # XCTest on iPhone simulator
 ```
 
-List available simulators if the destination name fails:
+List simulators if the destination name fails:
 
 ```bash
 xcodebuild -showdestinations -project Yarik.xcodeproj -scheme "Yarik (iOS)"
 ```
 
-## First mesh message (manual test)
+## Linking YarikMesh from the app
 
-**Simulators are not sufficient** for BLE mesh between two instances; use **two physical iPhones** (or one Yarik build and another mesh client on the same protocol generation — see `UPSTREAM.md`).
+The shell imports the mesh module so Xcode links the package:
 
-1. Install Yarik on **Phone A** and **Phone B** (Bluetooth and Local Network allowed).
-2. On both devices, stay on the default **`#bluetooth`** mesh channel.
-3. Wait until peers appear in the list or `/who` (often within ~30s, devices in BLE range, screens on).
-4. On Phone A, send a public mesh message or `/msg <peer> hello from Yarik`.
-5. Confirm delivery on Phone B and reply B → A.
+```swift
+import YarikMesh
+```
+
+Use `@testable import YarikMesh` in unit tests. Public surface today is minimal (`YarikMeshKit`); mesh APIs remain internal until Yarik UI wires them in.
 
 ## Repository layout
 
 | Path | Purpose |
 |------|---------|
-| `Yarik.xcodeproj` | Xcode project (iOS, macOS, share extension, tests) |
-| `bitchat/` | App sources (upstream folder name retained for easier merges) |
+| `Yarik.xcodeproj` | Xcode project (Yarik app, share extension, mesh tests) |
+| `Yarik/` | App shell (SwiftUI starter) |
+| `Packages/YarikMesh` | Mesh / protocol Swift package |
+| `YarikMeshTests/` | XCTest suite for YarikMesh |
 | `localPackages/` | BitFoundation, BitLogger, Arti/Tor |
-| `Package.swift` | SwiftPM tests |
-| `docs/` | Upstream technical documentation |
-| `UPSTREAM.md` | Integrated upstream commit and Yarik-specific deltas |
+| `Package.swift` | SwiftPM test manifest for CI |
+| `UPSTREAM.md` | Pinned upstream commit and refresh notes |
 
 ## License
 
-Upstream client is public domain (Unlicense). Yarik-specific configuration and documentation follow the same repository license unless noted otherwise.
+Upstream mesh client is public domain (Unlicense). Yarik-specific configuration and documentation follow the repository license unless noted otherwise.

@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0576A29205865664C0937536"
-               BuildableName = "bitchat.app"
-               BlueprintName = "bitchat_macOS"
+               BuildableName = "Yarik.app"
+               BlueprintName = "Yarik_macOS"
                ReferencedContainer = "container:Yarik.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -31,8 +31,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0576A29205865664C0937536"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_macOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_macOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -43,8 +43,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "47FF23248747DD7CB666CB91"
-               BuildableName = "bitchatTests_macOS.xctest"
-               BlueprintName = "bitchatTests_macOS"
+               BuildableName = "YarikMeshTests_macOS.xctest"
+               BlueprintName = "YarikMeshTests_macOS"
                ReferencedContainer = "container:Yarik.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -65,18 +65,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0576A29205865664C0937536"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_macOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_macOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "BITCHAT_LOG_LEVEL"
-            value = "debug"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -89,8 +82,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0576A29205865664C0937536"
-            BuildableName = "bitchat.app"
-            BlueprintName = "bitchat_macOS"
+            BuildableName = "Yarik.app"
+            BlueprintName = "Yarik_macOS"
             ReferencedContainer = "container:Yarik.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

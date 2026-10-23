@@ -122,7 +122,7 @@ jobs:
         run: swift test --quiet --filter PerformanceBaselineTests
 
       # Order-of-magnitude performance regression gate. Floors are deliberately
-      # generous (see bitchatTests/Performance/perf-floors.json) so this
+      # generous (see YarikMeshTests/Performance/perf-floors.json) so this
       # catches algorithmic regressions, never runner variance. If a metric
       # still lands below floor (a saturated runner can dip one), the script
       # re-runs the benchmarks — appending to the same log and keeping each
