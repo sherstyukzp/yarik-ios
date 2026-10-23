@@ -9,26 +9,20 @@ struct MessengerSettingsView: View {
     @ObservedObject private var bridgeService = BridgeService.shared
     @ObservedObject private var locationManager = LocationChannelManager.shared
 
-    @AppStorage(AppTheme.storageKey) private var appThemeRawValue = AppTheme.matrix.rawValue
-    @AppStorage(AppLanguageSettings.overrideKey) private var languageOverride = ""
-
     @State private var liveVoiceEnabled = PTTSettings.liveVoiceEnabled
     @State private var locationNotesEnabled = LocationNotesSettings.enabled
     @State private var hideMessagePreviews = NotificationPrivacySettings.hideMessagePreviews
     @State private var customRelays = NostrRelaySettings.customRelays()
     @State private var relayInput = ""
     @State private var relayError: String?
-    @State private var showLanguageRestartNote = false
     @State private var showPanicConfirmation = false
     @State private var showVerification = false
-    @State private var showTopology = false
     @FocusState private var nicknameFocused: Bool
 
     var body: some View {
         NavigationStack {
             Form {
                 profileSection
-                appearanceSection
                 voiceSection
                 connectivitySection
                 relaysSection
@@ -58,9 +52,6 @@ struct MessengerSettingsView: View {
         .sheet(isPresented: $showVerification) {
             VerificationSheetView(isPresented: $showVerification)
                 .environmentObject(verificationModel)
-        }
-        .sheet(isPresented: $showTopology) {
-            MeshTopologyView(provider: { appChromeModel.meshTopologyDisplayModel() })
         }
         .confirmationDialog(
             String(localized: "app_info.settings.danger.panic_confirm_title", defaultValue: "wipe all data?", comment: "Title of the confirmation dialog before a panic wipe"),
@@ -95,32 +86,6 @@ struct MessengerSettingsView: View {
             Text("Профіль")
         } footer: {
             Text("Це імʼя бачать люди поруч. Перевірка показує ваш код, щоб співрозмовник звірив його особисто.")
-        }
-    }
-
-    private var appearanceSection: some View {
-        Section {
-            Picker("Вигляд", selection: $appThemeRawValue) {
-                ForEach(AppTheme.allCases) { theme in
-                    Text(theme.displayNameKey).tag(theme.rawValue)
-                }
-            }
-            Picker("Мова", selection: $languageOverride) {
-                Text(String(localized: "app_info.settings.language.system", defaultValue: "system default", comment: "Menu option that clears the in-app language override")).tag("")
-                ForEach(AppLanguageSettings.availableLanguages, id: \.self) { code in
-                    Text(AppLanguageSettings.endonym(for: code)).tag(code)
-                }
-            }
-            .onChange(of: languageOverride) { newValue in
-                AppLanguageSettings.setOverride(newValue.isEmpty ? nil : newValue)
-                showLanguageRestartNote = true
-            }
-        } header: {
-            Text("Загальне")
-        } footer: {
-            if showLanguageRestartNote {
-                Text("Перезапустіть Yarik, щоб застосувати мову.")
-            }
         }
     }
 
@@ -242,8 +207,8 @@ struct MessengerSettingsView: View {
                 }
                 .navigationTitle("Команди")
             }
-            Button {
-                showTopology = true
+            NavigationLink {
+                MeshTopologyView(provider: { appChromeModel.meshTopologyDisplayModel() })
             } label: {
                 Label("Мережа поруч", systemImage: "point.3.connected.trianglepath.dotted")
             }

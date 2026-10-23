@@ -66,7 +66,6 @@ final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
 /// App entry the Yarik target presents. Owns the mesh runtime and the chat UI.
 public struct YarikRootView: View {
     @StateObject private var runtime: AppRuntime
-    @AppStorage(AppTheme.storageKey) private var appThemeRawValue = AppTheme.matrix.rawValue
     @Environment(\.scenePhase) private var scenePhase
 
     public init() {
@@ -78,7 +77,7 @@ public struct YarikRootView: View {
 
     public var body: some View {
         ContentView()
-            .environment(\.appTheme, AppTheme(rawValue: appThemeRawValue) ?? .matrix)
+            .environment(\.appTheme, .liquidGlass)
             .environmentObject(runtime.publicChatModel)
             .environmentObject(runtime.privateInboxModel)
             .environmentObject(runtime.privateConversationModel)

@@ -39,6 +39,7 @@ struct MessengerInboxView: View {
     #endif
 
     @State private var query = ""
+    @State private var inboxFilter: InboxFilter = .all
     @State private var showSettings = false
     @State private var showPeople = false
     @State private var showPlaces = false
@@ -60,71 +61,80 @@ struct MessengerInboxView: View {
                     }
                 }
 
-                Section("Місця") {
-                    if matches(query, "Поруч") {
-                        NavigationLink(value: MessengerRoute.mesh) {
-                            chatLabel(
-                                title: "Поруч",
-                                preview: meshPreview,
-                                symbol: "antenna.radiowaves.left.and.right",
-                                date: meshLastDate,
-                                unread: false
-                            )
+                if shows(.places) {
+                    Section("Місця") {
+                        if matches(query, "Поруч") {
+                            NavigationLink(value: MessengerRoute.mesh) {
+                                chatLabel(
+                                    title: "Поруч",
+                                    preview: meshPreview,
+                                    symbol: "antenna.radiowaves.left.and.right",
+                                    date: meshLastDate,
+                                    unread: false
+                                )
+                            }
                         }
-                    }
-                    ForEach(placeRows) { place in
-                        NavigationLink(value: MessengerRoute.location(place.geohash)) {
-                            chatLabel(
-                                title: place.title,
-                                preview: place.subtitle,
-                                symbol: "mappin.and.ellipse",
-                                date: nil,
-                                unread: false
-                            )
+                        ForEach(placeRows) { place in
+                            NavigationLink(value: MessengerRoute.location(place.geohash)) {
+                                chatLabel(
+                                    title: place.title,
+                                    preview: place.subtitle,
+                                    symbol: "mappin.and.ellipse",
+                                    date: nil,
+                                    unread: false
+                                )
+                            }
                         }
-                    }
-                    Button {
-                        appChromeModel.presentNotices()
-                    } label: {
-                        Label("Оголошення", systemImage: "pin")
-                    }
-                    Button {
-                        showPlaces = true
-                    } label: {
-                        Label("Інші місця", systemImage: "map")
+                        Button {
+                            appChromeModel.presentNotices()
+                        } label: {
+                            Label("Оголошення", systemImage: "pin")
+                        }
+                        Button {
+                            showPlaces = true
+                        } label: {
+                            Label("Інші місця", systemImage: "map")
+                        }
                     }
                 }
 
-                if !filteredGroups.isEmpty {
+                if shows(.groups) {
                     Section("Групи") {
-                        ForEach(filteredGroups) { group in
-                            NavigationLink(value: MessengerRoute.direct(group.peerID)) {
-                                chatLabel(
-                                    title: group.name,
-                                    preview: preview(for: group.peerID) ?? "\(group.memberCount) учасників",
-                                    symbol: "person.3",
-                                    date: lastDate(for: group.peerID),
-                                    unread: group.hasUnread
-                                )
+                        if filteredGroups.isEmpty {
+                            Text("Груп ще немає")
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(filteredGroups) { group in
+                                NavigationLink(value: MessengerRoute.direct(group.peerID)) {
+                                    chatLabel(
+                                        title: group.name,
+                                        preview: preview(for: group.peerID) ?? "\(group.memberCount) учасників",
+                                        symbol: "person.3",
+                                        date: lastDate(for: group.peerID),
+                                        unread: group.hasUnread
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
-                Section("Повідомлення") {
-                    if filteredDirectChats.isEmpty {
-                        Text("Приватні розмови зʼявляться тут")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(filteredDirectChats) { chat in
-                            NavigationLink(value: MessengerRoute.direct(chat.peerID)) {
-                                chatLabel(
-                                    title: chat.title,
-                                    preview: chat.preview,
-                                    symbol: chat.isFavorite ? "star.fill" : "person",
-                                    date: chat.date,
-                                    unread: chat.hasUnread
-                                )
+                if shows(.messages) {
+                    Section("Повідомлення") {
+                        if filteredDirectChats.isEmpty {
+                            Text("Приватні розмови зʼявляться тут")
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(filteredDirectChats) { chat in
+                                NavigationLink(value: MessengerRoute.direct(chat.peerID)) {
+                                    chatLabel(
+                                        title: chat.title,
+                                        preview: chat.preview,
+                                        symbol: chat.isFavorite ? "star.fill" : "person",
+                                        date: chat.date,
+                                        unread: chat.hasUnread
+                                    )
+                                }
                             }
                         }
                     }
@@ -148,11 +158,13 @@ struct MessengerInboxView: View {
                     Button {
                         showSettings = true
                     } label: {
-                        Text("Налаштування")
+                        Image(systemName: "gearshape")
                     }
+                    .accessibilityLabel("Налаштування")
                     .accessibilityHint("Відкриває профіль, звʼязок і приватність")
                 }
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    inboxFilterMenu
                     Button {
                         showPeople = true
                     } label: {
@@ -232,6 +244,52 @@ struct MessengerInboxView: View {
             Button("common.ok", role: .cancel) {}
         } message: {
             Text("content.alert.screenshot.message")
+        }
+    }
+
+    private var inboxFilterMenu: some View {
+        Menu {
+            Button {
+                markAllAsRead()
+            } label: {
+                Label("Позначити всі як прочитані", systemImage: "checkmark")
+            }
+            .disabled(!hasUnreadChats)
+
+            Section("Фільтрувати за") {
+                Picker("Фільтр", selection: $inboxFilter) {
+                    ForEach(InboxFilter.allCases) { filter in
+                        Text(filter.title).tag(filter)
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: inboxFilter == .all
+                  ? "line.3.horizontal.decrease"
+                  : "line.3.horizontal.decrease.circle.fill")
+        }
+        .accessibilityLabel(inboxFilter.title)
+        .accessibilityHint("Фільтр списку чатів")
+    }
+
+    private func shows(_ filter: InboxFilter) -> Bool {
+        inboxFilter == .all || inboxFilter == filter
+    }
+
+    private var hasUnreadChats: Bool {
+        !privateInboxModel.unreadPeerIDs.isEmpty
+            || peerListModel.groupRows.contains(where: \.hasUnread)
+            || peerListModel.recentChatRows.contains(where: \.hasUnread)
+            || peerListModel.meshRows.contains(where: \.hasUnread)
+    }
+
+    private func markAllAsRead() {
+        var peerIDs = privateInboxModel.unreadPeerIDs
+        peerIDs.formUnion(peerListModel.groupRows.filter(\.hasUnread).map(\.peerID))
+        peerIDs.formUnion(peerListModel.recentChatRows.filter(\.hasUnread).map(\.peerID))
+        peerIDs.formUnion(peerListModel.meshRows.filter(\.hasUnread).map(\.peerID))
+        for peerID in peerIDs {
+            privateConversationModel.markMessagesAsRead(from: peerID)
         }
     }
 
